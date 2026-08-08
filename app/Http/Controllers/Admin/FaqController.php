@@ -13,22 +13,33 @@ class FaqController extends Controller
     public function index()
     {
         $faq = Faq::orderBy('urutan', 'asc')->orderBy('id_faq', 'desc')->get();
+        
+        $stats = [
+            'total' => $faq->count(),
+            'aktif' => $faq->where('status_aktif', 1)->count(),
+        ];
+        
         return Inertia::render('Admin/Faq/Index', [
-            'faq' => $faq
+            'faq' => $faq,
+            'stats' => $stats
         ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'pertanyaan' => 'required|string|max:500',
-            'jawaban' => 'nullable|string|nullable',
-            'urutan' => 'required|integer'
+        $request->merge([
+            'status_aktif' => filter_var($request->status_aktif, FILTER_VALIDATE_BOOLEAN),
         ]);
 
-        $data = $request;
-        
+        $request->validate([
+            'pertanyaan' => 'required|string|max:500',
+            'jawaban' => 'nullable|string',
+            'urutan' => 'required|integer',
+            'status_aktif' => 'nullable|boolean'
+        ]);
 
+        $data = $request->all();
+        
         Faq::create($data);
 
         return redirect()->back()->with('success', 'Faq berhasil ditambahkan!');
@@ -36,15 +47,19 @@ class FaqController extends Controller
 
     public function update(Request $request, Faq $faq)
     {
-        $request->validate([
-            'pertanyaan' => 'required|string|max:500',
-            'jawaban' => 'nullable|string|nullable',
-            'urutan' => 'required|integer'
+        $request->merge([
+            'status_aktif' => filter_var($request->status_aktif, FILTER_VALIDATE_BOOLEAN),
         ]);
 
-        $data = $request;
-        
+        $request->validate([
+            'pertanyaan' => 'required|string|max:500',
+            'jawaban' => 'nullable|string',
+            'urutan' => 'required|integer',
+            'status_aktif' => 'nullable|boolean'
+        ]);
 
+        $data = $request->all();
+        
         $faq->update($data);
 
         return redirect()->back()->with('success', 'Faq berhasil diperbarui!');

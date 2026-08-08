@@ -37,5 +37,9 @@ class DatabaseSeeder extends Seeder
         foreach ($settings as $setting) {
             \App\Models\Pengaturan::create($setting);
         }
+
+        $this->call([
+            FaqSeeder::class,
+        ]);
     }
 }

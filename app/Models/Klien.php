@@ -12,4 +12,8 @@ class Klien extends Model
     const CREATED_AT = 'rec_datecreated';
     const UPDATED_AT = 'rec_dateupdate';
     //
+    public function proyek()
+    {
+        return $this->hasMany(Proyek::class, 'prk_klien', 'nama_klien');
+    }
 }

@@ -8,11 +8,12 @@ use Inertia\Inertia;
 Route::get('/', function () {
     $layanan = \App\Models\Layanan::take(6)->get();
     $keunggulan = \App\Models\Keunggulan::orderBy('urutan', 'asc')->get();
-    $klien = \App\Models\Klien::orderBy('urutan', 'asc')->get();
+    $klien = \App\Models\Klien::where('status_aktif', 1)->orderBy('urutan', 'asc')->get();
     $ulasan = \App\Models\Ulasan::where('status_disetujui', 1)->orderBy('id_ulasan', 'desc')->take(6)->get();
     $proyek = \App\Models\Proyek::where('prk_status', 'Published')->where('prk_is_tampil', 1)->orderBy('prk_tahun', 'desc')->take(6)->get();
     $blog = \App\Models\Blog::orderBy('tanggal_terbit', 'desc')->take(3)->get();
-    $faq = \App\Models\Faq::orderBy('urutan', 'asc')->get();
+    $faq = \App\Models\Faq::where('status_aktif', 1)->orderBy('urutan', 'asc')->get();
+    $mitra = \App\Models\Mitra::where('status_aktif', 1)->orderBy('urutan', 'asc')->get();
 
     return Inertia::render('Welcome', [
         'layanan' => $layanan,
@@ -22,6 +23,7 @@ Route::get('/', function () {
         'proyek' => $proyek,
         'blog' => $blog,
         'faq' => $faq,
+        'mitra' => $mitra,
     ]);
 })->name('home');
 
@@ -31,7 +33,7 @@ Route::get('/tentang-kami', function () {
 
 Route::get('/layanan', function () {
     $layanan = \App\Models\Layanan::all();
-    $klien = \App\Models\Klien::all();
+    $klien = \App\Models\Klien::where('status_aktif', 1)->orderBy('urutan', 'asc')->get();
     return Inertia::render('Layanan', [
         'layanan' => $layanan,
         'klien' => $klien,

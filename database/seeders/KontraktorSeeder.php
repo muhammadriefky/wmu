@@ -51,15 +51,15 @@ class KontraktorSeeder extends Seeder
         // 3. Proyek
         Proyek::truncate();
         $proyeks = [
-            ['judul_proyek' => 'Pembangunan Gedung Perkantoran Sudirman', 'nama_klien' => 'PT. Sudirman Investama', 'tahun_pengerjaan' => '2023'],
-            ['judul_proyek' => 'Renovasi Interior Hotel Bintang 4', 'nama_klien' => 'Mulia Group Hotel', 'tahun_pengerjaan' => '2022'],
-            ['judul_proyek' => 'Pembangunan Perumahan Cluster Elit', 'nama_klien' => 'Citra Land Development', 'tahun_pengerjaan' => '2024'],
-            ['judul_proyek' => 'Konstruksi Pabrik Manufaktur', 'nama_klien' => 'PT. Industrial Makmur', 'tahun_pengerjaan' => '2021'],
-            ['judul_proyek' => 'Infrastruktur Jalan Kawasan Industri', 'nama_klien' => 'Kawasan Industri Terpadu', 'tahun_pengerjaan' => '2023'],
+            ['prk_judul' => 'Pembangunan Gedung Perkantoran Sudirman', 'prk_klien' => 'PT. Sudirman Investama', 'prk_tahun' => '2023', 'prk_status' => 'Published', 'prk_is_tampil' => 1],
+            ['prk_judul' => 'Renovasi Interior Hotel Bintang 4', 'prk_klien' => 'Mulia Group Hotel', 'prk_tahun' => '2022', 'prk_status' => 'Published', 'prk_is_tampil' => 1],
+            ['prk_judul' => 'Pembangunan Perumahan Cluster Elit', 'prk_klien' => 'Citra Land Development', 'prk_tahun' => '2024', 'prk_status' => 'Published', 'prk_is_tampil' => 1],
+            ['prk_judul' => 'Konstruksi Pabrik Manufaktur', 'prk_klien' => 'PT. Industrial Makmur', 'prk_tahun' => '2021', 'prk_status' => 'Published', 'prk_is_tampil' => 1],
+            ['prk_judul' => 'Infrastruktur Jalan Kawasan Industri', 'prk_klien' => 'Kawasan Industri Terpadu', 'prk_tahun' => '2023', 'prk_status' => 'Published', 'prk_is_tampil' => 1],
         ];
 
         foreach ($proyeks as $p) {
-            $p['slug'] = Str::slug($p['judul_proyek']);
+            $p['prk_slug'] = Str::slug($p['prk_judul']);
             $p['rec_datecreated'] = $now;
             Proyek::create($p);
         }

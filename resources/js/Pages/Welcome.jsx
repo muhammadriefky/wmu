@@ -10,7 +10,7 @@ import {
     Eye, Target, ChevronDown, MessageCircle, TrendingUp, Zap
 } from 'lucide-react';
 
-export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, blog, faq }) {
+export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, blog, faq, mitra }) {
     const { pengaturan } = usePage().props;
     const [openFaq, setOpenFaq] = useState(null);
     const [currentUlasanIndex, setCurrentUlasanIndex] = useState(0);
@@ -543,7 +543,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                     <div className="h-48 relative overflow-visible shrink-0">
                                         <div className="w-full h-full overflow-hidden">
                                             <img
-                                                src={item.prk_gambar ? `/storage/${item.prk_gambar}` : `https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop`}
+                                                src={item.gambar ? `/storage/${item.gambar}` : `https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop`}
                                                 alt={item.judul_layanan}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                                 onError={(e) => { e.target.onerror = null; e.target.src = `https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop`; }}
@@ -694,12 +694,12 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                                     <div className="h-12 md:h-16 w-full flex items-center justify-center">
                                                         <img
                                                             src={k.logo ? `/storage/${k.logo}` : fallbackLogos[i % fallbackLogos.length]}
-                                                            alt={k.prk_klien}
+                                                            alt={k.nama_klien}
                                                             className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300"
                                                             onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
                                                         />
                                                     </div>
-                                                    <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{k.prk_klien || 'Client'}</span>
+                                                    <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{k.nama_klien || 'Client'}</span>
                                                 </div>
                                             )
                                         })
@@ -741,12 +741,12 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                                     <div className="h-12 md:h-16 w-full flex items-center justify-center">
                                                         <img
                                                             src={k.logo ? `/storage/${k.logo}` : fallbackLogos[i % fallbackLogos.length]}
-                                                            alt={k.prk_klien}
+                                                            alt={k.nama_klien}
                                                             className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300"
                                                             onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
                                                         />
                                                     </div>
-                                                    <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{k.prk_klien || 'Client'}</span>
+                                                    <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{k.nama_klien || 'Client'}</span>
                                                 </div>
                                             )
                                         })
@@ -780,23 +780,51 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                             PARTNER KAMI
                         </div>
                         <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 w-full px-4 md:px-0">
-                            {[
-                                { name: 'Schneider', url: 'https://www.google.com/s2/favicons?domain=se.com&sz=128' },
-                                { name: 'BOSCH', url: 'https://www.google.com/s2/favicons?domain=bosch.com&sz=128' },
-                                { name: 'HILTI', url: 'https://www.google.com/s2/favicons?domain=hilti.com&sz=128' },
-                                { name: 'Dulux', url: 'https://www.google.com/s2/favicons?domain=dulux.co.id&sz=128' },
-                                { name: 'DAIKIN', url: 'https://www.google.com/s2/favicons?domain=daikin.co.id&sz=128' },
-                                { name: 'TOTO', url: 'https://www.google.com/s2/favicons?domain=toto.com&sz=128' },
-                                { name: 'Legrand', url: 'https://www.google.com/s2/favicons?domain=legrand.com&sz=128' },
-                                { name: '3M', url: 'https://www.google.com/s2/favicons?domain=3m.com&sz=128' }
-                            ].map((partner, i) => (
-                                <div key={`partner-${i}`} className="flex flex-col items-center justify-center w-[120px] md:w-40 gap-3 bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-md hover:border-gray-200 hover:-translate-y-1 transition-all duration-300">
-                                    <div className="h-10 md:h-14 w-full flex items-center justify-center">
-                                        <img src={partner.url} alt={partner.name} className="max-h-full max-w-full object-contain filter transition-all duration-300" />
+                            {mitra && mitra.length > 0 ? (
+                                mitra.map((partner, i) => {
+                                    const fallbackLogos = [
+                                        'https://www.google.com/s2/favicons?domain=se.com&sz=128',
+                                        'https://www.google.com/s2/favicons?domain=bosch.com&sz=128',
+                                        'https://www.google.com/s2/favicons?domain=hilti.com&sz=128',
+                                        'https://www.google.com/s2/favicons?domain=dulux.co.id&sz=128',
+                                        'https://www.google.com/s2/favicons?domain=daikin.co.id&sz=128',
+                                        'https://www.google.com/s2/favicons?domain=toto.com&sz=128',
+                                        'https://www.google.com/s2/favicons?domain=legrand.com&sz=128',
+                                        'https://www.google.com/s2/favicons?domain=3m.com&sz=128'
+                                    ];
+                                    return (
+                                        <div key={partner.id_mitra || i} className="flex flex-col items-center justify-center w-[120px] md:w-40 gap-3 bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-md hover:border-gray-200 hover:-translate-y-1 transition-all duration-300">
+                                            <div className="h-10 md:h-14 w-full flex items-center justify-center">
+                                                <img 
+                                                    src={partner.logo ? `/storage/${partner.logo}` : fallbackLogos[i % fallbackLogos.length]} 
+                                                    alt={partner.nama_mitra} 
+                                                    className="max-h-full max-w-full object-contain filter transition-all duration-300" 
+                                                    onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
+                                                />
+                                            </div>
+                                            <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{partner.nama_mitra}</span>
+                                        </div>
+                                    )
+                                })
+                            ) : (
+                                [
+                                    { name: 'Schneider', url: 'https://www.google.com/s2/favicons?domain=se.com&sz=128' },
+                                    { name: 'BOSCH', url: 'https://www.google.com/s2/favicons?domain=bosch.com&sz=128' },
+                                    { name: 'HILTI', url: 'https://www.google.com/s2/favicons?domain=hilti.com&sz=128' },
+                                    { name: 'Dulux', url: 'https://www.google.com/s2/favicons?domain=dulux.co.id&sz=128' },
+                                    { name: 'DAIKIN', url: 'https://www.google.com/s2/favicons?domain=daikin.co.id&sz=128' },
+                                    { name: 'TOTO', url: 'https://www.google.com/s2/favicons?domain=toto.com&sz=128' },
+                                    { name: 'Legrand', url: 'https://www.google.com/s2/favicons?domain=legrand.com&sz=128' },
+                                    { name: '3M', url: 'https://www.google.com/s2/favicons?domain=3m.com&sz=128' }
+                                ].map((partner, i) => (
+                                    <div key={`partner-${i}`} className="flex flex-col items-center justify-center w-[120px] md:w-40 gap-3 bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-md hover:border-gray-200 hover:-translate-y-1 transition-all duration-300">
+                                        <div className="h-10 md:h-14 w-full flex items-center justify-center">
+                                            <img src={partner.url} alt={partner.name} className="max-h-full max-w-full object-contain filter transition-all duration-300" />
+                                        </div>
+                                        <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{partner.name}</span>
                                     </div>
-                                    <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{partner.name}</span>
-                                </div>
-                            ))}
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>

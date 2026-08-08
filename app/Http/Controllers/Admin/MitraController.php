@@ -7,14 +7,24 @@ use App\Models\Mitra;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Proyek;
 
 class MitraController extends Controller
 {
     public function index()
     {
         $mitra = Mitra::orderBy('urutan', 'asc')->orderBy('id_mitra', 'desc')->get();
+        
+        $stats = [
+            'total' => $mitra->count(),
+            'aktif' => $mitra->where('status_aktif', 1)->count(),
+            'kategori' => $mitra->whereNotNull('kategori')->where('kategori', '!=', '')->unique('kategori')->count(),
+            'proyek' => Proyek::count(),
+        ];
+
         return Inertia::render('Admin/Mitra/Index', [
-            'mitra' => $mitra
+            'mitra' => $mitra,
+            'stats' => $stats
         ]);
     }
 
@@ -23,6 +33,8 @@ class MitraController extends Controller
         $request->validate([
             'nama_mitra' => 'required|string|max:255',
             'urutan' => 'required|integer',
+            'kategori' => 'nullable|string|max:255',
+            'status_aktif' => 'boolean',
             'logo' => 'nullable|image|max:2048|nullable'
         ]);
 
@@ -42,6 +54,8 @@ class MitraController extends Controller
         $request->validate([
             'nama_mitra' => 'required|string|max:255',
             'urutan' => 'required|integer',
+            'kategori' => 'nullable|string|max:255',
+            'status_aktif' => 'boolean',
             'logo' => 'nullable|image|max:2048|nullable'
         ]);
 

@@ -13,21 +13,29 @@ class KeunggulanController extends Controller
     public function index()
     {
         $keunggulan = Keunggulan::orderBy('urutan', 'asc')->orderBy('id_keunggulan', 'desc')->get();
+        
+        $stats = [
+            'total' => $keunggulan->count(),
+            'aktif' => $keunggulan->where('status_aktif', 1)->count(),
+            'terakhir_diperbarui' => $keunggulan->max('rec_dateupdate') ? \Carbon\Carbon::parse($keunggulan->max('rec_dateupdate'))->locale('id')->diffForHumans() : '-',
+            'urutan_tertinggi' => $keunggulan->min('urutan') ?: '-',
+        ];
+
         return Inertia::render('Admin/Keunggulan/Index', [
-            'keunggulan' => $keunggulan
+            'keunggulan' => $keunggulan,
+            'stats' => $stats
         ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string|nullable',
-            'ikon' => 'nullable|string|max:255|nullable',
-            'urutan' => 'required|integer'
+            'deskripsi' => 'nullable|string',
+            'ikon' => 'nullable|string|max:255',
+            'urutan' => 'required|integer',
+            'status_aktif' => 'boolean'
         ]);
-
-        $data = $request;
         
 
         Keunggulan::create($data);
@@ -37,14 +45,13 @@ class KeunggulanController extends Controller
 
     public function update(Request $request, Keunggulan $keunggulan)
     {
-        $request->validate([
+        $data = $request->validate([
             'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string|nullable',
-            'ikon' => 'nullable|string|max:255|nullable',
-            'urutan' => 'required|integer'
+            'deskripsi' => 'nullable|string',
+            'ikon' => 'nullable|string|max:255',
+            'urutan' => 'required|integer',
+            'status_aktif' => 'boolean'
         ]);
-
-        $data = $request;
         
 
         $keunggulan->update($data);

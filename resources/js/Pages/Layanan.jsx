@@ -261,7 +261,7 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
                         <div className="flex flex-wrap justify-center gap-4 flex-grow">
                             {klien && klien.length > 0 ? klien.slice(0, 6).map((k) => (
                                 <div key={k.id_klien} className="w-[150px] h-[80px] bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:shadow-md transition-all grayscale hover:grayscale-0 cursor-pointer overflow-hidden p-2">
-                                    <img src={`/storage/${k.logo_klien}`} alt={k.prk_klien} className="max-w-full max-h-full object-contain" />
+                                    <img src={`/storage/${k.logo}`} alt={k.nama_klien} className="max-w-full max-h-full object-contain" />
                                 </div>
                             )) : (
                                 /* Fallback mock klien */

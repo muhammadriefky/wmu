@@ -12,18 +12,34 @@ class KlienController extends Controller
 {
     public function index()
     {
-        $klien = Klien::orderBy('urutan', 'asc')->orderBy('id_klien', 'desc')->get();
+        $klien = Klien::withCount('proyek')->orderBy('urutan', 'asc')->orderBy('id_klien', 'desc')->get();
+        
+        $stats = [
+            'total' => Klien::count(),
+            'aktif' => Klien::where('status_aktif', 1)->count(),
+            'proyek' => \App\Models\Proyek::count(),
+            'testimoni' => \App\Models\Ulasan::count(),
+        ];
+
         return Inertia::render('Admin/Klien/Index', [
-            'klien' => $klien
+            'klien' => $klien,
+            'stats' => $stats
         ]);
     }
 
     public function store(Request $request)
     {
+        $request->merge([
+            'status_aktif' => filter_var($request->status_aktif, FILTER_VALIDATE_BOOLEAN),
+        ]);
+
         $request->validate([
             'nama_klien' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'telepon' => 'nullable|string|max:50',
             'logo' => 'nullable|image|max:2048',
-            'urutan' => 'required|integer'
+            'urutan' => 'required|integer',
+            'status_aktif' => 'nullable|boolean'
         ]);
 
         $data = $request->except('logo');
@@ -39,10 +55,17 @@ class KlienController extends Controller
 
     public function update(Request $request, Klien $klien)
     {
+        $request->merge([
+            'status_aktif' => filter_var($request->status_aktif, FILTER_VALIDATE_BOOLEAN),
+        ]);
+
         $request->validate([
             'nama_klien' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'telepon' => 'nullable|string|max:50',
             'logo' => 'nullable|image|max:2048',
-            'urutan' => 'required|integer'
+            'urutan' => 'required|integer',
+            'status_aktif' => 'nullable|boolean'
         ]);
 
         $data = $request->except('logo');
