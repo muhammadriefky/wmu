@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Pengaturan;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+class PengaturanController extends Controller
+{
+    public function index()
+    {
+        $pengaturan = Pengaturan::all()->pluck('nilai', 'kunci');
+        
+        return Inertia::render('Admin/Pengaturan/Index', [
+            'pengaturan' => $pengaturan
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $data = $request->except(['_token']);
+        
+        foreach ($data as $kunci => $nilai) {
+            Pengaturan::updateOrCreate(
+                ['kunci' => $kunci],
+                ['nilai' => $nilai]
+            );
+        }
+
+        return redirect()->back()->with('success', 'Pengaturan Global berhasil diperbarui!');
+    }
+}
