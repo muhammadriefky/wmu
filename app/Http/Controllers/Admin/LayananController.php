@@ -69,13 +69,21 @@ class LayananController extends Controller
             'kategori' => 'nullable|string|max:100',
             'status' => 'required|string|max:20',
             'is_unggulan' => 'boolean',
+            'deskripsi_lengkap' => 'nullable|string',
+            'fitur_layanan' => 'nullable|array',
+            'proses_kerja' => 'nullable|array',
+            'gambar_detail' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->except('gambar');
+        $data = $request->except(['gambar', 'gambar_detail']);
         $data['is_unggulan'] = $request->boolean('is_unggulan');
         
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('layanan', 'public');
+        }
+
+        if ($request->hasFile('gambar_detail')) {
+            $data['gambar_detail'] = $request->file('gambar_detail')->store('layanan', 'public');
         }
 
         Layanan::create($data);
@@ -97,9 +105,13 @@ class LayananController extends Controller
             'kategori' => 'nullable|string|max:100',
             'status' => 'required|string|max:20',
             'is_unggulan' => 'boolean',
+            'deskripsi_lengkap' => 'nullable|string',
+            'fitur_layanan' => 'nullable|array',
+            'proses_kerja' => 'nullable|array',
+            'gambar_detail' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->except('gambar');
+        $data = $request->except(['gambar', 'gambar_detail']);
         $data['is_unggulan'] = $request->boolean('is_unggulan');
         
         if ($request->hasFile('gambar')) {
@@ -107,6 +119,13 @@ class LayananController extends Controller
                 Storage::disk('public')->delete($layanan->gambar);
             }
             $data['gambar'] = $request->file('gambar')->store('layanan', 'public');
+        }
+
+        if ($request->hasFile('gambar_detail')) {
+            if ($layanan->gambar_detail) {
+                Storage::disk('public')->delete($layanan->gambar_detail);
+            }
+            $data['gambar_detail'] = $request->file('gambar_detail')->store('layanan', 'public');
         }
 
         $layanan->update($data);
@@ -119,6 +138,9 @@ class LayananController extends Controller
         
         if ($layanan->gambar) {
             Storage::disk('public')->delete($layanan->gambar);
+        }
+        if ($layanan->gambar_detail) {
+            Storage::disk('public')->delete($layanan->gambar_detail);
         }
         $layanan->delete();
 

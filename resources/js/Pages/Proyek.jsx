@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { Head, usePage } from '@inertiajs/react';
+import { useState, useRef, useEffect } from 'react';
+import { Head, usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -9,59 +9,68 @@ import {
 } from 'lucide-react';
 
 
-const mockProyekData = [
-    {
-        id: 1,
-        judul: "Grand City Office Tower",
-        kategori: "Commercial Building",
-        kategoriId: "commercial",
-        deskripsi: "Pengerjaan fasade unitized curtain wall dengan sistem high performance untuk bangunan perkantoran 20 lantai.",
-        lokasi: "Jakarta Selatan, DKI Jakarta",
-        tahun: "2024",
-        luas: "10.500 m²",
-        tantangan: "Desain kompleks dengan tuntutan estetika tinggi dan efisiensi energi.",
-        solusi: "Sistem unitized dengan kaca low-e dan sealant berkualitas tinggi.",
-        hasil: "Fasad berperforma tinggi dengan tampilan modern dan presisi.",
-        gambarMain: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop",
-        thumbnails: [
-            "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=400&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1541881518018-97cce025fb2b?q=80&w=400&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1464938050520-ef2270bb8ce8?q=80&w=400&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1577495508048-b635879837f1?q=80&w=400&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1554469384-e58fac16e23a?q=80&w=400&auto=format&fit=crop"
-        ]
-    }
-];
-
-const mockSemuaProyek = [
-    { id: 101, judul: "Grand City Office Tower", kategori: "Commercial Building", lokasi: "Jakarta Selatan, DKI Jakarta", tahun: "2024", gambar: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=400&auto=format&fit=crop" },
-    { id: 102, judul: "Industrial Warehouse", kategori: "Industrial", lokasi: "Cikarang, Jawa Barat", tahun: "2024", gambar: "https://images.unsplash.com/photo-1586528116311-ad8ed7c508c0?q=80&w=400&auto=format&fit=crop" },
-    { id: 103, judul: "Mulia Resort & Hotel", kategori: "Hospitality", lokasi: "Bali, Indonesia", tahun: "2023", gambar: "https://images.unsplash.com/photo-1542314831-c6a4d14d8c85?q=80&w=400&auto=format&fit=crop" },
-    { id: 104, judul: "Airport Terminal Building", kategori: "Public Facility", lokasi: "Tangerang, Banten", tahun: "2023", gambar: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=400&auto=format&fit=crop" },
-    { id: 105, judul: "Apartement Grand City", kategori: "Residential", lokasi: "Bandung, Jawa Barat", tahun: "2024", gambar: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?q=80&w=400&auto=format&fit=crop" }
-];
-
-const mockTestimoni = [
-    { id: 1, klien: "WIKA", logo: "https://upload.wikimedia.org/wikipedia/id/thumb/2/23/Wijaya_Karya_Logo.svg/320px-Wijaya_Karya_Logo.svg.png", rating: 5, ulasan: "Profesional, responsif, dan selalu mengutamakan kualitas. PT WMU adalah mitra terpercaya kami dalam setiap proyek.", nama: "Dewi Lestari", jabatan: "Construction Director" },
-    { id: 2, klien: "Sinarmas Land", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Sinarmas_Land_Logo.svg/320px-Sinarmas_Land_Logo.svg.png", rating: 5, ulasan: "Hasil pekerjaan rapi dan sesuai standar internasional, Tim WMU sangat berpengalaman dan kompeten.", nama: "Andi Setiawan", jabatan: "Head of Engineering" },
-    { id: 3, klien: "Astra", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Astra_International_logo.svg/320px-Astra_International_logo.svg.png", rating: 5, ulasan: "WMU memberikan hasil fasade yang sangat memuaskan. Kualitas material dan ketepatan waktu menjadi nilai lebih bagi kami.", nama: "Budi Santoso", jabatan: "Project Manager" }
-];
-
 export default function Proyek() {
-    const { pengaturan } = usePage().props;
+    const { pengaturan, proyek, klien = [] } = usePage().props;
+    const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-    const project = mockProyekData[0]; // Currently showing one featured project as per design
+    const genericReviews = [
+        "Profesional, responsif, dan selalu mengutamakan kualitas. PT WMU adalah mitra terpercaya kami dalam setiap proyek.",
+        "Hasil pekerjaan rapi dan sesuai standar internasional. Tim WMU sangat berpengalaman dan kompeten di bidangnya.",
+        "Memberikan hasil fasade yang sangat memuaskan. Kualitas material dan ketepatan waktu menjadi nilai lebih bagi kami.",
+        "Kerja sama yang luar biasa. Manajemen proyek yang tertata dengan baik membuat pekerjaan selesai tepat waktu.",
+        "Sangat direkomendasikan untuk proyek skala besar. Inovasi dan solusi yang ditawarkan sangat membantu kelancaran proyek."
+    ];
+
+    // Get featured projects (unggulan)
+    const featuredProjects = (proyek && proyek.length > 0) 
+        ? proyek.filter(p => p.prk_is_unggulan === 1 || p.prk_is_unggulan === true) 
+        : [];
+        
+    // Fallback if none are marked as unggulan
+    const displayFeatured = featuredProjects.length > 0 ? featuredProjects : (proyek && proyek.length > 0 ? [proyek[0]] : []);
+
+    // Auto-slide effect for featured projects
+    useEffect(() => {
+        if (displayFeatured.length > 1) {
+            const timer = setInterval(() => {
+                setCurrentFeaturedIndex((prev) => (prev + 1) % displayFeatured.length);
+            }, 5000);
+            return () => clearInterval(timer);
+        }
+    }, [displayFeatured.length]);
+
+    // Auto-slide for Testimonials/Klien
+    useEffect(() => {
+        if (klien && klien.length > 1) {
+            const testiTimer = setInterval(() => {
+                if (testiSliderRef.current) {
+                    const { scrollLeft, scrollWidth, clientWidth } = testiSliderRef.current;
+                    if (scrollLeft + clientWidth >= scrollWidth - 10) {
+                        testiSliderRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+                    } else {
+                        scrollSlider(testiSliderRef, 'right');
+                    }
+                }
+            }, 3000);
+            return () => clearInterval(testiTimer);
+        }
+    }, [klien]);
+
+    const project = displayFeatured.length > 0 ? displayFeatured[currentFeaturedIndex] : null;
 
     const projectSliderRef = useRef(null);
     const testiSliderRef = useRef(null);
 
+    const galeri = project && project.prk_galeri ? JSON.parse(project.prk_galeri) : [];
+    const thumbnails = project ? [project.prk_gambar, ...galeri].filter(Boolean).map(t => `/storage/${t}`) : [];
+
     const nextImage = () => {
-        setActiveImageIndex((prev) => (prev + 1) % project.thumbnails.length);
+        setActiveImageIndex((prev) => (prev + 1) % (thumbnails.length || 1));
     };
 
     const prevImage = () => {
-        setActiveImageIndex((prev) => (prev - 1 + project.thumbnails.length) % project.thumbnails.length);
+        setActiveImageIndex((prev) => (prev - 1 + (thumbnails.length || 1)) % (thumbnails.length || 1));
     };
 
     const scrollSlider = (ref, direction) => {
@@ -185,142 +194,157 @@ export default function Proyek() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30 -mt-4 md:-mt-8 lg:-mt-12">
 
                     {/* Featured Project Showcase */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                        className="bg-white rounded-[2rem] p-6 lg:p-8 shadow-xl flex flex-col lg:flex-row gap-8 lg:gap-0 mb-16"
-                    >
-                        {/* Left Column: Details */}
-                        <div className="lg:w-[30%] lg:pr-8 flex flex-col justify-between">
-                            <div>
-                                <div className="text-wmu-accent text-xs font-bold tracking-widest uppercase mb-4">PROYEK UNGGULAN</div>
-                                <h3 className="text-3xl lg:text-4xl font-extrabold text-wmu-dark mb-4 leading-tight">{project.judul}</h3>
-                                <div className="inline-block border border-wmu-accent text-wmu-accent text-xs font-semibold px-3 py-1 rounded-md mb-6">
-                                    {project.prk_kategori}
-                                </div>
-                                <p className="text-gray-600 text-sm leading-relaxed mb-8">
-                                    {project.deskripsi}
-                                </p>
+                    {project ? (
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={project.prk_id}
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.5 }}
+                                className="bg-white rounded-[2rem] p-6 lg:p-8 shadow-xl flex flex-col lg:flex-row gap-8 lg:gap-0 mb-16"
+                            >
+                                {/* Left Column: Details */}
+                                <div className="lg:w-[30%] lg:pr-8 flex flex-col justify-between">
+                                    <div>
+                                        <div className="text-wmu-accent text-xs font-bold tracking-widest uppercase mb-4">PROYEK UNGGULAN</div>
+                                        <h3 className="text-3xl lg:text-4xl font-extrabold text-wmu-dark mb-4 leading-tight">{project.prk_judul}</h3>
+                                        <div className="inline-block border border-wmu-accent text-wmu-accent text-xs font-semibold px-3 py-1 rounded-md mb-6">
+                                            {project.prk_kategori}
+                                        </div>
+                                        <p className="text-gray-600 text-sm leading-relaxed mb-8">
+                                            {project.prk_deskripsi || "Proyek unggulan dari PT Winmulyautama yang mewakili standar kualitas dan profesionalisme tinggi."}
+                                        </p>
 
-                                <div className="space-y-5 mb-8">
-                                    <div className="flex gap-4">
-                                        <div className="mt-1"><MapPin size={20} className="text-wmu-accent" /></div>
-                                        <div>
-                                            <div className="text-xs text-gray-500 mb-1">Lokasi</div>
-                                            <div className="text-sm font-semibold text-wmu-dark">{project.lokasi}</div>
+                                        <div className="space-y-5 mb-8">
+                                            <div className="flex gap-4">
+                                                <div className="mt-1"><MapPin size={20} className="text-wmu-accent" /></div>
+                                                <div>
+                                                    <div className="text-xs text-gray-500 mb-1">Klien</div>
+                                                    <div className="text-sm font-semibold text-wmu-dark">{project.prk_klien}</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-4">
+                                                <div className="mt-1"><Calendar size={20} className="text-wmu-accent" /></div>
+                                                <div>
+                                                    <div className="text-xs text-gray-500 mb-1">Tahun</div>
+                                                    <div className="text-sm font-semibold text-wmu-dark">{project.prk_tahun}</div>
+                                                </div>
+                                            </div>
+                                            {project.prk_luas && (
+                                                <div className="flex gap-4">
+                                                    <div className="mt-1"><Building2 size={20} className="text-wmu-accent" /></div>
+                                                    <div>
+                                                        <div className="text-xs text-gray-500 mb-1">Area / Fasade</div>
+                                                        <div className="text-sm font-semibold text-wmu-dark">{project.prk_luas}</div>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                    <div className="flex gap-4">
-                                        <div className="mt-1"><Calendar size={20} className="text-wmu-accent" /></div>
-                                        <div>
-                                            <div className="text-xs text-gray-500 mb-1">Tahun</div>
-                                            <div className="text-sm font-semibold text-wmu-dark">{project.tahun}</div>
+
+                                    <Link href={route('proyek.detail', project.prk_slug)} className="bg-wmu-dark hover:bg-[#021f2b] text-white px-6 py-4 rounded-xl font-bold transition-colors w-full flex items-center justify-between group mt-auto">
+                                        Lihat Detail Proyek
+                                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                                    </Link>
+                                </div>
+
+                                {/* Middle Column: Images */}
+                                <div className="lg:w-[45%] relative">
+                                    <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 group cursor-pointer shadow-lg">
+                                        <AnimatePresence mode="wait">
+                                            <motion.img
+                                                key={activeImageIndex}
+                                                src={thumbnails[activeImageIndex] || (project.prk_gambar ? `/storage/${project.prk_gambar}` : 'https://placehold.co/800x600?text=No+Image')}
+                                                alt={project.prk_judul}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </AnimatePresence>
+                                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-wmu-accent shadow-xl group-hover:scale-110 transition-transform">
+                                                <Link href={route('proyek.detail', project.prk_slug)} className="flex items-center justify-center w-full h-full text-wmu-accent">
+                                                    <Play size={24} className="ml-1" fill="currentColor" />
+                                                </Link>
+                                            </div>
+                                        </div>
+                                        <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-wmu-dark/80 hover:bg-wmu-dark text-white rounded-full flex items-center justify-center backdrop-blur-sm transition-colors z-10">
+                                            <ChevronLeft size={20} />
+                                        </button>
+                                        <button onClick={(e) => { e.stopPropagation(); nextImage(); }} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-wmu-dark/80 hover:bg-wmu-dark text-white rounded-full flex items-center justify-center backdrop-blur-sm transition-colors z-10">
+                                            <ChevronRight size={20} />
+                                        </button>
+                                    </div>
+
+                                    {/* Thumbnails */}
+                                    <div className="flex gap-2 lg:gap-3 justify-between">
+                                        {thumbnails.map((thumb, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => setActiveImageIndex(idx)}
+                                                className={`relative w-1/5 aspect-video rounded-lg overflow-hidden border-2 transition-all duration-300 ${activeImageIndex === idx ? 'border-[#DFA639] scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                                            >
+                                                <img src={thumb} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Right Column: Key Points */}
+                                <div className="lg:w-[25%] bg-wmu-dark rounded-[1.5rem] p-6 lg:p-8 text-white lg:ml-6 flex flex-col justify-center space-y-8 relative overflow-hidden mt-8 lg:mt-0">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#DFA639]/10 rounded-full blur-3xl"></div>
+                                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#00BF62]/10 rounded-full blur-3xl"></div>
+
+                                    <div className="relative z-10">
+                                        <div className="flex items-start gap-4 mb-3">
+                                            <div className="mt-1"><ShieldCheck size={24} className="text-wmu-accent" /></div>
+                                            <div>
+                                                <h4 className="font-bold text-lg mb-1">Tantangan</h4>
+                                                <p className="text-sm text-gray-400 line-clamp-3 leading-relaxed">{project.prk_tantangan || "Mengutamakan keselamatan kerja dan spesifikasi."}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="flex gap-4">
-                                        <div className="mt-1"><Building2 size={20} className="text-wmu-accent" /></div>
-                                        <div>
-                                            <div className="text-xs text-gray-500 mb-1">Luas Fasade</div>
-                                            <div className="text-sm font-semibold text-wmu-dark">{project.luas}</div>
+
+                                    <div className="relative z-10">
+                                        <div className="flex items-start gap-4 mb-3">
+                                            <div className="mt-1"><CheckCircle2 size={24} className="text-wmu-accent" /></div>
+                                            <div>
+                                                <h4 className="font-bold text-lg mb-1">Solusi</h4>
+                                                <p className="text-sm text-gray-400 line-clamp-3 leading-relaxed">{project.prk_solusi || "Pengerjaan sesuai dengan standar dan arahan profesional."}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="relative z-10">
+                                        <div className="flex items-start gap-4">
+                                            <div className="mt-1"><ThumbsUp size={24} className="text-wmu-accent" /></div>
+                                            <div>
+                                                <h4 className="font-bold text-lg mb-1">Hasil</h4>
+                                                <p className="text-sm text-gray-400 line-clamp-3 leading-relaxed">{project.prk_hasil || "Memuaskan dengan penyelesaian yang tepat waktu."}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <button className="bg-wmu-dark hover:bg-[#021f2b] text-white px-6 py-4 rounded-xl font-bold transition-colors w-full flex items-center justify-between group mt-auto">
-                                Lihat Detail Proyek
-                                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                            </button>
-                        </div>
-
-                        {/* Middle Column: Images */}
-                        <div className="lg:w-[45%] relative">
-                            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 group cursor-pointer shadow-lg">
-                                <AnimatePresence mode="wait">
-                                    <motion.img
-                                        key={activeImageIndex}
-                                        src={project.thumbnails[activeImageIndex]}
-                                        alt={project.judul}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.3 }}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </AnimatePresence>
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-wmu-accent shadow-xl group-hover:scale-110 transition-transform">
-                                        <Play size={24} className="ml-1" fill="currentColor" />
-                                    </div>
-                                </div>
-                                <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-wmu-dark/80 hover:bg-wmu-dark text-white rounded-full flex items-center justify-center backdrop-blur-sm transition-colors z-10">
-                                    <ChevronLeft size={20} />
-                                </button>
-                                <button onClick={(e) => { e.stopPropagation(); nextImage(); }} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-wmu-dark/80 hover:bg-wmu-dark text-white rounded-full flex items-center justify-center backdrop-blur-sm transition-colors z-10">
-                                    <ChevronRight size={20} />
-                                </button>
-                            </div>
-
-                            {/* Thumbnails */}
-                            <div className="flex gap-2 lg:gap-3 justify-between">
-                                {project.thumbnails.map((thumb, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setActiveImageIndex(idx)}
-                                        className={`relative w-1/5 aspect-video rounded-lg overflow-hidden border-2 transition-all duration-300 ${activeImageIndex === idx ? 'border-[#DFA639] scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                                    >
-                                        <img src={thumb} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Right Column: Key Points */}
-                        <div className="lg:w-[25%] bg-wmu-dark rounded-[1.5rem] p-6 lg:p-8 text-white lg:ml-6 flex flex-col justify-center space-y-8 relative overflow-hidden mt-8 lg:mt-0">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#DFA639]/10 rounded-full blur-3xl"></div>
-                            <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#00BF62]/10 rounded-full blur-3xl"></div>
-
-                            <div className="relative z-10">
-                                <div className="flex items-start gap-4 mb-3">
-                                    <div className="mt-1"><ShieldCheck size={24} className="text-wmu-accent" /></div>
-                                    <div>
-                                        <h4 className="font-bold text-lg mb-1">Tantangan</h4>
-                                        <p className="text-sm text-gray-400 leading-relaxed">{project.tantangan}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="relative z-10">
-                                <div className="flex items-start gap-4 mb-3">
-                                    <div className="mt-1"><CheckCircle2 size={24} className="text-wmu-accent" /></div>
-                                    <div>
-                                        <h4 className="font-bold text-lg mb-1">Solusi</h4>
-                                        <p className="text-sm text-gray-400 leading-relaxed">{project.solusi}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="relative z-10">
-                                <div className="flex items-start gap-4">
-                                    <div className="mt-1"><ThumbsUp size={24} className="text-wmu-accent" /></div>
-                                    <div>
-                                        <h4 className="font-bold text-lg mb-1">Hasil</h4>
-                                        <p className="text-sm text-gray-400 leading-relaxed">{project.hasil}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
+                            </motion.div>
+                        </AnimatePresence>
+                    ) : null}
 
                     {/* Dots indicator for Featured Project section */}
-                    <div className="flex justify-center items-center gap-2 mb-16">
-                        <div className="w-8 h-2 rounded-full bg-wmu-accent"></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-300"></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-300"></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-300"></div>
-                    </div>
+                    {displayFeatured.length > 1 && (
+                        <div className="flex justify-center items-center gap-2 mb-16">
+                            {displayFeatured.map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setCurrentFeaturedIndex(idx)}
+                                    className={`h-2 rounded-full transition-all ${idx === currentFeaturedIndex ? 'w-8 bg-wmu-accent' : 'w-2 bg-gray-300 hover:bg-gray-400'}`}
+                                    aria-label={`Slide ke ${idx + 1}`}
+                                ></button>
+                            ))}
+                        </div>
+                    )}
 
                     {/* Stats Banner Section */}
                     <motion.div
@@ -377,9 +401,9 @@ export default function Proyek() {
                                 <div className="text-wmu-accent text-xs font-bold tracking-widest uppercase mb-2">SEMUA PROYEK</div>
                                 <h2 className="text-3xl md:text-4xl font-extrabold text-wmu-dark">Portofolio Proyek Kami</h2>
                             </div>
-                            <button className="bg-wmu-dark hover:bg-[#021f2b] text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2 whitespace-nowrap self-start md:self-auto">
+                            <Link href="/semua-proyek" className="bg-wmu-dark hover:bg-[#021f2b] text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2 whitespace-nowrap self-start md:self-auto">
                                 Lihat Semua Proyek <ArrowRight size={18} />
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Slider Controls */}
@@ -403,10 +427,10 @@ export default function Proyek() {
                             className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory hide-scrollbar"
                             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                         >
-                            {mockSemuaProyek.map((item) => (
-                                <div key={item.id} className="min-w-[280px] md:min-w-[300px] bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0 snap-start border border-gray-100 group">
+                            {proyek.map((item) => (
+                                <div key={item.prk_id} className="min-w-[280px] md:min-w-[300px] bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0 snap-start border border-gray-100 group">
                                     <div className="relative h-48 overflow-hidden">
-                                        <img src={item.prk_gambar} alt={item.judul} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <img src={`/storage/${item.prk_gambar}`} alt={item.prk_judul} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-wmu-dark/90 to-transparent flex items-end p-4">
                                             <span className="text-white text-xs font-semibold px-2 py-1 bg-wmu-dark/80 backdrop-blur-sm rounded">
                                                 {item.prk_kategori}
@@ -414,21 +438,21 @@ export default function Proyek() {
                                         </div>
                                     </div>
                                     <div className="p-5">
-                                        <h3 className="font-bold text-lg text-wmu-dark mb-4 line-clamp-1 group-hover:text-wmu-accent transition-colors">{item.judul}</h3>
+                                        <h3 className="font-bold text-lg text-wmu-dark mb-4 line-clamp-1 group-hover:text-wmu-accent transition-colors">{item.prk_judul}</h3>
 
                                         <div className="flex justify-between items-center text-xs text-gray-500 mb-6">
                                             <div className="flex items-center gap-1.5">
                                                 <MapPin size={14} className="text-wmu-accent" />
-                                                <span className="line-clamp-1 max-w-[120px]">{item.lokasi}</span>
+                                                <span className="line-clamp-1 max-w-[120px]">{item.prk_klien}</span>
                                             </div>
                                             <div className="flex items-center gap-1.5 whitespace-nowrap">
-                                                {item.tahun}
+                                                {item.prk_tahun}
                                             </div>
                                         </div>
 
-                                        <button className="text-wmu-accent font-bold text-sm flex items-center gap-2 hover:gap-3 transition-all">
+                                        <Link href={route('proyek.detail', item.prk_slug)} className="text-wmu-accent font-bold text-sm flex items-center gap-2 hover:gap-3 transition-all w-fit">
                                             Lihat Detail <ArrowRight size={14} />
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
                             ))}
@@ -457,36 +481,45 @@ export default function Proyek() {
                             {/* Right Slider */}
                             <div className="lg:w-2/3 w-full relative">
 
+                                {/* Left Button */}
+                                <button
+                                    onClick={() => scrollSlider(testiSliderRef, 'left')}
+                                    className="hidden md:flex absolute left-[-10px] lg:left-[-20px] top-1/2 -translate-y-1/2 w-10 h-10 border border-gray-200 hover:border-wmu-dark text-gray-500 hover:text-wmu-dark bg-white rounded-full items-center justify-center shadow-md hover:shadow-lg transition-all z-10"
+                                >
+                                    <ChevronLeft size={20} />
+                                </button>
+                                
+                                {/* Right Button */}
                                 <button
                                     onClick={() => scrollSlider(testiSliderRef, 'right')}
-                                    className="hidden md:flex absolute right-[-24px] top-1/2 -translate-y-1/2 w-10 h-10 border border-gray-300 hover:border-wmu-dark text-gray-500 hover:text-wmu-dark bg-white rounded-full items-center justify-center shadow-sm transition-colors z-10"
+                                    className="hidden md:flex absolute right-[-10px] lg:right-[-20px] top-1/2 -translate-y-1/2 w-10 h-10 border border-gray-200 hover:border-wmu-dark text-gray-500 hover:text-wmu-dark bg-white rounded-full items-center justify-center shadow-md hover:shadow-lg transition-all z-10"
                                 >
                                     <ChevronRight size={20} />
                                 </button>
 
                                 <div
                                     ref={testiSliderRef}
-                                    className="flex overflow-x-auto gap-6 snap-x snap-mandatory hide-scrollbar pb-4"
+                                    className="flex overflow-x-auto gap-6 snap-x snap-mandatory hide-scrollbar pb-6 px-4 -mx-4"
                                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                                 >
-                                    {mockTestimoni.map((item) => (
-                                        <div key={item.id} className="min-w-[280px] md:min-w-[320px] bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 flex-shrink-0 snap-start flex flex-col justify-between">
+                                    {klien.map((item, idx) => (
+                                        <div key={item.id_klien || idx} className="min-w-[280px] md:min-w-[320px] bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 p-6 md:p-8 flex-shrink-0 snap-center flex flex-col justify-between">
                                             <div>
                                                 <div className="flex justify-between items-start mb-6">
-                                                    <img src={item.logo} alt={item.klien} className="h-8 object-contain max-w-[120px]" />
-                                                    <div className="flex gap-0.5">
-                                                        {[...Array(item.rating)].map((_, i) => (
+                                                    <img src={`/storage/${item.logo}`} alt={item.nama_klien} className="h-12 md:h-16 object-contain max-w-[120px] md:max-w-[150px]" />
+                                                    <div className="flex gap-0.5 mt-2">
+                                                        {[...Array(5)].map((_, i) => (
                                                             <Star key={i} size={14} className="text-[#DFA639] fill-current" />
                                                         ))}
                                                     </div>
                                                 </div>
-                                                <p className="text-gray-600 text-sm leading-relaxed mb-8">
-                                                    "{item.ulasan}"
+                                                <p className="text-gray-600 text-sm leading-relaxed mb-8 italic">
+                                                    "{genericReviews[idx % genericReviews.length]}"
                                                 </p>
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-wmu-dark text-sm">{item.nama}</h4>
-                                                <p className="text-xs text-gray-500">{item.jabatan}</p>
+                                                <h4 className="font-bold text-wmu-dark text-sm">{item.nama_klien}</h4>
+                                                <p className="text-xs text-gray-500">Mitra Klien</p>
                                             </div>
                                         </div>
                                     ))}

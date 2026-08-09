@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Head, usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { motion } from 'framer-motion';
@@ -11,6 +12,15 @@ import {
 
 export default function Layanan({ layanan, klien, layananTambahan }) {
     const { pengaturan } = usePage().props;
+    const [activeKategoriKlien, setActiveKategoriKlien] = useState('Semua');
+
+    // Dapatkan kategori unik dari data klien (abaikan yang kosong)
+    const uniqueKategori = klien ? [...new Set(klien.filter(k => k.kategori).map(k => k.kategori))] : [];
+    
+    // Filter klien berdasarkan kategori yang dipilih
+    const filteredKlien = activeKategoriKlien === 'Semua' 
+        ? klien 
+        : klien.filter(k => k.kategori === activeKategoriKlien);
 
     const fadeInUp = {
         hidden: { opacity: 0, y: 40 },
@@ -165,14 +175,12 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
                                         </div>
 
                                         <div className="pt-4 border-t border-gray-50 mt-auto">
-                                            <a
-                                                href={`https://wa.me/${pengaturan?.no_telepon?.startsWith('0') ? '62' + pengaturan?.no_telepon?.substring(1) : pengaturan?.no_telepon}?text=Halo%20WMU,%20saya%20tertarik%20dengan%20layanan%20${item.judul_layanan}`}
-                                                target="_blank"
-                                                rel="noreferrer"
+                                            <Link
+                                                href={route('layanan.detail', item.slug)}
                                                 className="text-wmu-accent font-bold text-[11px] uppercase tracking-wider flex items-center group-hover:text-wmu-dark transition-colors"
                                             >
                                                 Selengkapnya <ArrowRight size={14} className="ml-1.5 group-hover:translate-x-1 transition-transform" />
-                                            </a>
+                                            </Link>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -244,12 +252,21 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
 
                     {/* Tabs */}
                     <div className="flex flex-wrap justify-center gap-3 mb-10">
-                        <button className="bg-wmu-dark text-white px-5 py-2 rounded-full text-xs font-semibold shadow-md">Semua</button>
-                        <button className="bg-white text-gray-600 border border-gray-200 px-5 py-2 rounded-full text-xs font-medium hover:bg-gray-50 hover:border-gray-300 transition-colors">Commercial Building</button>
-                        <button className="bg-white text-gray-600 border border-gray-200 px-5 py-2 rounded-full text-xs font-medium hover:bg-gray-50 hover:border-gray-300 transition-colors">Hospitality</button>
-                        <button className="bg-white text-gray-600 border border-gray-200 px-5 py-2 rounded-full text-xs font-medium hover:bg-gray-50 hover:border-gray-300 transition-colors">Corporate Office</button>
-                        <button className="bg-white text-gray-600 border border-gray-200 px-5 py-2 rounded-full text-xs font-medium hover:bg-gray-50 hover:border-gray-300 transition-colors">Industrial</button>
-                        <button className="bg-white text-gray-600 border border-gray-200 px-5 py-2 rounded-full text-xs font-medium hover:bg-gray-50 hover:border-gray-300 transition-colors">Public Facility</button>
+                        <button 
+                            onClick={() => setActiveKategoriKlien('Semua')}
+                            className={`${activeKategoriKlien === 'Semua' ? 'bg-wmu-dark text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'} px-5 py-2 rounded-full text-xs font-semibold transition-colors`}
+                        >
+                            Semua
+                        </button>
+                        {uniqueKategori.map((kategori, index) => (
+                            <button 
+                                key={index}
+                                onClick={() => setActiveKategoriKlien(kategori)}
+                                className={`${activeKategoriKlien === kategori ? 'bg-wmu-dark text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300'} px-5 py-2 rounded-full text-xs font-semibold transition-colors`}
+                            >
+                                {kategori}
+                            </button>
+                        ))}
                     </div>
 
                     {/* Logos Carousel Mock */}
@@ -259,9 +276,9 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
                         </button>
 
                         <div className="flex flex-wrap justify-center gap-4 flex-grow">
-                            {klien && klien.length > 0 ? klien.slice(0, 6).map((k) => (
+                            {filteredKlien && filteredKlien.length > 0 ? filteredKlien.slice(0, 6).map((k) => (
                                 <div key={k.id_klien} className="w-[150px] h-[80px] bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:shadow-md transition-all grayscale hover:grayscale-0 cursor-pointer overflow-hidden p-2">
-                                    <img src={`/storage/${k.logo}`} alt={k.nama_klien} className="max-w-full max-h-full object-contain" />
+                                    <img src={k.logo && k.logo.startsWith('http') ? k.logo : `/storage/${k.logo}`} alt={k.nama_klien} className="max-w-full max-h-full object-contain" />
                                 </div>
                             )) : (
                                 /* Fallback mock klien */

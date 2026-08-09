@@ -16,11 +16,13 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // Admin Master
-        User::create([
-            'nama' => 'Administrator',
-            'email' => '',
-            'kata_sandi' => \Illuminate\Support\Facades\Hash::make('rahasia123'),
-        ]);
+        User::firstOrCreate(
+            ['email' => 'admin@gmail.com'],
+            [
+                'nama' => 'Administrator',
+                'kata_sandi' => \Illuminate\Support\Facades\Hash::make('rahasia123'),
+            ]
+        );
 
         // Default Settings
         $settings = [
@@ -35,11 +37,19 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($settings as $setting) {
-            \App\Models\Pengaturan::create($setting);
+            \App\Models\Pengaturan::firstOrCreate(['kunci' => $setting['kunci']], $setting);
         }
 
         $this->call([
+            MitraSeeder::class,
             FaqSeeder::class,
+            KontraktorSeeder::class,
+            KlienSeeder::class,
+            UlasanSeeder::class,
+            ProyekSeeder::class,
+            GaleriSeeder::class,
+            BlogSeeder::class,
+            VideoSeeder::class,
         ]);
     }
 }

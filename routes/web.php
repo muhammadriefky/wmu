@@ -28,8 +28,16 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/tentang-kami', function () {
-    return Inertia::render('TentangKami');
-})->name('tentang');
+    $keunggulan = \App\Models\Keunggulan::orderBy('urutan', 'asc')->get();
+    $mitra = \App\Models\Mitra::where('status_aktif', 1)->orderBy('urutan', 'asc')->get();
+    $videos = \App\Models\Video::where('status', 'Aktif')->orderBy('id_video', 'asc')->get();
+    
+    return Inertia::render('TentangKami', [
+        'keunggulan' => $keunggulan,
+        'mitra' => $mitra,
+        'videos' => $videos,
+    ]);
+})->name('tentang-kami');
 
 Route::get('/layanan', function () {
     $layanan = \App\Models\Layanan::all();
@@ -41,19 +49,93 @@ Route::get('/layanan', function () {
     ]);
 })->name('layanan');
 
+Route::get('/layanan/{slug}', function ($slug) {
+    $layanan = \App\Models\Layanan::where('slug', $slug)->where('status', 'Published')->firstOrFail();
+    
+    // Increment views
+    $layanan->increment('views');
+    
+    // Get other services for "Layanan Lainnya" section
+    $layananLain = \App\Models\Layanan::where('id_layanan', '!=', $layanan->id_layanan)
+        ->where('status', 'Published')
+        ->take(4)
+        ->get();
+    
+    return Inertia::render('LayananDetail', [
+        'layanan' => $layanan,
+        'layananLain' => $layananLain,
+    ]);
+})->name('layanan.detail');
+
 Route::get('/proyek', function () {
     $proyek = \App\Models\Proyek::where('prk_status', 'Published')->where('prk_is_tampil', 1)->orderBy('prk_tahun', 'desc')->get();
-    return Inertia::render('Proyek', ['proyek' => $proyek]);
+    $klien = \App\Models\Klien::where('status_aktif', 1)->get();
+    return Inertia::render('Proyek', ['proyek' => $proyek, 'klien' => $klien]);
 })->name('proyek');
+
+Route::get('/semua-proyek', function () {
+    $proyek = \App\Models\Proyek::where('prk_status', 'Published')->where('prk_is_tampil', 1)->orderBy('prk_tahun', 'desc')->get();
+    // Get unique categories from active projects
+    $kategoriList = \App\Models\Proyek::where('prk_status', 'Published')
+        ->where('prk_is_tampil', 1)
+        ->whereNotNull('prk_kategori')
+        ->where('prk_kategori', '!=', '')
+        ->select('prk_kategori')
+        ->distinct()
+        ->pluck('prk_kategori')
+        ->values();
+    
+    return Inertia::render('SemuaProyek', [
+        'proyek' => $proyek,
+        'kategoriList' => $kategoriList
+    ]);
+})->name('semua-proyek');
+
+Route::get('/proyek/{slug}', function ($slug) {
+    $proyek = \App\Models\Proyek::where('prk_slug', $slug)->where('prk_status', 'Published')->firstOrFail();
+    
+    // Process gallery json
+    $galeri = $proyek->prk_galeri ? json_decode($proyek->prk_galeri, true) : [];
+    
+    return Inertia::render('ProyekDetail', [
+        'proyek' => $proyek,
+        'galeri' => is_array($galeri) ? $galeri : []
+    ]);
+})->name('proyek.detail');
 
 Route::get('/blog', function () {
     $blog = \App\Models\Blog::orderBy('tanggal_terbit', 'desc')->paginate(9);
-    return Inertia::render('Blog/Index', ['blog' => $blog]);
+    $kategoriList = \App\Models\Blog::whereNotNull('kategori')
+        ->where('kategori', '!=', '')
+        ->select('kategori')
+        ->distinct()
+        ->pluck('kategori')
+        ->values();
+        
+    $popularBlogs = \App\Models\Blog::where('status', 'Published')
+        ->orderBy('tanggal_terbit', 'desc')
+        ->take(5)
+        ->get();
+        
+    return Inertia::render('Blog/Index', [
+        'blog' => $blog,
+        'kategoriList' => $kategoriList,
+        'popularBlogs' => $popularBlogs
+    ]);
 })->name('blog');
 
 Route::get('/blog/{slug}', function ($slug) {
     $blog = \App\Models\Blog::where('slug', $slug)->firstOrFail();
-    return Inertia::render('Blog/Show', ['blog' => $blog]);
+    $popularBlogs = \App\Models\Blog::where('status', 'Published')
+        ->where('slug', '!=', $slug)
+        ->orderBy('tanggal_terbit', 'desc')
+        ->take(5)
+        ->get();
+        
+    return Inertia::render('Blog/Show', [
+        'blog' => $blog,
+        'popularBlogs' => $popularBlogs
+    ]);
 })->name('blog.show');
 
 Route::post('/ulasan', function (\Illuminate\Http\Request $request) {
@@ -96,6 +178,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('/proyek', \App\Http\Controllers\Admin\ProyekController::class)->except(['create', 'show', 'edit']);
         Route::resource('/blog', \App\Http\Controllers\Admin\BlogController::class)->except(['create', 'show', 'edit']);
         Route::resource('/ulasan', \App\Http\Controllers\Admin\UlasanController::class)->except(['create', 'show', 'edit']);
+        Route::resource('/video', \App\Http\Controllers\Admin\VideoController::class)->except(['create', 'show', 'edit']);
     });
 });
 

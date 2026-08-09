@@ -21,8 +21,14 @@ export default function Index({ proyek, stats }) {
         prk_gambar: null,
         prk_kategori: '',
         prk_status: 'Draft',
-        prk_is_tampil: false,
         prk_is_unggulan: false,
+        prk_deskripsi: '',
+        prk_tantangan: '',
+        prk_solusi: '',
+        prk_hasil: '',
+        prk_luas: '',
+        prk_galeri: [], // new files to upload
+        existing_galeri: [], // existing uploaded files
     });
 
     const openModal = (item = null) => {
@@ -40,6 +46,13 @@ export default function Index({ proyek, stats }) {
                 prk_status: item.prk_status || 'Draft',
                 prk_is_tampil: item.prk_is_tampil ? true : false,
                 prk_is_unggulan: item.prk_is_unggulan ? true : false,
+                prk_deskripsi: item.prk_deskripsi || '',
+                prk_tantangan: item.prk_tantangan || '',
+                prk_solusi: item.prk_solusi || '',
+                prk_hasil: item.prk_hasil || '',
+                prk_luas: item.prk_luas || '',
+                prk_galeri: [],
+                existing_galeri: item.prk_galeri ? (typeof item.prk_galeri === 'string' ? JSON.parse(item.prk_galeri) : item.prk_galeri) : [],
             });
         } else {
             setIsEditing(false);
@@ -63,6 +76,7 @@ export default function Index({ proyek, stats }) {
                 delete updateData.prk_gambar;
             }
             
+            // To handle multiple files properly with Inertia _method: 'put', we must force FormData
             router.post(route('admin.proyek.update', editId), updateData, {
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
@@ -70,6 +84,7 @@ export default function Index({ proyek, stats }) {
         } else {
             post(route('admin.proyek.store'), {
                 preserveScroll: true,
+                forceFormData: true,
                 onSuccess: () => closeModal(),
             });
         }
@@ -94,6 +109,11 @@ export default function Index({ proyek, stats }) {
             prk_status: item.prk_status || '',
             prk_is_tampil: !item.prk_is_tampil,
             prk_is_unggulan: item.prk_is_unggulan ? true : false,
+            prk_deskripsi: item.prk_deskripsi || '',
+            prk_tantangan: item.prk_tantangan || '',
+            prk_solusi: item.prk_solusi || '',
+            prk_hasil: item.prk_hasil || '',
+            prk_luas: item.prk_luas || '',
         }, { preserveScroll: true });
     };
 
@@ -354,14 +374,15 @@ export default function Index({ proyek, stats }) {
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-                    <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl">
-                        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-800">{isEditing ? 'Edit Proyek' : 'Tambah Proyek Baru'}</h3>
-                            <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={20} /></button>
-                        </div>
-                        
-                        <div className="overflow-y-auto p-6 flex-1 custom-scrollbar">
+                <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50">
+                    <div className="flex min-h-full items-center justify-center p-4 py-10">
+                        <div className="bg-white rounded-lg max-w-2xl w-full shadow-2xl">
+                            <div className="flex justify-between items-center p-6 border-b border-gray-100">
+                                <h3 className="text-lg font-bold text-gray-800">{isEditing ? 'Edit Proyek' : 'Tambah Proyek Baru'}</h3>
+                                <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={20} /></button>
+                            </div>
+                            
+                            <div className="p-6">
                             <form id="proyekForm" onSubmit={submit}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                                     <div>
@@ -410,18 +431,21 @@ export default function Index({ proyek, stats }) {
                                         </div>
                                         <div className="flex-1">
                                             <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Kategori</label>
-                                            <select 
+                                            <input 
+                                                type="text"
+                                                list="proyek-kategori-list"
+                                                placeholder="Pilih atau ketik kategori..."
                                                 className="block w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-accent focus:ring-wmu-accent transition-all text-sm"
                                                 value={data.prk_kategori}
                                                 onChange={e => setData('prk_kategori', e.target.value)}
-                                            >
-                                                <option value="">Pilih Kategori...</option>
-                                                <option value="Infrastruktur">Infrastruktur</option>
-                                                <option value="Industrial">Industrial</option>
-                                                <option value="Residential">Residential</option>
-                                                <option value="Hospitality">Hospitality</option>
-                                                <option value="Commercial">Commercial</option>
-                                            </select>
+                                            />
+                                            <datalist id="proyek-kategori-list">
+                                                <option value="Infrastruktur" />
+                                                <option value="Industrial" />
+                                                <option value="Residential" />
+                                                <option value="Hospitality" />
+                                                <option value="Commercial" />
+                                            </datalist>
                                             {errors.prk_kategori && <p className="text-red-500 text-xs mt-1">{errors.prk_kategori}</p>}
                                         </div>
                                     </div>
@@ -459,6 +483,89 @@ export default function Index({ proyek, stats }) {
                                         )}
                                     </div>
                                     {errors.prk_gambar && <p className="text-red-500 text-xs mt-1">{errors.prk_gambar}</p>}
+                                </div>
+
+                                <div className="mb-5">
+                                    <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Luas Area / Fasade</label>
+                                    <input
+                                        type="text"
+                                        className="block w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-accent focus:ring-wmu-accent transition-all text-sm"
+                                        value={data.prk_luas}
+                                        onChange={e => setData('prk_luas', e.target.value)}
+                                        placeholder="Contoh: 1.500 m²"
+                                    />
+                                    {errors.prk_luas && <p className="text-red-500 text-xs mt-1">{errors.prk_luas}</p>}
+                                </div>
+
+                                <div className="mb-5">
+                                    <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Deskripsi Proyek</label>
+                                    <textarea
+                                        rows="3"
+                                        className="block w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-accent focus:ring-wmu-accent transition-all text-sm"
+                                        value={data.prk_deskripsi}
+                                        onChange={e => setData('prk_deskripsi', e.target.value)}
+                                    ></textarea>
+                                    {errors.prk_deskripsi && <p className="text-red-500 text-xs mt-1">{errors.prk_deskripsi}</p>}
+                                </div>
+                                
+                                <div className="mb-5">
+                                    <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Tantangan</label>
+                                    <textarea
+                                        rows="2"
+                                        className="block w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-accent focus:ring-wmu-accent transition-all text-sm"
+                                        value={data.prk_tantangan}
+                                        onChange={e => setData('prk_tantangan', e.target.value)}
+                                    ></textarea>
+                                    {errors.prk_tantangan && <p className="text-red-500 text-xs mt-1">{errors.prk_tantangan}</p>}
+                                </div>
+
+                                <div className="mb-5">
+                                    <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Solusi</label>
+                                    <textarea
+                                        rows="2"
+                                        className="block w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-accent focus:ring-wmu-accent transition-all text-sm"
+                                        value={data.prk_solusi}
+                                        onChange={e => setData('prk_solusi', e.target.value)}
+                                    ></textarea>
+                                    {errors.prk_solusi && <p className="text-red-500 text-xs mt-1">{errors.prk_solusi}</p>}
+                                </div>
+
+                                <div className="mb-5">
+                                    <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Hasil</label>
+                                    <textarea
+                                        rows="2"
+                                        className="block w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-accent focus:ring-wmu-accent transition-all text-sm"
+                                        value={data.prk_hasil}
+                                        onChange={e => setData('prk_hasil', e.target.value)}
+                                    ></textarea>
+                                    {errors.prk_hasil && <p className="text-red-500 text-xs mt-1">{errors.prk_hasil}</p>}
+                                </div>
+
+                                <div className="mb-5">
+                                    <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Galeri Proyek (Pilih beberapa)</label>
+                                    <input 
+                                        type="file" 
+                                        multiple 
+                                        accept="image/*" 
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-wmu-accent hover:file:bg-blue-100"
+                                        onChange={e => setData('prk_galeri', Array.from(e.target.files))}
+                                    />
+                                    {errors.prk_galeri && <p className="text-red-500 text-xs mt-1">{errors.prk_galeri}</p>}
+                                    {data.existing_galeri && data.existing_galeri.length > 0 && (
+                                        <div className="mt-3 flex gap-2 flex-wrap">
+                                            {data.existing_galeri.map((img, i) => (
+                                                <div key={i} className="relative w-16 h-16 group">
+                                                    <img src={`/storage/${img}`} className="w-full h-full object-cover rounded-md border" />
+                                                    <button type="button" onClick={() => {
+                                                        const newExisting = data.existing_galeri.filter((_, idx) => idx !== i);
+                                                        setData('existing_galeri', newExisting);
+                                                    }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <X size={12} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5 bg-gray-50 p-4 rounded-xl border border-gray-100">
@@ -502,12 +609,13 @@ export default function Index({ proyek, stats }) {
                                 </div>
                             </form>
                         </div>
-                        
-                        <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-white rounded-b-lg">
-                            <button type="button" onClick={closeModal} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">Batal</button>
-                            <button form="proyekForm" type="submit" disabled={processing} className="px-5 py-2 bg-wmu-accent text-white font-medium rounded-lg hover:bg-green-600 shadow-sm disabled:opacity-50 transition-all">
-                                {processing ? 'Menyimpan...' : 'Simpan Proyek'}
-                            </button>
+                            
+                            <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-white rounded-b-lg">
+                                <button type="button" onClick={closeModal} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">Batal</button>
+                                <button form="proyekForm" type="submit" disabled={processing} className="px-5 py-2 bg-wmu-accent text-white font-medium rounded-lg hover:bg-green-600 shadow-sm disabled:opacity-50 transition-all">
+                                    {processing ? 'Menyimpan...' : 'Simpan Proyek'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

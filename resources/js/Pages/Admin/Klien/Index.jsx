@@ -17,6 +17,7 @@ export default function Index({ klien, stats }) {
         email: '',
         telepon: '',
         urutan: '',
+        kategori: '',
         logo: null,
         status_aktif: true,
         _method: 'post', // Default method
@@ -32,11 +33,12 @@ export default function Index({ klien, stats }) {
                 email: item.email || '',
                 telepon: item.telepon || '',
                 urutan: item.urutan || '',
+                kategori: item.kategori || '',
                 logo: null,
                 status_aktif: item.status_aktif ? true : false,
                 _method: 'put',
             });
-            setImagePreview(item.logo ? `/storage/${item.logo}` : null);
+            setImagePreview(item.logo ? (item.logo.startsWith('http') ? item.logo : `/storage/${item.logo}`) : null);
         } else {
             setIsEditing(false);
             setEditId(null);
@@ -204,6 +206,7 @@ export default function Index({ klien, stats }) {
                             <tr className="bg-gray-50">
                                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Logo</th>
                                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Nama Klien</th>
+                                <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Kategori</th>
                                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Email</th>
                                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider">Telepon</th>
                                 <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
@@ -218,7 +221,7 @@ export default function Index({ klien, stats }) {
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="h-10 w-10 flex items-center justify-center bg-gray-50 border border-gray-100 rounded overflow-hidden p-1">
                                                 {item.logo ? (
-                                                    <img src={`/storage/${item.logo}`} alt={item.nama_klien} className="max-h-full max-w-full object-contain" />
+                                                    <img src={item.logo.startsWith('http') ? item.logo : `/storage/${item.logo}`} alt={item.nama_klien} className="max-h-full max-w-full object-contain" />
                                                 ) : (
                                                     <span className="text-gray-400 text-xs">No Logo</span>
                                                 )}
@@ -227,6 +230,11 @@ export default function Index({ klien, stats }) {
                                         <td className="px-6 py-4">
                                             <div className="text-sm font-bold text-gray-900">{item.nama_klien}</div>
                                             <div className="text-xs text-gray-400">Urutan: {item.urutan}</div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                                                {item.kategori || 'Tanpa Kategori'}
+                                            </span>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-500">
                                             {item.email || '-'}
@@ -315,13 +323,13 @@ export default function Index({ klien, stats }) {
             {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-                    <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl">
-                        <div className="flex justify-between items-center p-6 border-b border-gray-100">
+                    <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+                        <div className="flex justify-between items-center p-6 border-b border-gray-100 shrink-0">
                             <h3 className="text-lg font-bold text-gray-800">{isEditing ? 'Edit Klien' : 'Tambah Klien Baru'}</h3>
                             <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 transition-colors"><X size={20} /></button>
                         </div>
                         
-                        <div className="overflow-y-auto p-6 flex-1 custom-scrollbar">
+                        <div className="overflow-y-auto p-6 flex-1 custom-scrollbar min-h-0">
                             <form id="klienForm" onSubmit={submit}>
                                 <div className="mb-5 flex flex-col items-center">
                                     <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center relative overflow-hidden bg-gray-50 mb-3 group hover:border-blue-400 transition-colors">
@@ -368,6 +376,17 @@ export default function Index({ klien, stats }) {
                                         />
                                         {errors.urutan && <p className="text-red-500 text-xs mt-1">{errors.urutan}</p>}
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                                        <input 
+                                            type="text" 
+                                            value={data.kategori} 
+                                            onChange={e => setData('kategori', e.target.value)}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                            placeholder="Contoh: Industrial, Hospitality"
+                                        />
+                                        {errors.kategori && <p className="text-red-500 text-xs mt-1">{errors.kategori}</p>}
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
@@ -411,7 +430,7 @@ export default function Index({ klien, stats }) {
                             </form>
                         </div>
                         
-                        <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-white rounded-b-xl">
+                        <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-white rounded-b-xl shrink-0">
                             <button type="button" onClick={closeModal} className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors">Batal</button>
                             <button form="klienForm" type="submit" disabled={processing} className="px-5 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 shadow-sm disabled:opacity-50 transition-all flex items-center justify-center">
                                 {processing ? 'Menyimpan...' : 'Simpan Klien'}

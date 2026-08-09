@@ -5,7 +5,7 @@ import {
     LayoutDashboard, Settings, Star, Users, Briefcase, 
     MessageSquare, FileText, BriefcaseBusiness, HelpCircle, 
     Menu, X, Building2, ChevronDown, LogOut, User as UserIcon,
-    Bell, Search, ExternalLink, ShieldCheck, Home
+    Bell, Search, ExternalLink, ShieldCheck, Home, Play
 } from 'lucide-react';
 
 export default function AdminLayout({ header, children }) {
@@ -117,6 +117,9 @@ export default function AdminLayout({ header, children }) {
                         </NavItem>
                         <NavItem href={route('admin.blog.index')} routeName="admin.blog" icon={FileText}>
                             Blog
+                        </NavItem>
+                        <NavItem href={route('admin.video.index')} routeName="admin.video" icon={Play}>
+                            Video
                         </NavItem>
                         <NavItem href={route('admin.ulasan.index')} routeName="admin.ulasan" icon={MessageSquare}>
                             Testimoni

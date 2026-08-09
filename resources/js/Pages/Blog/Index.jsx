@@ -1,31 +1,23 @@
+import { useState, useMemo } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import { motion } from 'framer-motion';
 import {
     ChevronRight, ChevronDown, LayoutGrid, Settings,
     Home, Briefcase, ShieldCheck, TrendingUp,
-    Clock, ArrowRight, ChevronLeft, Phone
+    Clock, ArrowRight, ChevronLeft, Phone, Tag
 } from 'lucide-react';
 
-export default function Index({ blog }) {
+export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
     const { pengaturan } = usePage().props;
 
-    const popularArticles = [
-        { id: 1, title: 'Jenis-Jenis Sistem Fasade pada Bangunan Modern', date: '12 Mei 2024', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=200' },
-        { id: 2, title: 'Perbedaan Curtain Wall dan Window Wall', date: '10 Mei 2024', img: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=200' },
-        { id: 3, title: 'Cara Merawat Fasade Agar Tahan Lama dan Optimal', date: '8 Mei 2024', img: 'https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=200' },
-        { id: 4, title: 'Keunggulan Aluminium Composite Panel (ACP)', date: '5 Mei 2024', img: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=200' },
-        { id: 5, title: 'Proses Pengerjaan Fasade dari Awal Hingga Akhir', date: '2 Mei 2024', img: 'https://images.unsplash.com/photo-1504307651254-35680f356f12?q=80&w=200' },
-    ];
+    const [activeCategory, setActiveCategory] = useState('Semua');
 
-    const categories = [
-        { name: 'Teknologi & Material', count: 18, icon: Settings },
-        { name: 'Desain & Arsitektur', count: 15, icon: Home },
-        { name: 'Proyek & Studi Kasus', count: 22, icon: Briefcase },
-        { name: 'Tips & Panduan', count: 17, icon: ShieldCheck },
-        { name: 'Industri & Tren', count: 12, icon: TrendingUp },
-    ];
-
+    const filteredBlogs = useMemo(() => {
+        if (!blog?.data) return [];
+        if (activeCategory === 'Semua') return blog.data;
+        return blog.data.filter(item => item.kategori === activeCategory);
+    }, [blog, activeCategory]);
     return (
         <PublicLayout hideCTA={true}>
             <Head>
@@ -83,24 +75,30 @@ export default function Index({ blog }) {
             <section className="bg-white pb-12 pt-8 relative z-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-                        <button className="flex items-center gap-2 bg-wmu-dark text-white px-6 py-3 rounded-lg text-xs font-semibold shadow-md border border-wmu-dark hover:bg-gray-800 transition-colors">
-                            <LayoutGrid size={16} className="text-wmu-accent" /> Semua Artikel
+                        <button 
+                            onClick={() => setActiveCategory('Semua')}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-lg text-xs font-semibold shadow-sm border transition-colors ${
+                                activeCategory === 'Semua' 
+                                    ? 'bg-wmu-dark text-white border-wmu-dark hover:bg-gray-800' 
+                                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                            }`}
+                        >
+                            <LayoutGrid size={16} className={activeCategory === 'Semua' ? 'text-wmu-accent' : 'text-gray-400'} /> Semua Artikel
                         </button>
-                        <button className="flex items-center gap-2 bg-white text-gray-600 px-6 py-3 rounded-lg text-xs font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors">
-                            <Settings size={16} className="text-wmu-accent" /> Teknologi & Material
-                        </button>
-                        <button className="flex items-center gap-2 bg-white text-gray-600 px-6 py-3 rounded-lg text-xs font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors">
-                            <Home size={16} className="text-wmu-accent" /> Desain & Arsitektur
-                        </button>
-                        <button className="flex items-center gap-2 bg-white text-gray-600 px-6 py-3 rounded-lg text-xs font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors">
-                            <Briefcase size={16} className="text-wmu-accent" /> Proyek & Studi Kasus
-                        </button>
-                        <button className="flex items-center gap-2 bg-white text-gray-600 px-6 py-3 rounded-lg text-xs font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors">
-                            <ShieldCheck size={16} className="text-wmu-accent" /> Tips & Panduan
-                        </button>
-                        <button className="flex items-center gap-2 bg-white text-gray-600 px-6 py-3 rounded-lg text-xs font-medium border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors">
-                            <TrendingUp size={16} className="text-wmu-accent" /> Industri & Tren
-                        </button>
+                        
+                        {(Array.isArray(kategoriList) ? kategoriList : Object.values(kategoriList || {})).map(kat => (
+                            <button 
+                                key={kat}
+                                onClick={() => setActiveCategory(kat)}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-lg text-xs font-semibold shadow-sm border transition-colors ${
+                                    activeCategory === kat 
+                                        ? 'bg-wmu-dark text-white border-wmu-dark hover:bg-gray-800' 
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                }`}
+                            >
+                                <Tag size={16} className={activeCategory === kat ? 'text-wmu-accent' : 'text-gray-400'} /> {kat}
+                            </button>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -119,14 +117,14 @@ export default function Index({ blog }) {
                             </div>
 
                             <div className="flex flex-col gap-6">
-                                {blog.data && blog.data.length > 0 ? (
-                                    blog.data.map((item) => (
+                                {filteredBlogs.length > 0 ? (
+                                    filteredBlogs.map((item) => (
                                         <div key={item.id_blog} className="flex flex-col md:flex-row gap-6 border border-gray-200 p-4 rounded-2xl hover:shadow-lg transition-all duration-300 group bg-white">
                                             {/* Image */}
                                             <div className="w-full md:w-[280px] h-[220px] shrink-0 rounded-xl overflow-hidden relative bg-gray-100">
                                                 <img src={item.gambar ? `/storage/${item.gambar}` : 'https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=600'} alt={item.judul_blog} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                                 <div className="absolute bottom-3 left-3 bg-wmu-dark/90 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded tracking-wide uppercase">
-                                                    {item.kategori?.nama_kategori || 'Artikel'}
+                                                    {item.kategori || 'Artikel'}
                                                 </div>
                                             </div>
 
@@ -223,20 +221,24 @@ export default function Index({ blog }) {
                             <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                                 <h4 className="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100">Artikel Populer</h4>
                                 <div className="flex flex-col gap-5">
-                                    {popularArticles.map((article) => (
-                                        <div key={article.id} className="flex gap-4 group cursor-pointer items-center">
-                                            <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-100">
-                                                <img src={article.img} alt={article.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    {popularBlogs.length > 0 ? popularBlogs.map((article, idx) => (
+                                        <Link href={`/blog/${article.slug}`} key={article.id_blog} className="flex gap-4 group cursor-pointer items-center">
+                                            <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-100 relative">
+                                                <img src={article.gambar ? `/storage/${article.gambar}` : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=200'} alt={article.judul_blog} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
                                             <div className="flex flex-col justify-center flex-grow">
-                                                <span className="text-[10px] font-bold text-gray-400 mb-1">0{article.id}</span>
+                                                <span className="text-[10px] font-bold text-gray-400 mb-1">0{idx + 1}</span>
                                                 <h5 className="font-bold text-sm text-gray-800 group-hover:text-wmu-dark transition-colors leading-snug line-clamp-2 mb-1.5">
-                                                    {article.title}
+                                                    {article.judul_blog}
                                                 </h5>
-                                                <span className="text-[10px] font-medium text-gray-500">{article.date}</span>
+                                                <span className="text-[10px] font-medium text-gray-500">
+                                                    {new Date(article.tanggal_terbit).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                </span>
                                             </div>
-                                        </div>
-                                    ))}
+                                        </Link>
+                                    )) : (
+                                        <div className="text-sm text-gray-500 italic">Belum ada artikel.</div>
+                                    )}
                                 </div>
                             </div>
 
@@ -244,13 +246,16 @@ export default function Index({ blog }) {
                             <div className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8">
                                 <h4 className="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100">Kategori</h4>
                                 <div className="flex flex-col gap-4">
-                                    {categories.map((cat, idx) => (
-                                        <div key={idx} className="flex items-center justify-between group cursor-pointer">
+                                    {(Array.isArray(kategoriList) ? kategoriList : Object.values(kategoriList || {})).map((kat, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            onClick={() => setActiveCategory(kat)}
+                                            className="flex items-center justify-between group cursor-pointer"
+                                        >
                                             <div className="flex items-center gap-3">
-                                                <cat.icon size={16} className="text-[#DFA639]" />
-                                                <span className="text-sm font-medium text-gray-600 group-hover:text-wmu-dark transition-colors">{cat.name}</span>
+                                                <Tag size={16} className="text-[#DFA639]" />
+                                                <span className="text-sm font-medium text-gray-600 group-hover:text-wmu-dark transition-colors">{kat}</span>
                                             </div>
-                                            <span className="text-xs font-medium text-gray-400 group-hover:text-wmu-dark transition-colors">({cat.count})</span>
                                         </div>
                                     ))}
                                 </div>

@@ -9,7 +9,7 @@ import {
     Plus, Minus
 } from 'lucide-react';
 
-export default function TentangKami() {
+export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }) {
     const { pengaturan } = usePage().props;
     const [orgZoom, setOrgZoom] = useState(100);
 
@@ -452,30 +452,35 @@ export default function TentangKami() {
 
                         <div className="lg:w-3/4 w-full">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {[
-                                    { title: 'Proses Pembangunan Proyek Gedung Perkantoran', duration: '02:25', img: 'https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070' },
-                                    { title: 'Manajemen Proyek Secara Profesional', duration: '01:45', img: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071' },
-                                    { title: 'Komitmen Kami terhadap Keselamatan Kerja', duration: '02:12', img: 'https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=2070' },
-                                    { title: 'Hasil Konstruksi dengan Kualitas Terbaik', duration: '02:42', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070' }
-                                ].map((video, idx) => (
-                                    <div key={idx} className="group cursor-pointer bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                                {videos.length > 0 ? videos.map((video) => (
+                                    <a key={video.id_video} href={video.url_video || '#'} target={video.url_video ? "_blank" : "_self"} className="group cursor-pointer bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                                         <div className="relative aspect-[4/3] bg-gray-200">
-                                            <img src={video.img} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                            <img 
+                                                src={video.gambar ? `/storage/${video.gambar}` : 'https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070'} 
+                                                alt={video.judul_video} 
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                                            />
                                             <div className="absolute inset-0 bg-wmu-dark/20 group-hover:bg-wmu-dark/40 transition-colors"></div>
 
                                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/50 group-hover:scale-110 transition-transform">
                                                 <Play size={16} fill="currentColor" className="ml-0.5" />
                                             </div>
 
-                                            <div className="absolute bottom-2 left-2 bg-wmu-dark/80 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
-                                                <Play size={10} fill="currentColor" /> {video.duration}
-                                            </div>
+                                            {video.durasi && (
+                                                <div className="absolute bottom-2 left-2 bg-wmu-dark/80 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
+                                                    <Play size={10} fill="currentColor" /> {video.durasi}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="p-4 flex-grow flex items-start">
-                                            <h4 className="font-bold text-xs text-gray-900 group-hover:text-wmu-accent transition-colors line-clamp-3 leading-snug">{video.title}</h4>
+                                            <h4 className="font-bold text-xs text-gray-900 group-hover:text-wmu-accent transition-colors line-clamp-3 leading-snug">{video.judul_video}</h4>
                                         </div>
+                                    </a>
+                                )) : (
+                                    <div className="col-span-1 md:col-span-2 lg:col-span-4 text-center py-10 text-gray-500">
+                                        Belum ada video kegiatan saat ini.
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
                     </div>

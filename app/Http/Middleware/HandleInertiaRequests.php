@@ -39,7 +39,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'pengaturan' => function () {
-                return \App\Models\Pengaturan::all()->pluck('nilai_pengaturan', 'key_pengaturan')->toArray();
+                return \App\Models\Pengaturan::all()->pluck('nilai', 'kunci')->toArray();
             },
         ];
     }

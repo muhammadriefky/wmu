@@ -32,6 +32,10 @@ export default function Index({ layanan, proyek, stats, filters }) {
         kategori: '',
         status: 'Published',
         is_unggulan: false,
+        deskripsi_lengkap: '',
+        fitur_layanan: [],
+        proses_kerja: [],
+        gambar_detail: null,
     });
 
     // Debounce search
@@ -65,6 +69,10 @@ export default function Index({ layanan, proyek, stats, filters }) {
                 kategori: item.kategori || '',
                 status: item.status || 'Published',
                 is_unggulan: item.is_unggulan ? true : false,
+                deskripsi_lengkap: item.deskripsi_lengkap || '',
+                fitur_layanan: item.fitur_layanan || [],
+                proses_kerja: item.proses_kerja || [],
+                gambar_detail: null,
             });
         } else {
             setIsEditing(false);
@@ -75,6 +83,10 @@ export default function Index({ layanan, proyek, stats, filters }) {
             setData('status', 'Published');
             setData('is_unggulan', false);
             setData('kategori', '');
+            setData('deskripsi_lengkap', '');
+            setData('fitur_layanan', []);
+            setData('proses_kerja', []);
+            setData('gambar_detail', null);
         }
         setIsModalOpen(true);
     };
@@ -91,6 +103,9 @@ export default function Index({ layanan, proyek, stats, filters }) {
             let updateData = { ...data, _method: 'put' };
             if (typeof updateData.gambar === 'string') {
                 delete updateData.gambar;
+            }
+            if (typeof updateData.gambar_detail === 'string') {
+                delete updateData.gambar_detail;
             }
             router.post(route('admin.layanan.update', editId), updateData, {
                 preserveScroll: true,
@@ -123,6 +138,32 @@ export default function Index({ layanan, proyek, stats, filters }) {
         const newKeunggulan = [...(data.keunggulan_layanan || [])];
         newKeunggulan.splice(index, 1);
         setData('keunggulan_layanan', newKeunggulan);
+    };
+
+    // Fitur Layanan logic
+    const addFitur = () => setData('fitur_layanan', [...(data.fitur_layanan || []), { judul: '', deskripsi: '' }]);
+    const updateFitur = (index, field, value) => {
+        const newFitur = [...(data.fitur_layanan || [])];
+        newFitur[index] = { ...newFitur[index], [field]: value };
+        setData('fitur_layanan', newFitur);
+    };
+    const removeFitur = (index) => {
+        const newFitur = [...(data.fitur_layanan || [])];
+        newFitur.splice(index, 1);
+        setData('fitur_layanan', newFitur);
+    };
+
+    // Proses Kerja logic
+    const addProses = () => setData('proses_kerja', [...(data.proses_kerja || []), { langkah: '', deskripsi: '' }]);
+    const updateProses = (index, field, value) => {
+        const newProses = [...(data.proses_kerja || [])];
+        newProses[index] = { ...newProses[index], [field]: value };
+        setData('proses_kerja', newProses);
+    };
+    const removeProses = (index) => {
+        const newProses = [...(data.proses_kerja || [])];
+        newProses.splice(index, 1);
+        setData('proses_kerja', newProses);
     };
 
     const toggleProyek = (id) => {
@@ -433,13 +474,13 @@ export default function Index({ layanan, proyek, stats, filters }) {
             {/* Modal Form */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl">
-                        <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100">
+                    <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+                        <div className="flex justify-between items-center px-6 py-5 border-b border-gray-100 shrink-0">
                             <h3 className="text-lg font-bold text-gray-800">{isEditing ? 'Edit Layanan' : 'Tambah Layanan'}</h3>
                             <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"><X size={20} /></button>
                         </div>
                         
-                        <div className="overflow-y-auto p-6 flex-1 custom-scrollbar">
+                        <div className="overflow-y-auto p-6 flex-1 min-h-0 relative">
                             <form id="layananForm" onSubmit={submit}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div>
@@ -469,14 +510,17 @@ export default function Index({ layanan, proyek, stats, filters }) {
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1.5">Kategori</label>
-                                        <select
+                                        <input
+                                            type="text"
+                                            list="layanan-kategori-list"
+                                            placeholder="Pilih atau ketik kategori..."
                                             className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700"
                                             value={data.kategori}
                                             onChange={e => setData('kategori', e.target.value)}
-                                        >
-                                            <option value="">Pilih Kategori</option>
+                                        />
+                                        <datalist id="layanan-kategori-list">
                                             {kategoriOptions.map(kat => <option key={kat} value={kat}>{kat}</option>)}
-                                        </select>
+                                        </datalist>
                                         {errors.kategori && <p className="text-red-500 text-xs mt-1.5">{errors.kategori}</p>}
                                     </div>
                                     <div>
@@ -571,6 +615,127 @@ export default function Index({ layanan, proyek, stats, filters }) {
                                     {errors.keunggulan_layanan && <p className="text-red-500 text-xs mt-1.5">{errors.keunggulan_layanan}</p>}
                                 </div>
 
+                                {/* Deskripsi Lengkap Section */}
+                                <div className="mb-6">
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Deskripsi Lengkap (Detail Page)</label>
+                                    <textarea
+                                        className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700"
+                                        value={data.deskripsi_lengkap || ''}
+                                        onChange={e => setData('deskripsi_lengkap', e.target.value)}
+                                        rows="6"
+                                        placeholder="Penjelasan mendalam tentang layanan ini..."
+                                    />
+                                    {errors.deskripsi_lengkap && <p className="text-red-500 text-xs mt-1.5">{errors.deskripsi_lengkap}</p>}
+                                </div>
+
+                                {/* Fitur Layanan Section */}
+                                <div className="mb-6 p-5 border border-gray-200 rounded-2xl bg-gray-50/50">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <label className="block text-sm font-bold text-gray-700">Fitur / Yang Anda Dapatkan</label>
+                                        <button 
+                                            type="button" 
+                                            onClick={addFitur}
+                                            className="flex items-center text-xs font-bold px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 hover:text-wmu-dark hover:border-gray-300 shadow-sm transition-all"
+                                        >
+                                            <Plus size={14} className="mr-1" /> Tambah
+                                        </button>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {data.fitur_layanan && data.fitur_layanan.map((fitur, index) => (
+                                            <div key={index} className="flex gap-3 items-start bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                                <div className="flex-grow space-y-3">
+                                                    <input
+                                                        type="text"
+                                                        className="block w-full rounded-xl border-gray-200 bg-white focus:border-wmu-dark focus:ring-wmu-dark sm:text-sm font-medium text-gray-900 shadow-sm"
+                                                        value={fitur.judul || ''}
+                                                        onChange={e => updateFitur(index, 'judul', e.target.value)}
+                                                        placeholder="Judul Fitur"
+                                                    />
+                                                    <textarea
+                                                        className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark sm:text-sm text-gray-600 shadow-sm"
+                                                        value={fitur.deskripsi || ''}
+                                                        onChange={e => updateFitur(index, 'deskripsi', e.target.value)}
+                                                        rows="2"
+                                                        placeholder="Deskripsi fitur..."
+                                                    />
+                                                </div>
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => removeFitur(index)}
+                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors shrink-0"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {(!data.fitur_layanan || data.fitur_layanan.length === 0) && (
+                                            <p className="text-sm text-gray-400 italic text-center py-5 bg-white rounded-xl border border-dashed border-gray-200">Belum ada daftar fitur.</p>
+                                        )}
+                                    </div>
+                                    {errors.fitur_layanan && <p className="text-red-500 text-xs mt-1.5">{errors.fitur_layanan}</p>}
+                                </div>
+
+                                {/* Proses Kerja Section */}
+                                <div className="mb-6 p-5 border border-gray-200 rounded-2xl bg-gray-50/50">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <label className="block text-sm font-bold text-gray-700">Tahapan Proses Kerja</label>
+                                        <button 
+                                            type="button" 
+                                            onClick={addProses}
+                                            className="flex items-center text-xs font-bold px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-700 hover:text-wmu-dark hover:border-gray-300 shadow-sm transition-all"
+                                        >
+                                            <Plus size={14} className="mr-1" /> Tambah
+                                        </button>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {data.proses_kerja && data.proses_kerja.map((proses, index) => (
+                                            <div key={index} className="flex gap-3 items-start bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-sm text-gray-500 shrink-0 mt-1">
+                                                    {index + 1}
+                                                </div>
+                                                <div className="flex-grow space-y-3">
+                                                    <input
+                                                        type="text"
+                                                        className="block w-full rounded-xl border-gray-200 bg-white focus:border-wmu-dark focus:ring-wmu-dark sm:text-sm font-medium text-gray-900 shadow-sm"
+                                                        value={proses.langkah || ''}
+                                                        onChange={e => updateProses(index, 'langkah', e.target.value)}
+                                                        placeholder="Nama Tahapan"
+                                                    />
+                                                    <textarea
+                                                        className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark sm:text-sm text-gray-600 shadow-sm"
+                                                        value={proses.deskripsi || ''}
+                                                        onChange={e => updateProses(index, 'deskripsi', e.target.value)}
+                                                        rows="2"
+                                                        placeholder="Deskripsi tahapan..."
+                                                    />
+                                                </div>
+                                                <button 
+                                                    type="button"
+                                                    onClick={() => removeProses(index)}
+                                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors shrink-0 mt-1"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        {(!data.proses_kerja || data.proses_kerja.length === 0) && (
+                                            <p className="text-sm text-gray-400 italic text-center py-5 bg-white rounded-xl border border-dashed border-gray-200">Belum ada tahapan kerja.</p>
+                                        )}
+                                    </div>
+                                    {errors.proses_kerja && <p className="text-red-500 text-xs mt-1.5">{errors.proses_kerja}</p>}
+                                </div>
+
+                                <div className="mb-6">
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Gambar Banner Detail (Opsional)</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-gray-100 file:text-wmu-dark hover:file:bg-gray-200 transition-colors cursor-pointer"
+                                        onChange={e => setData('gambar_detail', e.target.files[0])}
+                                    />
+                                    {errors.gambar_detail && <p className="text-red-500 text-xs mt-1.5">{errors.gambar_detail}</p>}
+                                </div>
+
                                 {/* Proyek Terkait Section */}
                                 <div className="mb-2 p-5 border border-gray-200 rounded-2xl bg-gray-50/50">
                                     <label className="block text-sm font-bold text-gray-700 mb-4">Tautkan Proyek</label>
@@ -610,7 +775,7 @@ export default function Index({ layanan, proyek, stats, filters }) {
                             </form>
                         </div>
                         
-                        <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-white rounded-b-2xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+                        <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-white rounded-b-2xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)] shrink-0">
                             <button type="button" onClick={closeModal} className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-700 font-bold hover:bg-gray-50 transition-colors shadow-sm">Batal</button>
                             <button form="layananForm" type="submit" disabled={processing} className="px-5 py-2.5 bg-wmu-dark text-white font-bold rounded-xl hover:bg-gray-800 shadow-sm disabled:opacity-50 transition-all flex items-center gap-2">
                                 {processing ? 'Menyimpan...' : 'Simpan Layanan'}
@@ -619,22 +784,6 @@ export default function Index({ layanan, proyek, stats, filters }) {
                     </div>
                 </div>
             )}
-            
-            <style jsx global>{`
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 6px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background-color: #E2E8F0;
-                    border-radius: 20px;
-                }
-                .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-                    background-color: #CBD5E1;
-                }
-            `}</style>
         </AdminLayout>
     );
 }

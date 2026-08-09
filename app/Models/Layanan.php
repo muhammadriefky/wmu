@@ -13,6 +13,8 @@ class Layanan extends Model
     protected $casts = [
         'keunggulan_layanan' => 'array',
         'proyek_terkait' => 'array',
+        'fitur_layanan' => 'array',
+        'proses_kerja' => 'array',
         'is_unggulan' => 'boolean',
     ];
 

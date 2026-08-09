@@ -1,0 +1,330 @@
+import { useState, useEffect } from 'react';
+import AdminLayout from '@/Layouts/AdminLayout';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
+import { 
+    Plus, Trash2, X, Filter, LayoutGrid, List, MoreVertical, 
+    Edit, Calendar, Search, ChevronDown, Play, Image as ImageIcon
+} from 'lucide-react';
+import Pagination from '@/Components/Pagination';
+
+export default function Index({ videos, stats, filters }) {
+    const { flash } = usePage().props;
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editId, setEditId] = useState(null);
+    
+    const [searchTerm, setSearchTerm] = useState(filters?.search || '');
+    const [sortFilter, setSortFilter] = useState(filters?.sort || 'Terbaru');
+
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+        judul_video: '',
+        durasi: '',
+        url_video: '',
+        status: 'Aktif',
+        gambar: null,
+    });
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchTerm !== filters?.search || sortFilter !== filters?.sort) {
+                router.get(route('admin.video.index'), {
+                    search: searchTerm,
+                    sort: sortFilter
+                }, { preserveState: true, preserveScroll: true, replace: true });
+            }
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm, sortFilter]);
+
+    const openModal = (video = null) => {
+        clearErrors();
+        if (video) {
+            setIsEditing(true);
+            setEditId(video.id_video);
+            setData({
+                judul_video: video.judul_video,
+                durasi: video.durasi || '',
+                url_video: video.url_video || '',
+                status: video.status,
+                gambar: null,
+            });
+        } else {
+            setIsEditing(false);
+            setEditId(null);
+            reset();
+        }
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setTimeout(reset, 200);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if (isEditing) {
+            post(route('admin.video.update', editId), {
+                onSuccess: () => closeModal(),
+                forceFormData: true, 
+            });
+        } else {
+            post(route('admin.video.store'), {
+                onSuccess: () => closeModal(),
+                forceFormData: true,
+            });
+        }
+    };
+
+    const handleDelete = (id) => {
+        if (confirm('Apakah Anda yakin ingin menghapus video ini?')) {
+            router.delete(route('admin.video.destroy', id));
+        }
+    };
+
+    return (
+        <AdminLayout>
+            <Head title="Manajemen Video" />
+            
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Manajemen Video</h2>
+                    <p className="text-sm text-gray-500 mt-1">Kelola data video kegiatan perusahaan</p>
+                </div>
+                <button 
+                    onClick={() => openModal()}
+                    className="bg-wmu-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-800 transition-all flex items-center gap-2"
+                >
+                    <Plus size={18} strokeWidth={2.5} /> Tambah Video Baru
+                </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                        <Play size={24} />
+                    </div>
+                    <div>
+                        <div className="text-3xl font-extrabold text-gray-900">{stats.total}</div>
+                        <div className="text-sm font-medium text-gray-500 mt-0.5">Total Video</div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center shrink-0">
+                        <Play size={24} />
+                    </div>
+                    <div>
+                        <div className="text-3xl font-extrabold text-gray-900">{stats.aktif}</div>
+                        <div className="text-sm font-medium text-gray-500 mt-0.5">Video Aktif</div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center gap-5">
+                    <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                        <Play size={24} />
+                    </div>
+                    <div>
+                        <div className="text-3xl font-extrabold text-gray-900">{stats.tidak_aktif}</div>
+                        <div className="text-sm font-medium text-gray-500 mt-0.5">Tidak Aktif</div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] overflow-hidden">
+                <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-gray-50/50">
+                    <div className="relative w-full md:w-80">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input 
+                            type="text" 
+                            placeholder="Cari video..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border-gray-200 text-sm focus:border-wmu-dark focus:ring-wmu-dark bg-white shadow-sm transition-all"
+                        />
+                    </div>
+                    <div className="flex items-center gap-3 w-full md:w-auto">
+                        <select 
+                            value={sortFilter}
+                            onChange={(e) => setSortFilter(e.target.value)}
+                            className="w-full md:w-40 py-2.5 pl-4 pr-10 rounded-xl border-gray-200 text-sm focus:border-wmu-dark focus:ring-wmu-dark bg-white shadow-sm font-medium"
+                        >
+                            <option value="Terbaru">Terbaru</option>
+                            <option value="Terlama">Terlama</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-white border-b border-gray-100">
+                                <th className="py-4 px-6 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Video</th>
+                                <th className="py-4 px-6 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Durasi</th>
+                                <th className="py-4 px-6 text-xs font-extrabold text-gray-500 uppercase tracking-wider">Status</th>
+                                <th className="py-4 px-6 text-xs font-extrabold text-gray-500 uppercase tracking-wider text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {videos.data.length > 0 ? (
+                                videos.data.map((video) => (
+                                    <tr key={video.id_video} className="hover:bg-gray-50/50 transition-colors group">
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-20 h-14 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-200 relative">
+                                                    {video.gambar ? (
+                                                        <img src={`/storage/${video.gambar}`} alt={video.judul_video} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                            <ImageIcon size={20} />
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center text-white">
+                                                        <Play size={16} fill="currentColor" />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-gray-900 mb-1">{video.judul_video}</div>
+                                                    {video.url_video && (
+                                                        <a href={video.url_video} target="_blank" className="text-xs text-blue-500 hover:underline">{video.url_video}</a>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className="text-sm font-medium text-gray-600">{video.durasi || '-'}</span>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <span className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide uppercase ${
+                                                video.status === 'Aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                                            }`}>
+                                                {video.status}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-6">
+                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => openModal(video)} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm">
+                                                    <Edit size={14} />
+                                                </button>
+                                                <button onClick={() => handleDelete(video.id_video)} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm">
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" className="py-12 text-center">
+                                        <div className="w-16 h-16 mx-auto bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
+                                            <Play size={24} className="text-gray-400" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-1">Belum ada Video</h3>
+                                        <p className="text-sm text-gray-500">Mulai tambahkan video kegiatan Anda sekarang.</p>
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {videos.data.length > 0 && <Pagination links={videos.links} />}
+            </div>
+
+            {/* Modal Form */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm overflow-y-auto custom-scrollbar">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl my-auto">
+                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-2xl">
+                            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                {isEditing ? <Edit size={18} className="text-wmu-accent" /> : <Plus size={18} className="text-wmu-accent" />}
+                                {isEditing ? 'Edit Video' : 'Tambah Video Baru'}
+                            </h3>
+                            <button onClick={closeModal} className="text-gray-400 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded-lg">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="px-6 py-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                            <form id="videoForm" onSubmit={handleSubmit}>
+                                {isEditing && (
+                                    <div className="mb-6 p-4 bg-yellow-50 rounded-xl border border-yellow-100 flex gap-3 text-yellow-800 text-sm">
+                                        <Edit className="shrink-0 mt-0.5 text-yellow-600" size={16} />
+                                        <div>Biarkan field gambar kosong jika tidak ingin mengubah thumbnail.</div>
+                                    </div>
+                                )}
+
+                                <div className="mb-5">
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Judul Video <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="text"
+                                        className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700"
+                                        value={data.judul_video}
+                                        onChange={e => setData('judul_video', e.target.value)}
+                                        required
+                                    />
+                                    {errors.judul_video && <p className="text-red-500 text-xs mt-1.5">{errors.judul_video}</p>}
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1.5">Durasi</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Contoh: 02:25"
+                                            className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700"
+                                            value={data.durasi}
+                                            onChange={e => setData('durasi', e.target.value)}
+                                        />
+                                        {errors.durasi && <p className="text-red-500 text-xs mt-1.5">{errors.durasi}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-1.5">Status <span className="text-red-500">*</span></label>
+                                        <select
+                                            className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700"
+                                            value={data.status}
+                                            onChange={e => setData('status', e.target.value)}
+                                        >
+                                            <option value="Aktif">Aktif</option>
+                                            <option value="Tidak Aktif">Tidak Aktif</option>
+                                        </select>
+                                        {errors.status && <p className="text-red-500 text-xs mt-1.5">{errors.status}</p>}
+                                    </div>
+                                </div>
+
+                                <div className="mb-5">
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">URL Video</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Contoh: https://youtube.com/..."
+                                        className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700"
+                                        value={data.url_video}
+                                        onChange={e => setData('url_video', e.target.value)}
+                                    />
+                                    {errors.url_video && <p className="text-red-500 text-xs mt-1.5">{errors.url_video}</p>}
+                                </div>
+
+                                <div className="mb-5">
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Gambar Thumbnail</label>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-gray-100 file:text-wmu-dark hover:file:bg-gray-200 transition-colors cursor-pointer"
+                                        onChange={e => setData('gambar', e.target.files[0])}
+                                    />
+                                    {errors.gambar && <p className="text-red-500 text-xs mt-1.5">{errors.gambar}</p>}
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-white rounded-b-2xl">
+                            <button type="button" onClick={closeModal} className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-700 font-bold hover:bg-gray-50 transition-colors">Batal</button>
+                            <button form="videoForm" type="submit" disabled={processing} className="px-5 py-2.5 bg-wmu-dark text-white font-bold rounded-xl hover:bg-gray-800 disabled:opacity-50 transition-all flex items-center gap-2">
+                                {processing ? 'Menyimpan...' : 'Simpan Video'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </AdminLayout>
+    );
+}

@@ -39,6 +39,7 @@ class KlienController extends Controller
             'telepon' => 'nullable|string|max:50',
             'logo' => 'nullable|image|max:2048',
             'urutan' => 'required|integer',
+            'kategori' => 'nullable|string|max:100',
             'status_aktif' => 'nullable|boolean'
         ]);
 
@@ -65,6 +66,7 @@ class KlienController extends Controller
             'telepon' => 'nullable|string|max:50',
             'logo' => 'nullable|image|max:2048',
             'urutan' => 'required|integer',
+            'kategori' => 'nullable|string|max:100',
             'status_aktif' => 'nullable|boolean'
         ]);
 

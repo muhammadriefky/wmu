@@ -558,7 +558,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                     <div className="p-6 pt-10 flex flex-col flex-grow">
                                         <h4 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-wmu-accent transition-colors">{item.judul_layanan}</h4>
                                         <p className="text-gray-500 text-sm mb-6 line-clamp-3 flex-grow leading-relaxed">{item.deskripsi}</p>
-                                        <Link href={`/layanan`} className="text-wmu-accent font-semibold text-sm flex items-center group-hover:text-wmu-dark transition-colors">
+                                        <Link href={`/layanan/${item.slug}`} className="text-wmu-accent font-semibold text-sm flex items-center group-hover:text-wmu-dark transition-colors">
                                             Selengkapnya <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                                         </Link>
                                     </div>
@@ -577,7 +577,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                             <h2 className="text-wmu-accent font-bold tracking-widest text-xs md:text-sm uppercase mb-2">PROYEK KAMI!</h2>
                             <h3 className="text-3xl md:text-4xl font-bold">Proyek Unggulan</h3>
                         </div>
-                        <Link href="/proyek" className="text-sm font-medium hover:text-wmu-accent transition-colors flex items-center group hidden md:flex">
+                        <Link href="/semua-proyek" className="text-sm font-medium hover:text-wmu-accent transition-colors flex items-center group hidden md:flex">
                             Lihat Semua Proyek <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </div>
@@ -593,6 +593,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                     transition={{ delay: index * 0.1 }}
                                     className="w-[220px] md:w-[230px] lg:w-[240px] shrink-0 snap-start group relative rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
                                 >
+                                    <Link href={`/proyek/${item.prk_slug}`} className="absolute inset-0 z-10"></Link>
                                     <div className="aspect-[4/5] md:aspect-square relative">
                                         <img
                                             src={item.prk_gambar ? `/storage/${item.prk_gambar}` : [
@@ -631,11 +632,11 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                                 {item.prk_kategori || 'Konstruksi'}
                                             </span>
                                         </div>
-                                        <div className="flex flex-col items-end gap-3 shrink-0">
+                                        <div className="flex flex-col items-end gap-3 shrink-0 relative z-20">
                                             <div className="text-xs md:text-sm font-bold text-gray-200">{item.prk_tahun}</div>
-                                            <button className="w-8 h-8 rounded-full border border-gray-400 flex items-center justify-center group-hover:bg-wmu-accent group-hover:border-wmu-accent group-hover:text-wmu-dark transition-colors bg-wmu-dark/50 backdrop-blur-sm">
+                                            <div className="w-8 h-8 rounded-full border border-gray-400 flex items-center justify-center group-hover:bg-wmu-accent group-hover:border-wmu-accent group-hover:text-wmu-dark transition-colors bg-wmu-dark/50 backdrop-blur-sm cursor-pointer">
                                                 <Plus size={16} />
-                                            </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </motion.div>
@@ -653,7 +654,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
 
                     {/* Mobile View All Link */}
                     <div className="mt-8 flex md:hidden justify-center">
-                        <Link href="/proyek" className="text-sm font-medium hover:text-wmu-accent transition-colors flex items-center group">
+                        <Link href="/semua-proyek" className="text-sm font-medium hover:text-wmu-accent transition-colors flex items-center group">
                             Lihat Semua Proyek <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </div>
@@ -693,7 +694,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                                 <div key={k.id_klien || i} className="flex flex-col items-center justify-center shrink-0 w-28 md:w-36 gap-3">
                                                     <div className="h-12 md:h-16 w-full flex items-center justify-center">
                                                         <img
-                                                            src={k.logo ? `/storage/${k.logo}` : fallbackLogos[i % fallbackLogos.length]}
+                                                            src={k.logo ? (k.logo.startsWith('http') ? k.logo : `/storage/${k.logo}`) : fallbackLogos[i % fallbackLogos.length]}
                                                             alt={k.nama_klien}
                                                             className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300"
                                                             onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
@@ -740,7 +741,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                                 <div key={`dup-${k.id_klien || i}`} className="flex flex-col items-center justify-center shrink-0 w-28 md:w-36 gap-3">
                                                     <div className="h-12 md:h-16 w-full flex items-center justify-center">
                                                         <img
-                                                            src={k.logo ? `/storage/${k.logo}` : fallbackLogos[i % fallbackLogos.length]}
+                                                            src={k.logo ? (k.logo.startsWith('http') ? k.logo : `/storage/${k.logo}`) : fallbackLogos[i % fallbackLogos.length]}
                                                             alt={k.nama_klien}
                                                             className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300"
                                                             onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
@@ -796,7 +797,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                         <div key={partner.id_mitra || i} className="flex flex-col items-center justify-center w-[120px] md:w-40 gap-3 bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-md hover:border-gray-200 hover:-translate-y-1 transition-all duration-300">
                                             <div className="h-10 md:h-14 w-full flex items-center justify-center">
                                                 <img 
-                                                    src={partner.logo ? `/storage/${partner.logo}` : fallbackLogos[i % fallbackLogos.length]} 
+                                                    src={partner.logo ? (partner.logo.startsWith('http') ? partner.logo : `/storage/${partner.logo}`) : fallbackLogos[i % fallbackLogos.length]}
                                                     alt={partner.nama_mitra} 
                                                     className="max-h-full max-w-full object-contain filter transition-all duration-300" 
                                                     onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
@@ -930,16 +931,16 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
 
                             <div className="flex flex-col gap-5 flex-1">
                                 {blog && blog.slice(0, 3).map((b, idx) => (
-                                    <Link key={b.id_blog || idx} href={`/blog/${b.prk_slug}`} className="flex gap-4 group items-center">
+                                    <Link key={b.id_blog || idx} href={`/blog/${b.slug}`} className="flex gap-4 group items-center">
                                         <div className="w-20 h-16 rounded-lg overflow-hidden shrink-0 shadow-sm border border-gray-50">
                                             <img
-                                                src={b.gambar_sampul ? `/storage/${b.gambar_sampul}` : "https://via.placeholder.com/150"}
-                                                alt={b.judul}
+                                                src={b.gambar ? `/storage/${b.gambar}` : "https://via.placeholder.com/150"}
+                                                alt={b.judul_blog}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-sm text-gray-900 group-hover:text-wmu-accent transition-colors line-clamp-2 leading-snug mb-1">{b.judul}</h4>
+                                            <h4 className="font-bold text-sm text-gray-900 group-hover:text-wmu-accent transition-colors line-clamp-2 leading-snug mb-1">{b.judul_blog}</h4>
                                             <p className="text-[11px] text-gray-500">{new Date(b.tanggal_terbit).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                                         </div>
                                     </Link>

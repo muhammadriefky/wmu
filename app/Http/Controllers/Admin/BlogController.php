@@ -10,11 +10,38 @@ use Illuminate\Support\Facades\Storage;
 
 class BlogController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $blog = Blog::orderBy('id_blog', 'desc')->get();
+        $query = Blog::query();
+
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('judul_blog', 'like', '%' . $request->search . '%')
+                  ->orWhere('slug', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->filled('sort')) {
+            if ($request->sort === 'Terbaru') {
+                $query->orderBy('id_blog', 'desc');
+            } elseif ($request->sort === 'Terlama') {
+                $query->orderBy('id_blog', 'asc');
+            }
+        } else {
+            $query->orderBy('id_blog', 'desc');
+        }
+
+        $blog = $query->paginate(10)->withQueryString();
+
+        $stats = [
+            'total' => Blog::count(),
+            'baru' => Blog::where('rec_datecreated', '>=', now()->subDays(30))->count(),
+        ];
+
         return Inertia::render('Admin/Blog/Index', [
-            'blog' => $blog
+            'blog' => $blog,
+            'stats' => $stats,
+            'filters' => (object) $request->only(['search', 'sort'])
         ]);
     }
 
@@ -23,13 +50,19 @@ class BlogController extends Controller
         $request->validate([
             'judul_blog' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
-            'meta_deskripsi' => 'nullable|string|max:160|nullable',
-            'isi_konten' => 'nullable|string|nullable',
-            'tanggal_terbit' => 'required|date'
+            'meta_deskripsi' => 'nullable|string|max:160',
+            'isi_konten' => 'nullable|string',
+            'tanggal_terbit' => 'required|date',
+            'gambar' => 'nullable|image|max:2048',
+            'kategori' => 'nullable|string|max:100',
+            'status' => 'required|string|max:20',
         ]);
 
-        $data = $request;
+        $data = $request->except('gambar');
         
+        if ($request->hasFile('gambar')) {
+            $data['gambar'] = $request->file('gambar')->store('blog', 'public');
+        }
 
         Blog::create($data);
 
@@ -41,13 +74,22 @@ class BlogController extends Controller
         $request->validate([
             'judul_blog' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
-            'meta_deskripsi' => 'nullable|string|max:160|nullable',
-            'isi_konten' => 'nullable|string|nullable',
-            'tanggal_terbit' => 'required|date'
+            'meta_deskripsi' => 'nullable|string|max:160',
+            'isi_konten' => 'nullable|string',
+            'tanggal_terbit' => 'required|date',
+            'gambar' => 'nullable|image|max:2048',
+            'kategori' => 'nullable|string|max:100',
+            'status' => 'required|string|max:20',
         ]);
 
-        $data = $request;
+        $data = $request->except('gambar');
         
+        if ($request->hasFile('gambar')) {
+            if ($blog->gambar) {
+                Storage::disk('public')->delete($blog->gambar);
+            }
+            $data['gambar'] = $request->file('gambar')->store('blog', 'public');
+        }
 
         $blog->update($data);
 
@@ -56,7 +98,9 @@ class BlogController extends Controller
 
     public function destroy(Blog $blog)
     {
-        
+        if ($blog->gambar) {
+            Storage::disk('public')->delete($blog->gambar);
+        }
         $blog->delete();
 
         return redirect()->back()->with('success', 'Blog berhasil dihapus!');
