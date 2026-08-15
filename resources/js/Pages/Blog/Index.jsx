@@ -27,27 +27,25 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
 
             {/* Hero Section */}
             <section className="relative bg-wmu-dark text-white min-h-[500px] flex items-center overflow-hidden">
-                {/* Right side image */}
-                <div className="absolute inset-0 z-0 flex justify-end">
-                    <div className="w-full lg:w-[65%] h-full relative">
-                        <img
-                            src="https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070"
-                            alt="Blog Hero"
-                            className="w-full h-full object-cover"
-                        />
-                        {/* Dark gradient for mobile */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-wmu-dark via-wmu-dark/90 to-transparent lg:hidden"></div>
-                    </div>
+                {/* Full-screen civil construction background with low opacity */}
+                <div className="absolute inset-0 z-0">
+                    <img
+                        src="/images/civil_construction_hero.png"
+                        alt="Civil Construction Background"
+                        className="w-full h-full object-cover opacity-30"
+                    />
+                    {/* Dark gradient overlay for readability */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-wmu-dark/95 via-wmu-dark/80 to-wmu-dark/60"></div>
+                    {/* Subtle texture dots overlay */}
+                    <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '28px 28px' }}></div>
                 </div>
 
-                {/* Diagonal dark shape for large screens */}
-                <div
-                    className="absolute inset-0 z-0 bg-gradient-to-r from-wmu-dark via-wmu-dark/80 to-wmu-dark/30 hidden lg:block backdrop-blur-sm"
-                    style={{ clipPath: 'polygon(0 0, 50% 0, 75% 100%, 0% 100%)' }}
-                ></div>
+                {/* Decorative accent glow */}
+                <div className="absolute top-20 right-20 w-80 h-80 bg-wmu-accent/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+                <div className="absolute bottom-10 left-10 w-60 h-60 bg-wmu-accent/5 rounded-full blur-2xl pointer-events-none z-0"></div>
 
                 {/* Content Container */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full pt-32 pb-24 md:pb-32 md:pt-40">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 w-full pt-32 pb-32 md:pb-40 md:pt-40">
                     <div className="max-w-2xl">
                         {/* Breadcrumb */}
                         <div className="flex items-center text-xs text-gray-400 mb-6 tracking-wide">
@@ -68,6 +66,13 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                             Temukan berbagai artikel, tips, dan insight terbaru seputar konstruksi fasade, teknologi, project, dan inovasi industri.
                         </p>
                     </div>
+                </div>
+
+                {/* Wave SVG transition to white section below */}
+                <div className="absolute bottom-0 left-0 right-0 z-10 leading-none">
+                    <svg viewBox="0 0 1440 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-16 md:h-20 lg:h-24" fill="white">
+                        <path d="M0,40 C180,80 360,0 540,40 C720,80 900,0 1080,40 C1260,80 1380,20 1440,40 L1440,80 L0,80 Z" />
+                    </svg>
                 </div>
             </section>
 

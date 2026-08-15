@@ -171,18 +171,22 @@ export default function PublicLayout({ children, hideCTA = false }) {
                 )}
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
-                    {/* 5 Columns Layout */}
+                    {/* Footer Grid Layout */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 mb-12">
                         {/* Col 1: Logo & About (3/12) */}
                         <div className="lg:col-span-3">
                             <div className="mb-6">
                                 <img src="/images/logonobg.png" alt="WMU Logo" className="h-10 w-auto object-contain" />
                             </div>
-                            <p className="text-gray-400 text-xs leading-relaxed mb-6">
-                                {pengaturan?.nama_perusahaan || 'WMU'} adalah perusahaan kontraktor profesional yang siap mewujudkan proyek konstruksi berkualitas tinggi dengan standar terbaik.
+                            <p className="text-gray-400 text-xs leading-relaxed mb-4">
+                                {pengaturan?.nama_perusahaan || 'PT. Win Mulya Utama'} adalah perusahaan kontraktor profesional yang siap mewujudkan proyek konstruksi berkualitas tinggi dengan standar terbaik.
                             </p>
-                            <div className="flex items-center gap-2">
-                                {/* Social Icons */}
+                            {/* Legal Info */}
+                            <div className="space-y-1.5 text-[11px] text-gray-500 border-t border-gray-700/50 pt-4">
+                                <div className="flex gap-2"><span className="text-gray-600 w-14 shrink-0">NIB</span><span className="text-gray-400">1806250095772</span></div>
+                                <div className="flex gap-2"><span className="text-gray-600 w-14 shrink-0">NPWP</span><span className="text-gray-400">1000.0000.0312.5557</span></div>
+                            </div>
+                            <div className="flex items-center gap-2 mt-5">
                                 <a href="#" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-wmu-accent hover:text-white transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" /></svg>
                                 </a>
@@ -206,10 +210,8 @@ export default function PublicLayout({ children, hideCTA = false }) {
                                 <li><Link href="/tentang-kami" className="hover:text-wmu-accent transition-colors">Tentang Kami</Link></li>
                                 <li><Link href="/layanan" className="hover:text-wmu-accent transition-colors">Layanan</Link></li>
                                 <li><Link href="/proyek" className="hover:text-wmu-accent transition-colors">Proyek</Link></li>
-                                <li><Link href="#" className="hover:text-wmu-accent transition-colors">Client</Link></li>
-                                <li><Link href="#" className="hover:text-wmu-accent transition-colors">Partnership</Link></li>
+                                <li><Link href="/blog" className="hover:text-wmu-accent transition-colors">Blog</Link></li>
                                 <li><Link href="#" className="hover:text-wmu-accent transition-colors">FAQ</Link></li>
-                                <li><Link href="#" className="hover:text-wmu-accent transition-colors">Kontak</Link></li>
                             </ul>
                         </div>
 
@@ -226,44 +228,61 @@ export default function PublicLayout({ children, hideCTA = false }) {
                             </ul>
                         </div>
 
-                        {/* Col 4: Kontak (2/12) */}
+                        {/* Col 4: Info Perusahaan (2/12) */}
                         <div className="lg:col-span-2">
-                            <h3 className="text-white font-bold text-sm mb-6">Kontak</h3>
+                            <h3 className="text-white font-bold text-sm mb-6">Info Perusahaan</h3>
                             <div className="space-y-4 text-xs text-gray-400">
-                                <div className="flex items-start gap-3">
-                                    <MapPin size={14} className="mt-0.5 shrink-0 text-gray-300" />
-                                    <span className="leading-relaxed">{pengaturan?.alamat || 'Jl. Jend. Sudirman No. 123\nJakarta Selatan, DKI Jakarta'}</span>
+                                <div>
+                                    <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Direktur Utama</p>
+                                    <p className="text-gray-300 font-medium">Win Ali</p>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <Phone size={14} className="shrink-0 text-gray-300" />
-                                    <span>{pengaturan?.no_telepon || '(021) 1234 5678'}</span>
+                                <div>
+                                    <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Domisili Office</p>
+                                    <p className="leading-relaxed">Jl. Meruya Selatan No.12, RT.1/RW.8, Meruya Selatan, Kec. Kembangan, Jakarta Barat</p>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <Mail size={14} className="shrink-0 text-gray-300" />
-                                    <span>{pengaturan?.email || 'info@wmu.co.id'}</span>
+                                <div>
+                                    <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Workshop</p>
+                                    <p className="leading-relaxed">Jl. H. Masim, RT.17/RW.4, Meruya Utara, Kec. Kembangan, Jakarta Barat 11620</p>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <Globe size={14} className="shrink-0 text-gray-300" />
-                                    <span>www.wmu.co.id</span>
+                                <div>
+                                    <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Akte Pendirian</p>
+                                    <p className="leading-relaxed text-[10px]">AHU-0133197.AH.01.11 Tgl. 17 Juni 2025</p>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Col 5: Newsletter (3/12) */}
+                        {/* Col 5: Kontak & Newsletter (3/12) */}
                         <div className="lg:col-span-3">
-                            <h3 className="text-white font-bold text-sm mb-6">Newsletter</h3>
-                            <p className="text-gray-400 text-xs leading-relaxed mb-4">
-                                Dapatkan update terbaru seputar proyek, tips konstruksi, dan informasi menarik dari kami.
-                            </p>
-                            <div className="relative">
-                                <input
-                                    type="email"
-                                    placeholder="Email Anda"
-                                    className="w-full bg-transparent border border-gray-700 text-white text-xs rounded-md px-4 py-2.5 focus:outline-none focus:border-wmu-accent transition-colors pr-10"
-                                />
-                                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors">
-                                    <Send size={14} />
-                                </button>
+                            <h3 className="text-white font-bold text-sm mb-6">Kontak</h3>
+                            <div className="space-y-3 text-xs text-gray-400 mb-6">
+                                <div className="flex items-center gap-3">
+                                    <Phone size={14} className="shrink-0 text-wmu-accent" />
+                                    <span>{pengaturan?.no_telepon || '0852-6031-8481'}</span>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                    <Mail size={14} className="shrink-0 text-wmu-accent mt-0.5" />
+                                    <div>
+                                        <p>office@winmulyautama.com</p>
+                                        <p className="mt-1">winmulyautama@gmail.com</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <Globe size={14} className="shrink-0 text-wmu-accent" />
+                                    <span>www.winmulyautama.com</span>
+                                </div>
+                            </div>
+                            <div className="border-t border-gray-700/50 pt-5">
+                                <p className="text-gray-400 text-xs leading-relaxed mb-3">Dapatkan update proyek & tips konstruksi terbaru.</p>
+                                <div className="relative">
+                                    <input
+                                        type="email"
+                                        placeholder="Email Anda"
+                                        className="w-full bg-transparent border border-gray-700 text-white text-xs rounded-md px-4 py-2.5 focus:outline-none focus:border-wmu-accent transition-colors pr-10"
+                                    />
+                                    <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-wmu-accent transition-colors">
+                                        <Send size={14} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

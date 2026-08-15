@@ -7,7 +7,7 @@ import {
     Award, ShieldCheck, Users, Clock, Tag, Package, HardHat, Headphones,
     ChevronRight, ChevronLeft, MapPin, Building2, Plus,
     FileText, PenTool, ClipboardList, Activity, FileCheck, PhoneCall,
-    Eye, Target, ChevronDown, MessageCircle, TrendingUp, Zap
+    Eye, Target, ChevronDown, MessageCircle, TrendingUp, Zap, X
 } from 'lucide-react';
 
 export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, blog, faq, mitra }) {
@@ -33,13 +33,16 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
         rating_bintang: 5,
     });
 
+    const [toastVisible, setToastVisible] = useState(false);
+
     const submitUlasan = (e) => {
         e.preventDefault();
         post(route('ulasan.storePublic'), {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
-                alert('Terima kasih! Ulasan Anda telah dikirim dan menunggu persetujuan admin.');
+                setToastVisible(true);
+                setTimeout(() => setToastVisible(false), 4000);
             }
         });
     };
@@ -1054,6 +1057,29 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                 </div>
             </section>
 
+            {/* Toast Notification */}
+            <AnimatePresence>
+                {toastVisible && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 60, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 60, scale: 0.95 }}
+                        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                        className="fixed bottom-24 right-6 z-[999] flex items-center gap-3 bg-white border border-green-100 shadow-2xl rounded-2xl px-5 py-4 max-w-xs"
+                    >
+                        <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                            <CheckCircle2 size={20} className="text-green-600" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-gray-900">Ulasan terkirim! 🎉</p>
+                            <p className="text-xs text-gray-500 mt-0.5">Terima kasih atas ulasan Anda.</p>
+                        </div>
+                        <button onClick={() => setToastVisible(false)} className="ml-auto text-gray-300 hover:text-gray-500 transition-colors">
+                            <X size={16} />
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
         </PublicLayout>
     );

@@ -1,17 +1,32 @@
 import { useState } from 'react';
 import { Head, usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowRight, HardHat, CheckCircle2,
     Award, ShieldCheck, Users, Headphones,
     Lightbulb, Leaf, Play, Binoculars, Building2,
-    Plus, Minus
+    Plus, Minus, X
 } from 'lucide-react';
+
+// Helper: convert YouTube URL to embed URL
+function getYoutubeEmbedUrl(url) {
+    if (!url) return null;
+    // Already embed
+    if (url.includes('youtube.com/embed/')) return url;
+    // youtu.be short link
+    const shortMatch = url.match(/youtu\.be\/([\w-]+)/);
+    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}?autoplay=1`;
+    // youtube.com/watch?v=
+    const watchMatch = url.match(/[?&]v=([\w-]+)/);
+    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1`;
+    return url;
+}
 
 export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }) {
     const { pengaturan } = usePage().props;
     const [orgZoom, setOrgZoom] = useState(100);
+    const [activeVideo, setActiveVideo] = useState(null);
 
     const fadeInUp = {
         hidden: { opacity: 0, y: 40 },
@@ -27,24 +42,18 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
 
             {/* Hero Section */}
             <section className="relative bg-wmu-dark text-white min-h-[70vh] flex flex-col justify-center overflow-hidden">
-                {/* Right side image */}
-                <div className="absolute inset-0 z-0 flex justify-end">
-                    <div className="w-full lg:w-[65%] h-full relative">
-                        <img
-                            src="https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070&auto=format&fit=crop"
-                            alt="Hero Background"
-                            className="w-full h-full object-cover"
-                        />
-                        {/* Dark gradient for mobile */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-wmu-dark via-wmu-dark/90 to-transparent lg:hidden"></div>
-                    </div>
+                {/* Full-screen Civil Engineering Background Image */}
+                <div className="absolute inset-0 z-0">
+                    <img
+                        src="/images/civil_construction_hero.png"
+                        alt="Konstruksi Sipil WMU"
+                        className="w-full h-full object-cover"
+                    />
+                    {/* Dark semi-transparent overlay for readability */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-wmu-dark/95 via-wmu-dark/75 to-wmu-dark/40"></div>
+                    {/* Bottom fade for seamless section transition */}
+                    <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-wmu-dark to-transparent"></div>
                 </div>
-
-                {/* Diagonal dark shape for large screens */}
-                <div
-                    className="absolute inset-0 z-0 bg-wmu-dark hidden lg:block"
-                    style={{ clipPath: 'polygon(0 0, 55% 0, 75% 100%, 0% 100%)' }}
-                ></div>
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-32 pb-24">
                     <div className="lg:w-3/4">
@@ -183,14 +192,12 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
 
                         <div className="lg:col-span-7 relative mt-16 lg:mt-0">
                             <div className="rounded-3xl overflow-hidden shadow-2xl relative bg-gray-200 aspect-[4/3] lg:aspect-[16/10]">
-                                <img src="https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070&auto=format&fit=crop" alt="Perjalanan Perusahaan" className="w-full h-full object-cover" />
+                                <img src="/images/civil_construction_work.png" alt="Perjalanan Perusahaan WMU" className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-wmu-dark/20 hover:bg-wmu-dark/10 transition-colors duration-500"></div>
 
-                                {/* Play Button Mock */}
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                    <button className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/50 hover:scale-110 transition-transform">
-                                        <Play size={32} fill="currentColor" className="ml-1.5" />
-                                    </button>
+                                {/* Construction badge overlay */}
+                                <div className="absolute top-4 left-4 bg-wmu-accent/90 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow">
+                                    <HardHat size={12} /> KONSTRUKSI SIPIL
                                 </div>
                             </div>
 
@@ -445,40 +452,58 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
                             <p className="text-gray-600 leading-relaxed text-sm mb-8">
                                 Kami berkomitmen memberikan hasil terbaik di setiap proses pembangunan.
                             </p>
-                            <a href="#" className="inline-flex items-center justify-center bg-wmu-dark text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-800 transition-colors shadow-lg shadow-wmu-dark/20">
-                                Lihat Semua Video <ArrowRight size={16} className="ml-2" />
-                            </a>
                         </div>
 
                         <div className="lg:w-3/4 w-full">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                {videos.length > 0 ? videos.map((video) => (
-                                    <a key={video.id_video} href={video.url_video || '#'} target={video.url_video ? "_blank" : "_self"} className="group cursor-pointer bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-                                        <div className="relative aspect-[4/3] bg-gray-200">
-                                            <img 
-                                                src={video.gambar ? `/storage/${video.gambar}` : 'https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070'} 
-                                                alt={video.judul_video} 
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                                            />
-                                            <div className="absolute inset-0 bg-wmu-dark/20 group-hover:bg-wmu-dark/40 transition-colors"></div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                                {videos.length > 0 ? videos.map((video) => {
+                                    const embedUrl = getYoutubeEmbedUrl(video.url_video);
+                                    return (
+                                        <motion.div
+                                            key={video.id_video}
+                                            initial={{ opacity: 0, y: 20 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
+                                            className="group cursor-pointer bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                                            onClick={() => setActiveVideo(video)}
+                                        >
+                                            <div className="relative aspect-video bg-gray-200">
+                                                <img 
+                                                    src={video.gambar ? `/storage/${video.gambar}` : '/images/civil_construction_hero.png'} 
+                                                    alt={video.judul_video} 
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                                                />
+                                                <div className="absolute inset-0 bg-wmu-dark/30 group-hover:bg-wmu-dark/50 transition-colors"></div>
 
-                                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/50 group-hover:scale-110 transition-transform">
-                                                <Play size={16} fill="currentColor" className="ml-0.5" />
-                                            </div>
-
-                                            {video.durasi && (
-                                                <div className="absolute bottom-2 left-2 bg-wmu-dark/80 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
-                                                    <Play size={10} fill="currentColor" /> {video.durasi}
+                                                {/* Play Button */}
+                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                                    <div className="w-14 h-14 bg-white/25 backdrop-blur-md rounded-full flex items-center justify-center text-white border-2 border-white/60 group-hover:scale-110 group-hover:bg-wmu-accent/80 transition-all duration-300 shadow-xl">
+                                                        <Play size={22} fill="currentColor" className="ml-1" />
+                                                    </div>
                                                 </div>
-                                            )}
-                                        </div>
-                                        <div className="p-4 flex-grow flex items-start">
-                                            <h4 className="font-bold text-xs text-gray-900 group-hover:text-wmu-accent transition-colors line-clamp-3 leading-snug">{video.judul_video}</h4>
-                                        </div>
-                                    </a>
-                                )) : (
-                                    <div className="col-span-1 md:col-span-2 lg:col-span-4 text-center py-10 text-gray-500">
-                                        Belum ada video kegiatan saat ini.
+
+                                                {video.durasi && (
+                                                    <div className="absolute bottom-2 right-2 bg-black/70 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center gap-1">
+                                                        <Play size={9} fill="currentColor" /> {video.durasi}
+                                                    </div>
+                                                )}
+
+                                                {/* YouTube badge */}
+                                                {video.url_video && video.url_video.includes('youtube') && (
+                                                    <div className="absolute top-2 left-2 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
+                                                        ▶ YouTube
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="p-4 flex-grow">
+                                                <h4 className="font-bold text-sm text-gray-900 group-hover:text-wmu-accent transition-colors line-clamp-2 leading-snug">{video.judul_video}</h4>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                }) : (
+                                    <div className="col-span-1 md:col-span-2 lg:col-span-3 text-center py-16 text-gray-400">
+                                        <Play size={48} className="mx-auto mb-4 opacity-20" />
+                                        <p className="font-medium">Belum ada video kegiatan saat ini.</p>
                                     </div>
                                 )}
                             </div>
@@ -486,6 +511,74 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
                     </div>
                 </div>
             </section>
+
+            {/* Video Modal */}
+            <AnimatePresence>
+                {activeVideo && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[999] flex items-center justify-center p-4"
+                        onClick={() => setActiveVideo(null)}
+                    >
+                        {/* Backdrop */}
+                        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                            className="relative z-10 w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            {/* Close button */}
+                            <button
+                                onClick={() => setActiveVideo(null)}
+                                className="absolute top-3 right-3 z-20 w-9 h-9 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-red-600 transition-colors"
+                            >
+                                <X size={18} />
+                            </button>
+
+                            {/* Video player */}
+                            <div className="relative aspect-video bg-black">
+                                {getYoutubeEmbedUrl(activeVideo.url_video) ? (
+                                    <iframe
+                                        src={getYoutubeEmbedUrl(activeVideo.url_video)}
+                                        title={activeVideo.judul_video}
+                                        className="w-full h-full"
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center">
+                                        <img 
+                                            src={activeVideo.gambar ? `/storage/${activeVideo.gambar}` : '/images/civil_construction_hero.png'} 
+                                            alt={activeVideo.judul_video}
+                                            className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-4">
+                                            <p className="text-white text-sm font-medium">Link video tidak tersedia</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Video title */}
+                            <div className="bg-wmu-dark p-4">
+                                <h4 className="text-white font-bold text-sm">{activeVideo.judul_video}</h4>
+                                {activeVideo.durasi && (
+                                    <span className="text-gray-400 text-xs flex items-center gap-1 mt-1">
+                                        <Play size={10} fill="currentColor" /> Durasi: {activeVideo.durasi}
+                                    </span>
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
 
         </PublicLayout>
