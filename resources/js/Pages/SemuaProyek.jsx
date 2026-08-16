@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Head, usePage, Link } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import SeoHead from '@/Components/SeoHead';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     MapPin, Calendar, ArrowRight, Search, Filter, FolderOpen, ArrowLeft
@@ -26,7 +27,10 @@ export default function SemuaProyek() {
 
     return (
         <PublicLayout pengaturan={pengaturan}>
-            <Head title="Semua Proyek - PT WMU" />
+            <SeoHead 
+                title="Semua Proyek" 
+                description="Lihat daftar lengkap portofolio proyek konstruksi dari PT Winmulyautama."
+            />
 
             {/* Header Section */}
             <section className="pt-32 pb-16 bg-gray-50 relative overflow-hidden">
@@ -134,7 +138,9 @@ export default function SemuaProyek() {
                                                 <img 
                                                     src={`/storage/${item.prk_gambar}`} 
                                                     alt={item.prk_judul} 
-                                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" 
+                                                    loading="lazy" 
+                                                    decoding="async" 
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-gray-400">

@@ -14,6 +14,7 @@ Route::get('/', function () {
     $blog = \App\Models\Blog::orderBy('tanggal_terbit', 'desc')->take(3)->get();
     $faq = \App\Models\Faq::where('status_aktif', 1)->orderBy('urutan', 'asc')->get();
     $mitra = \App\Models\Mitra::where('status_aktif', 1)->orderBy('urutan', 'asc')->get();
+    $tentangBeranda = \App\Models\TentangBeranda::first();
 
     return Inertia::render('Welcome', [
         'layanan' => $layanan,
@@ -24,6 +25,7 @@ Route::get('/', function () {
         'blog' => $blog,
         'faq' => $faq,
         'mitra' => $mitra,
+        'tentangBeranda' => $tentangBeranda,
     ]);
 })->name('home');
 
@@ -31,11 +33,13 @@ Route::get('/tentang-kami', function () {
     $keunggulan = \App\Models\Keunggulan::orderBy('urutan', 'asc')->get();
     $mitra = \App\Models\Mitra::where('status_aktif', 1)->orderBy('urutan', 'asc')->get();
     $videos = \App\Models\Video::where('status', 'Aktif')->orderBy('id_video', 'asc')->get();
+    $tentangKami = \App\Models\TentangKami::first();
     
     return Inertia::render('TentangKami', [
         'keunggulan' => $keunggulan,
         'mitra' => $mitra,
         'videos' => $videos,
+        'tentang' => $tentangKami,
     ]);
 })->name('tentang-kami');
 
@@ -156,6 +160,77 @@ Route::post('/ulasan', function (\Illuminate\Http\Request $request) {
     return redirect()->back();
 })->name('ulasan.storePublic');
 
+Route::get('/karir', function () {
+    $karir = \App\Models\Karir::where('status_aktif', 1)->orderBy('id_karir', 'desc')->get();
+    
+    // If no active karir, redirect to home or show 404 (user preferred conditional link, but if manually accessed, better handle it)
+    if ($karir->isEmpty()) {
+        return redirect()->route('home');
+    }
+    
+    return Inertia::render('Karir', [
+        'karir' => $karir
+    ]);
+})->name('karir');
+
+Route::get('/sitemap.xml', function () {
+    $proyeks = \App\Models\Proyek::where('prk_status', 'Published')->where('prk_is_tampil', 1)->get();
+    $blogs = \App\Models\Blog::where('status', 'Published')->get();
+    $layanans = \App\Models\Layanan::all();
+    
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    
+    $routes = [
+        '/' => 'daily',
+        '/tentang-kami' => 'weekly',
+        '/layanan' => 'weekly',
+        '/proyek' => 'weekly',
+        '/semua-proyek' => 'weekly',
+        '/blog' => 'daily'
+    ];
+
+    foreach ($routes as $route => $freq) {
+        $xml .= '<url>';
+        $xml .= '<loc>' . url($route) . '</loc>';
+        $xml .= '<lastmod>' . now()->tz('UTC')->toAtomString() . '</lastmod>';
+        $xml .= '<changefreq>' . $freq . '</changefreq>';
+        $xml .= '<priority>' . ($route == '/' ? '1.0' : '0.8') . '</priority>';
+        $xml .= '</url>';
+    }
+
+    foreach ($layanans as $layanan) {
+        $xml .= '<url>';
+        $xml .= '<loc>' . url("/layanan/{$layanan->id_layanan}") . '</loc>';
+        $xml .= '<lastmod>' . ($layanan->updated_at ? $layanan->updated_at->tz('UTC')->toAtomString() : now()->tz('UTC')->toAtomString()) . '</lastmod>';
+        $xml .= '<changefreq>monthly</changefreq>';
+        $xml .= '<priority>0.7</priority>';
+        $xml .= '</url>';
+    }
+
+    foreach ($proyeks as $proyek) {
+        $xml .= '<url>';
+        $xml .= '<loc>' . url("/proyek/{$proyek->prk_slug}") . '</loc>';
+        $xml .= '<lastmod>' . ($proyek->updated_at ? $proyek->updated_at->tz('UTC')->toAtomString() : now()->tz('UTC')->toAtomString()) . '</lastmod>';
+        $xml .= '<changefreq>monthly</changefreq>';
+        $xml .= '<priority>0.7</priority>';
+        $xml .= '</url>';
+    }
+
+    foreach ($blogs as $blog) {
+        $xml .= '<url>';
+        $xml .= '<loc>' . url("/blog/{$blog->slug}") . '</loc>';
+        $xml .= '<lastmod>' . ($blog->updated_at ? $blog->updated_at->tz('UTC')->toAtomString() : now()->tz('UTC')->toAtomString()) . '</lastmod>';
+        $xml .= '<changefreq>monthly</changefreq>';
+        $xml .= '<priority>0.7</priority>';
+        $xml .= '</url>';
+    }
+
+    $xml .= '</urlset>';
+    
+    return response($xml)->header('Content-Type', 'text/xml');
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -169,6 +244,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/pengaturan', [\App\Http\Controllers\Admin\PengaturanController::class, 'index'])->name('pengaturan');
         Route::post('/pengaturan', [\App\Http\Controllers\Admin\PengaturanController::class, 'update'])->name('pengaturan.update');
+        Route::get('/tentang-beranda', [\App\Http\Controllers\Admin\TentangBerandaController::class, 'index'])->name('tentang-beranda');
+        Route::post('/tentang-beranda', [\App\Http\Controllers\Admin\TentangBerandaController::class, 'update'])->name('tentang-beranda.update');
+        Route::get('/tentang-kami', [\App\Http\Controllers\Admin\TentangKamiController::class, 'index'])->name('tentang-kami');
+        Route::post('/tentang-kami', [\App\Http\Controllers\Admin\TentangKamiController::class, 'update'])->name('tentang-kami.update');
         Route::resource('/klien', \App\Http\Controllers\Admin\KlienController::class)->except(['create', 'show', 'edit']);
         Route::resource('/mitra', \App\Http\Controllers\Admin\MitraController::class)->except(['create', 'show', 'edit']);
         Route::resource('/keunggulan', \App\Http\Controllers\Admin\KeunggulanController::class)->except(['create', 'show', 'edit']);

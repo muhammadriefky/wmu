@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Head, usePage, Link } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import SeoHead from '@/Components/SeoHead';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowRight, HardHat, CheckCircle2,
@@ -23,10 +24,21 @@ function getYoutubeEmbedUrl(url) {
     return url;
 }
 
-export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }) {
+export default function TentangKami({ keunggulan = [], mitra = [], videos = [], tentang = null }) {
     const { pengaturan } = usePage().props;
     const [orgZoom, setOrgZoom] = useState(100);
     const [activeVideo, setActiveVideo] = useState(null);
+
+    const safeParse = (data) => {
+        if (!data) return [];
+        if (typeof data === 'string') {
+            try { return JSON.parse(data); } catch (e) { return []; }
+        }
+        return Array.isArray(data) ? data : [];
+    };
+
+    const sejarah = safeParse(tentang?.sejarah_perusahaan);
+    const nilai = safeParse(tentang?.nilai_perusahaan);
 
     const fadeInUp = {
         hidden: { opacity: 0, y: 40 },
@@ -35,10 +47,10 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
 
     return (
         <PublicLayout>
-            <Head>
-                <title>{`Tentang Kami - ${pengaturan?.nama_perusahaan || 'WMU'}`}</title>
-                <meta name="description" content="Profil, sejarah, dan nilai-nilai perusahaan WMU." />
-            </Head>
+            <SeoHead 
+                title="Tentang Kami" 
+                description="Pelajari lebih lanjut tentang sejarah, nilai-nilai, dan struktur organisasi WMU Construction."
+            />
 
             {/* Hero Section */}
             <section className="relative bg-wmu-dark text-white min-h-[70vh] flex flex-col justify-center overflow-hidden">
@@ -72,11 +84,11 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
                             </motion.div>
 
                             <motion.h1 variants={fadeInUp} className="text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight mb-6 text-white">
-                                Tentang Kami
+                                {tentang?.judul_hero || 'Tentang Kami'}
                             </motion.h1>
 
                             <motion.p variants={fadeInUp} className="text-lg text-gray-300 mb-12 max-w-xl leading-relaxed">
-                                Mengenal lebih dekat dedikasi dan perjalanan kami di industri konstruksi dengan standar kualitas terbaik.
+                                {tentang?.deskripsi_hero || 'Mengenal lebih dekat dedikasi dan perjalanan kami di industri konstruksi dengan standar kualitas terbaik.'}
                             </motion.p>
 
                             {/* Stats inline */}
@@ -128,14 +140,7 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
                         </div>
                         <div className="lg:col-span-8">
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:gap-8">
-                                {[
-                                    { title: 'Integritas', desc: 'Menjunjung tinggi kejujuran, transparansi, dan etika dalam setiap pekerjaan.', icon: ShieldCheck },
-                                    { title: 'Kualitas', desc: 'Berkomitmen menghasilkan kualitas terbaik di setiap detail.', icon: Award },
-                                    { title: 'Keselamatan', desc: 'Mengutamakan keselamatan kerja demi melindungi tim dan lingkungan.', icon: HardHat },
-                                    { title: 'Inovasi', desc: 'Terus berinovasi untuk menghadirkan solusi konstruksi yang lebih baik dan efisien.', icon: Lightbulb },
-                                    { title: 'Kolaborasi', desc: 'Bekerja sama dengan tim, mitra, dan klien demi mencapai hasil terbaik.', icon: Users },
-                                    { title: 'Keberlanjutan', desc: 'Membangun dengan memperhatikan dampak jangka panjang bagi masa depan.', icon: Leaf }
-                                ].map((nilai, idx) => (
+                                {nilai.length > 0 ? nilai.map((item, idx) => (
                                     <motion.div
                                         key={idx}
                                         initial={{ opacity: 0, y: 20 }}
@@ -145,10 +150,32 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
                                         className="bg-white rounded-2xl p-6 text-center hover:-translate-y-2 transition-all duration-300 group"
                                     >
                                         <div className="w-16 h-16 mx-auto bg-gray-50 border border-gray-100 rounded-[20px] flex items-center justify-center mb-5 group-hover:bg-wmu-accent/10 group-hover:border-wmu-accent/30 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-                                            <nilai.icon size={28} className="text-wmu-accent/70 group-hover:text-wmu-accent transition-colors" strokeWidth={1.5} />
+                                            <Award size={28} className="text-wmu-accent/70 group-hover:text-wmu-accent transition-colors" strokeWidth={1.5} />
                                         </div>
-                                        <h4 className="font-bold text-gray-900 mb-2">{nilai.title}</h4>
-                                        <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed">{nilai.desc}</p>
+                                        <h4 className="font-bold text-gray-900 mb-2">{item.title}</h4>
+                                        <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed">{item.desc}</p>
+                                    </motion.div>
+                                )) : [
+                                    { title: 'Integritas', desc: 'Menjunjung tinggi kejujuran, transparansi, dan etika dalam setiap pekerjaan.' },
+                                    { title: 'Kualitas', desc: 'Berkomitmen menghasilkan kualitas terbaik di setiap detail.' },
+                                    { title: 'Keselamatan', desc: 'Mengutamakan keselamatan kerja demi melindungi tim dan lingkungan.' },
+                                    { title: 'Inovasi', desc: 'Terus berinovasi untuk menghadirkan solusi konstruksi yang lebih baik dan efisien.' },
+                                    { title: 'Kolaborasi', desc: 'Bekerja sama dengan tim, mitra, dan klien demi mencapai hasil terbaik.' },
+                                    { title: 'Keberlanjutan', desc: 'Membangun dengan memperhatikan dampak jangka panjang bagi masa depan.' }
+                                ].map((item, idx) => (
+                                    <motion.div
+                                        key={idx}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: idx * 0.1 }}
+                                        className="bg-white rounded-2xl p-6 text-center hover:-translate-y-2 transition-all duration-300 group"
+                                    >
+                                        <div className="w-16 h-16 mx-auto bg-gray-50 border border-gray-100 rounded-[20px] flex items-center justify-center mb-5 group-hover:bg-wmu-accent/10 group-hover:border-wmu-accent/30 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+                                            <Award size={28} className="text-wmu-accent/70 group-hover:text-wmu-accent transition-colors" strokeWidth={1.5} />
+                                        </div>
+                                        <h4 className="font-bold text-gray-900 mb-2">{item.title}</h4>
+                                        <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed">{item.desc}</p>
                                     </motion.div>
                                 ))}
                             </div>
@@ -166,7 +193,20 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
                             <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-12 leading-tight">Perjalanan & Sejarah Perusahaan</h3>
 
                             <div className="relative pl-8 md:pl-10 border-l border-gray-200 space-y-10">
-                                {[
+                                {sejarah.length > 0 ? sejarah.map((item, idx) => (
+                                    <div key={idx} className="relative group">
+                                        {/* Timeline Dot */}
+                                        <div className="absolute -left-[37px] md:-left-[45px] top-1 w-2.5 h-2.5 bg-gray-300 rounded-full group-hover:bg-wmu-accent transition-colors ring-4 ring-gray-50"></div>
+
+                                        <div className="flex flex-col md:flex-row md:items-start gap-1 md:gap-6">
+                                            <div className="font-bold text-wmu-accent text-lg md:w-16 shrink-0 leading-none mt-0.5">{item.year}</div>
+                                            <div>
+                                                <h4 className="font-bold text-gray-900 mb-2">{item.title}</h4>
+                                                <p className="text-sm text-gray-500 leading-relaxed">{item.desc}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )) : [
                                     { year: '2014', title: 'Awal Berdiri', desc: `${pengaturan?.nama_perusahaan || 'WMU'} didirikan dengan visi menjadi perusahaan kontraktor profesional dan terpercaya.` },
                                     { year: '2016', title: 'Ekspansi Layanan', desc: 'Menambah layanan konstruksi terintegrasi meliputi design & build serta interior construction.' },
                                     { year: '2018', title: 'Peningkatan Kapasitas', desc: 'Meningkatkan sumber daya manusia, alat berat, dan sistem manajemen proyek.' },
@@ -311,6 +351,16 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
 
                             {/* Org Chart Container */}
                             <div className="overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-gray-200 flex justify-center">
+                            {tentang?.struktur_organisasi_image ? (
+                                <div className="flex justify-center w-full">
+                                    <img 
+                                        src={`/storage/${tentang.struktur_organisasi_image}`} 
+                                        alt="Struktur Organisasi" 
+                                        className="w-full h-auto max-w-4xl object-contain transition-transform duration-300 origin-top"
+                                        style={{ transform: `scale(${orgZoom / 100})` }}
+                                    />
+                                </div>
+                            ) : (
                                 <div 
                                     className="min-w-[800px] flex flex-col items-center select-none pt-4 transition-transform duration-300 origin-top"
                                     style={{ transform: `scale(${orgZoom / 100})` }}
@@ -432,6 +482,7 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
                                     </div>
 
                                 </div>
+                            )}
                             </div>
 
                             <div className="mt-4 pt-4 border-t border-gray-50 text-right text-[10px] text-gray-400">
@@ -543,7 +594,15 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
 
                             {/* Video player */}
                             <div className="relative aspect-video bg-black">
-                                {getYoutubeEmbedUrl(activeVideo.url_video) ? (
+                                {activeVideo.sumber === 'Upload' && activeVideo.file_video ? (
+                                    <video 
+                                        src={`/storage/${activeVideo.file_video}`} 
+                                        controls 
+                                        autoPlay 
+                                        className="w-full h-full"
+                                        poster={activeVideo.gambar ? `/storage/${activeVideo.gambar}` : undefined}
+                                    />
+                                ) : activeVideo.sumber === 'Youtube' && getYoutubeEmbedUrl(activeVideo.url_video) ? (
                                     <iframe
                                         src={getYoutubeEmbedUrl(activeVideo.url_video)}
                                         title={activeVideo.judul_video}
@@ -560,7 +619,7 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [] }
                                             className="w-full h-full object-cover"
                                         />
                                         <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-4">
-                                            <p className="text-white text-sm font-medium">Link video tidak tersedia</p>
+                                            <p className="text-white text-sm font-medium">Video tidak tersedia</p>
                                         </div>
                                     </div>
                                 )}

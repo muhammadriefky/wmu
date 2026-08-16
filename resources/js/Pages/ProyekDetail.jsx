@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import SeoHead from '@/Components/SeoHead';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Building2, MapPin, Calendar, CheckCircle, Target, Trophy, Scaling } from 'lucide-react';
 
@@ -11,7 +12,13 @@ export default function ProyekDetail({ proyek, galeri }) {
 
     return (
         <PublicLayout>
-            <Head title={`${proyek.prk_judul} - Portofolio Proyek`} />
+            <SeoHead 
+                title={proyek.prk_judul} 
+                description={proyek.prk_deskripsi?.substring(0, 160).replace(/(<([^>]+)>)/gi, "")}
+                image={proyek.prk_gambar ? `/storage/${proyek.prk_gambar}` : null}
+                url={route('proyek.show', proyek.prk_slug)}
+                type="article"
+            />
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden bg-wmu-dark">

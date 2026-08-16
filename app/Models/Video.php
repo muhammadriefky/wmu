@@ -16,8 +16,10 @@ class Video extends Model
     protected $fillable = [
         'judul_video',
         'durasi',
+        'sumber',
         'gambar',
         'url_video',
+        'file_video',
         'status',
         'rec_datecreated',
         'rec_dateupdate',

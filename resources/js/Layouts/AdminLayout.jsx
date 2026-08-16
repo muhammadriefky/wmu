@@ -5,7 +5,7 @@ import {
     LayoutDashboard, Settings, Star, Users, Briefcase, 
     MessageSquare, FileText, BriefcaseBusiness, HelpCircle, 
     Menu, X, Building2, ChevronDown, LogOut, User as UserIcon,
-    Bell, Search, ExternalLink, ShieldCheck, Home, Play
+    Bell, Search, ExternalLink, ShieldCheck, Home, Play, MonitorPlay
 } from 'lucide-react';
 
 export default function AdminLayout({ header, children }) {
@@ -109,6 +109,12 @@ export default function AdminLayout({ header, children }) {
                         <div className="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                             Content Management
                         </div>
+                        <NavItem href={route('admin.tentang-beranda')} routeName="admin.tentang-beranda" icon={MonitorPlay}>
+                            Tentang Beranda
+                        </NavItem>
+                        <NavItem href={route('admin.tentang-kami')} routeName="admin.tentang-kami" icon={MonitorPlay}>
+                            Tentang Kami
+                        </NavItem>
                         <NavItem href={route('admin.layanan.index')} routeName="admin.layanan" icon={BriefcaseBusiness}>
                             Layanan Kami
                         </NavItem>

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Head, usePage, Link } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import SeoHead from '@/Components/SeoHead';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Building2, Users, Map, ThumbsUp, Play, ChevronLeft, ChevronRight,
@@ -82,10 +83,10 @@ export default function Proyek() {
 
     return (
         <PublicLayout>
-            <Head>
-                <title>{`Portofolio Proyek - ${pengaturan?.nama_perusahaan || 'WMU'}`}</title>
-                <meta name="description" content="Kumpulan karya dan portofolio proyek konstruksi dari PT Winmulyautama." />
-            </Head>
+            <SeoHead 
+                title="Proyek Pilihan" 
+                description="Eksplorasi portofolio proyek konstruksi terbaik kami yang telah diselesaikan dengan standar kualitas tertinggi."
+            />
 
             {/* Hero Section */}
             <section className="bg-wmu-dark text-white pt-32 pb-32 md:pb-48 relative overflow-hidden">
@@ -287,7 +288,7 @@ export default function Proyek() {
                                                 onClick={() => setActiveImageIndex(idx)}
                                                 className={`relative w-1/5 aspect-video rounded-lg overflow-hidden border-2 transition-all duration-300 ${activeImageIndex === idx ? 'border-[#DFA639] scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
                                             >
-                                                <img src={thumb} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                                                <img src={thumb} alt={`Thumbnail ${idx + 1}`} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                             </button>
                                         ))}
                                     </div>
@@ -430,7 +431,7 @@ export default function Proyek() {
                             {proyek.map((item) => (
                                 <div key={item.prk_id} className="min-w-[280px] md:min-w-[300px] bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0 snap-start border border-gray-100 group">
                                     <div className="relative h-48 overflow-hidden">
-                                        <img src={`/storage/${item.prk_gambar}`} alt={item.prk_judul} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <img src={`/storage/${item.prk_gambar}`} alt={item.prk_judul} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-wmu-dark/90 to-transparent flex items-end p-4">
                                             <span className="text-white text-xs font-semibold px-2 py-1 bg-wmu-dark/80 backdrop-blur-sm rounded">
                                                 {item.prk_kategori}
@@ -506,7 +507,7 @@ export default function Proyek() {
                                         <div key={item.id_klien || idx} className="min-w-[280px] md:min-w-[320px] bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 p-6 md:p-8 flex-shrink-0 snap-center flex flex-col justify-between">
                                             <div>
                                                 <div className="flex justify-between items-start mb-6">
-                                                    <img src={`/storage/${item.logo}`} alt={item.nama_klien} className="h-12 md:h-16 object-contain max-w-[120px] md:max-w-[150px]" />
+                                                    <img src={`/storage/${item.logo}`} alt={item.nama_klien} loading="lazy" decoding="async" className="h-12 md:h-16 object-contain max-w-[120px] md:max-w-[150px]" />
                                                     <div className="flex gap-0.5 mt-2">
                                                         {[...Array(5)].map((_, i) => (
                                                             <Star key={i} size={14} className="text-[#DFA639] fill-current" />

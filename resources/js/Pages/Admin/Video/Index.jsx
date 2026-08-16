@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm, usePage, router } from '@inertiajs/react';
-import {
-    Plus, Trash2, X, Edit, Search, Play, Film
+import { 
+    Plus, Trash2, X, Filter, LayoutGrid, List, MoreVertical, 
+    Edit, Calendar, Search, ChevronDown, Play, Image as ImageIcon
 } from 'lucide-react';
 import Pagination from '@/Components/Pagination';
 
@@ -11,27 +12,48 @@ export default function Index({ videos, stats, filters }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editId, setEditId] = useState(null);
-
+    
     const [searchTerm, setSearchTerm] = useState(filters?.search || '');
     const [sortFilter, setSortFilter] = useState(filters?.sort || 'Terbaru');
 
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         judul_video: '',
         durasi: '',
+        sumber: 'Youtube',
         url_video: '',
+        file_video: null,
         status: 'Aktif',
         gambar: null,
     });
 
+    const handleVideoFileChange = (e) => {
+        const file = e.target.files[0];
+        setData('file_video', file);
+        if (file) {
+            const videoElement = document.createElement('video');
+            videoElement.preload = 'metadata';
+            videoElement.onloadedmetadata = function() {
+                window.URL.revokeObjectURL(videoElement.src);
+                const duration = videoElement.duration;
+                if (duration) {
+                    const minutes = Math.floor(duration / 60);
+                    const seconds = Math.floor(duration % 60);
+                    setData('durasi', `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+                }
+            }
+            videoElement.src = URL.createObjectURL(file);
+        }
+    };
+
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchTerm !== (filters?.search || '') || sortFilter !== (filters?.sort || 'Terbaru')) {
+            if (searchTerm !== filters?.search || sortFilter !== filters?.sort) {
                 router.get(route('admin.video.index'), {
                     search: searchTerm,
                     sort: sortFilter
                 }, { preserveState: true, preserveScroll: true, replace: true });
             }
-        }, 300);
+        }, 500);
         return () => clearTimeout(timer);
     }, [searchTerm, sortFilter]);
 
@@ -41,10 +63,12 @@ export default function Index({ videos, stats, filters }) {
             setIsEditing(true);
             setEditId(video.id_video);
             setData({
-                judul_video: video.judul_video || '',
+                judul_video: video.judul_video,
                 durasi: video.durasi || '',
+                sumber: video.sumber || 'Youtube',
                 url_video: video.url_video || '',
-                status: video.status || 'Aktif',
+                file_video: null,
+                status: video.status,
                 gambar: null,
             });
         } else {
@@ -57,111 +81,104 @@ export default function Index({ videos, stats, filters }) {
 
     const closeModal = () => {
         setIsModalOpen(false);
-        reset();
+        setTimeout(reset, 200);
     };
 
-    const submit = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-
+        
         if (isEditing) {
             let updateData = { ...data, _method: 'put' };
             if (!updateData.gambar) {
                 delete updateData.gambar;
             }
+            if (!updateData.file_video) {
+                delete updateData.file_video;
+            }
             router.post(route('admin.video.update', editId), updateData, {
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
+                forceFormData: true, 
             });
         } else {
             post(route('admin.video.store'), {
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
+                forceFormData: true,
             });
         }
     };
 
-    const deleteItem = (id) => {
-        if (confirm('Yakin ingin menghapus video ini?')) {
-            router.delete(route('admin.video.destroy', id), {
-                preserveScroll: true,
-            });
+    const handleDelete = (id) => {
+        if (confirm('Apakah Anda yakin ingin menghapus video ini?')) {
+            router.delete(route('admin.video.destroy', id));
         }
     };
 
     return (
-        <AdminLayout header="Manajemen Video">
+        <AdminLayout>
             <Head title="Manajemen Video" />
-
-            {flash?.success && (
-                <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl relative shadow-sm">
-                    <span className="block sm:inline">{flash.success}</span>
-                </div>
-            )}
-
-            {/* Header */}
+            
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Manajemen Video</h2>
                     <p className="text-sm text-gray-500 mt-1">Kelola data video kegiatan perusahaan</p>
                 </div>
-                <button
+                <button 
                     onClick={() => openModal()}
-                    className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-800 transition-all flex items-center gap-2"
+                    className="bg-wmu-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-800 transition-all flex items-center gap-2"
                 >
-                    <Plus size={18} strokeWidth={2.5} /> Tambah Video
+                    <Plus size={18} strokeWidth={2.5} /> Tambah Video Baru
                 </button>
             </div>
 
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-5">
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center gap-5">
                     <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                        <Film size={24} />
+                        <Play size={24} />
                     </div>
                     <div>
-                        <div className="text-3xl font-extrabold text-gray-900">{stats?.total || 0}</div>
+                        <div className="text-3xl font-extrabold text-gray-900">{stats.total}</div>
                         <div className="text-sm font-medium text-gray-500 mt-0.5">Total Video</div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-5">
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center gap-5">
                     <div className="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center shrink-0">
                         <Play size={24} />
                     </div>
                     <div>
-                        <div className="text-3xl font-extrabold text-gray-900">{stats?.aktif || 0}</div>
+                        <div className="text-3xl font-extrabold text-gray-900">{stats.aktif}</div>
                         <div className="text-sm font-medium text-gray-500 mt-0.5">Video Aktif</div>
                     </div>
                 </div>
-                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-5">
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center gap-5">
                     <div className="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
-                        <X size={24} />
+                        <Play size={24} />
                     </div>
                     <div>
-                        <div className="text-3xl font-extrabold text-gray-900">{stats?.tidak_aktif || 0}</div>
+                        <div className="text-3xl font-extrabold text-gray-900">{stats.tidak_aktif}</div>
                         <div className="text-sm font-medium text-gray-500 mt-0.5">Tidak Aktif</div>
                     </div>
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                {/* Search & Filter Bar */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] overflow-hidden">
                 <div className="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-gray-50/50">
                     <div className="relative w-full md:w-80">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                        <input
-                            type="text"
-                            placeholder="Cari video..."
+                        <input 
+                            type="text" 
+                            placeholder="Cari video..." 
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border-gray-200 text-sm focus:border-gray-900 focus:ring-gray-900 bg-white shadow-sm transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border-gray-200 text-sm focus:border-wmu-dark focus:ring-wmu-dark bg-white shadow-sm transition-all"
                         />
                     </div>
                     <div className="flex items-center gap-3 w-full md:w-auto">
-                        <select
+                        <select 
                             value={sortFilter}
                             onChange={(e) => setSortFilter(e.target.value)}
-                            className="w-full md:w-40 py-2.5 pl-4 pr-10 rounded-xl border-gray-200 text-sm focus:border-gray-900 focus:ring-gray-900 bg-white shadow-sm font-medium"
+                            className="w-full md:w-40 py-2.5 pl-4 pr-10 rounded-xl border-gray-200 text-sm focus:border-wmu-dark focus:ring-wmu-dark bg-white shadow-sm font-medium"
                         >
                             <option value="Terbaru">Terbaru</option>
                             <option value="Terlama">Terlama</option>
@@ -169,7 +186,6 @@ export default function Index({ videos, stats, filters }) {
                     </div>
                 </div>
 
-                {/* Table Content */}
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
@@ -181,22 +197,27 @@ export default function Index({ videos, stats, filters }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
-                            {videos?.data?.length > 0 ? (
+                            {videos.data.length > 0 ? (
                                 videos.data.map((video) => (
                                     <tr key={video.id_video} className="hover:bg-gray-50/50 transition-colors group">
                                         <td className="py-4 px-6">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-20 h-14 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-200 relative flex items-center justify-center">
+                                                <div className="w-20 h-14 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-200 relative">
                                                     {video.gambar ? (
                                                         <img src={`/storage/${video.gambar}`} alt={video.judul_video} className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <Film size={20} className="text-gray-400" />
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                            <ImageIcon size={20} />
+                                                        </div>
                                                     )}
+                                                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center text-white">
+                                                        <Play size={16} fill="currentColor" />
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <div className="font-bold text-gray-900 mb-1">{video.judul_video}</div>
                                                     {video.url_video && (
-                                                        <a href={video.url_video} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline truncate block max-w-[200px]">{video.url_video}</a>
+                                                        <a href={video.url_video} target="_blank" className="text-xs text-blue-500 hover:underline">{video.url_video}</a>
                                                     )}
                                                 </div>
                                             </div>
@@ -212,11 +233,11 @@ export default function Index({ videos, stats, filters }) {
                                             </span>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <div className="flex items-center justify-end gap-2">
+                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button onClick={() => openModal(video)} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm">
                                                     <Edit size={14} />
                                                 </button>
-                                                <button onClick={() => deleteItem(video.id_video)} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm">
+                                                <button onClick={() => handleDelete(video.id_video)} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm">
                                                     <Trash2 size={14} />
                                                 </button>
                                             </div>
@@ -227,7 +248,7 @@ export default function Index({ videos, stats, filters }) {
                                 <tr>
                                     <td colSpan="4" className="py-12 text-center">
                                         <div className="w-16 h-16 mx-auto bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
-                                            <Film size={24} className="text-gray-400" />
+                                            <Play size={24} className="text-gray-400" />
                                         </div>
                                         <h3 className="text-lg font-bold text-gray-900 mb-1">Belum ada Video</h3>
                                         <p className="text-sm text-gray-500">Mulai tambahkan video kegiatan Anda sekarang.</p>
@@ -237,26 +258,26 @@ export default function Index({ videos, stats, filters }) {
                         </tbody>
                     </table>
                 </div>
-
-                {videos?.data?.length > 0 && <div className="p-4 border-t border-gray-100"><Pagination links={videos.links} /></div>}
+                
+                {videos.data.length > 0 && <Pagination links={videos.links} />}
             </div>
 
             {/* Modal Form */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm overflow-y-auto">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm overflow-y-auto custom-scrollbar">
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl my-auto">
                         <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50 rounded-t-2xl">
                             <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                {isEditing ? <Edit size={18} className="text-yellow-500" /> : <Plus size={18} className="text-green-500" />}
+                                {isEditing ? <Edit size={18} className="text-wmu-accent" /> : <Plus size={18} className="text-wmu-accent" />}
                                 {isEditing ? 'Edit Video' : 'Tambah Video Baru'}
                             </h3>
                             <button onClick={closeModal} className="text-gray-400 hover:text-red-500 transition-colors p-1 hover:bg-red-50 rounded-lg">
                                 <X size={20} />
                             </button>
                         </div>
-
-                        <div className="px-6 py-6 max-h-[70vh] overflow-y-auto">
-                            <form id="videoForm" onSubmit={submit}>
+                        
+                        <div className="px-6 py-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                            <form id="videoForm" onSubmit={handleSubmit}>
                                 {isEditing && (
                                     <div className="mb-6 p-4 bg-yellow-50 rounded-xl border border-yellow-100 flex gap-3 text-yellow-800 text-sm">
                                         <Edit className="shrink-0 mt-0.5 text-yellow-600" size={16} />
@@ -268,7 +289,7 @@ export default function Index({ videos, stats, filters }) {
                                     <label className="block text-sm font-bold text-gray-700 mb-1.5">Judul Video <span className="text-red-500">*</span></label>
                                     <input
                                         type="text"
-                                        className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-gray-900 transition-all duration-200 sm:text-sm font-medium text-gray-700"
+                                        className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700"
                                         value={data.judul_video}
                                         onChange={e => setData('judul_video', e.target.value)}
                                         required
@@ -281,17 +302,19 @@ export default function Index({ videos, stats, filters }) {
                                         <label className="block text-sm font-bold text-gray-700 mb-1.5">Durasi</label>
                                         <input
                                             type="text"
-                                            placeholder="Contoh: 02:25"
-                                            className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-gray-900 transition-all duration-200 sm:text-sm font-medium text-gray-700"
+                                            placeholder={data.sumber === 'Upload' ? "Otomatis diisi" : "Contoh: 02:25"}
+                                            className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700 disabled:opacity-50"
                                             value={data.durasi}
                                             onChange={e => setData('durasi', e.target.value)}
+                                            disabled={data.sumber === 'Upload'}
                                         />
+                                        {data.sumber === 'Upload' && <p className="text-gray-500 text-xs mt-1.5">Durasi dihitung otomatis dari file.</p>}
                                         {errors.durasi && <p className="text-red-500 text-xs mt-1.5">{errors.durasi}</p>}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1.5">Status <span className="text-red-500">*</span></label>
                                         <select
-                                            className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-gray-900 transition-all duration-200 sm:text-sm font-medium text-gray-700"
+                                            className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700"
                                             value={data.status}
                                             onChange={e => setData('status', e.target.value)}
                                         >
@@ -303,33 +326,66 @@ export default function Index({ videos, stats, filters }) {
                                 </div>
 
                                 <div className="mb-5">
-                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">URL Video</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Contoh: https://youtube.com/..."
-                                        className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-900 focus:ring-gray-900 transition-all duration-200 sm:text-sm font-medium text-gray-700"
-                                        value={data.url_video}
-                                        onChange={e => setData('url_video', e.target.value)}
-                                    />
-                                    {errors.url_video && <p className="text-red-500 text-xs mt-1.5">{errors.url_video}</p>}
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Sumber Video <span className="text-red-500">*</span></label>
+                                    <div className="flex gap-4">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input type="radio" name="sumber" value="Youtube" checked={data.sumber === 'Youtube'} onChange={e => setData('sumber', e.target.value)} className="text-wmu-dark focus:ring-wmu-dark" />
+                                            <span className="text-sm font-medium text-gray-700">Link YouTube</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input type="radio" name="sumber" value="Upload" checked={data.sumber === 'Upload'} onChange={e => setData('sumber', e.target.value)} className="text-wmu-dark focus:ring-wmu-dark" />
+                                            <span className="text-sm font-medium text-gray-700">Upload File Video</span>
+                                        </label>
+                                    </div>
+                                    {errors.sumber && <p className="text-red-500 text-xs mt-1.5">{errors.sumber}</p>}
                                 </div>
+
+                                {data.sumber === 'Youtube' ? (
+                                    <div className="mb-5">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1.5">URL Video YouTube <span className="text-red-500">*</span></label>
+                                        <input
+                                            type="url"
+                                            placeholder="Contoh: https://youtube.com/..."
+                                            className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-wmu-dark focus:ring-wmu-dark transition-all duration-200 sm:text-sm font-medium text-gray-700"
+                                            value={data.url_video}
+                                            onChange={e => setData('url_video', e.target.value)}
+                                            required={data.sumber === 'Youtube'}
+                                        />
+                                        {errors.url_video && <p className="text-red-500 text-xs mt-1.5">{errors.url_video}</p>}
+                                    </div>
+                                ) : (
+                                    <div className="mb-5">
+                                        <label className="block text-sm font-bold text-gray-700 mb-1.5">File Video (MP4/AVI) <span className="text-red-500">*</span></label>
+                                        <input
+                                            type="file"
+                                            accept="video/mp4,video/avi,video/mpeg,video/quicktime,video/webm"
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-gray-100 file:text-wmu-dark hover:file:bg-gray-200 transition-colors cursor-pointer"
+                                            onChange={handleVideoFileChange}
+                                            required={data.sumber === 'Upload' && !isEditing}
+                                        />
+                                        {isEditing && data.sumber === 'Upload' && (
+                                            <p className="text-gray-500 text-xs mt-1.5">Biarkan kosong jika tidak ingin mengubah video.</p>
+                                        )}
+                                        {errors.file_video && <p className="text-red-500 text-xs mt-1.5">{errors.file_video}</p>}
+                                    </div>
+                                )}
 
                                 <div className="mb-5">
                                     <label className="block text-sm font-bold text-gray-700 mb-1.5">Gambar Thumbnail</label>
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-gray-100 file:text-gray-900 hover:file:bg-gray-200 transition-colors cursor-pointer"
+                                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-gray-100 file:text-wmu-dark hover:file:bg-gray-200 transition-colors cursor-pointer"
                                         onChange={e => setData('gambar', e.target.files[0])}
                                     />
                                     {errors.gambar && <p className="text-red-500 text-xs mt-1.5">{errors.gambar}</p>}
                                 </div>
                             </form>
                         </div>
-
+                        
                         <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 bg-white rounded-b-2xl">
                             <button type="button" onClick={closeModal} className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-700 font-bold hover:bg-gray-50 transition-colors">Batal</button>
-                            <button form="videoForm" type="submit" disabled={processing} className="px-5 py-2.5 bg-gray-900 text-white font-bold rounded-xl hover:bg-gray-800 disabled:opacity-50 transition-all flex items-center gap-2">
+                            <button form="videoForm" type="submit" disabled={processing} className="px-5 py-2.5 bg-wmu-dark text-white font-bold rounded-xl hover:bg-gray-800 disabled:opacity-50 transition-all flex items-center gap-2">
                                 {processing ? 'Menyimpan...' : 'Simpan Video'}
                             </button>
                         </div>

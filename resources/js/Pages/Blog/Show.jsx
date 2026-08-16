@@ -1,5 +1,6 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import SeoHead from '@/Components/SeoHead';
 import { motion } from 'framer-motion';
 import { Calendar, ArrowLeft } from 'lucide-react';
 
@@ -8,15 +9,12 @@ export default function Show({ blog }) {
 
     return (
         <PublicLayout>
-            <Head>
-                <title>{`${blog.judul_blog} - ${pengaturan?.nama_perusahaan || 'WMU'}`}</title>
-                <meta name="description" content={blog.meta_deskripsi || blog.judul_blog} />
-                
-                {/* Open Graph Tags for Social Sharing */}
-                <meta property="og:title" content={blog.judul_blog} />
-                <meta property="og:description" content={blog.meta_deskripsi || blog.judul_blog} />
-                <meta property="og:type" content="article" />
-            </Head>
+            <SeoHead 
+                title={blog.judul_blog} 
+                description={blog.deskripsi_singkat || blog.konten?.substring(0, 160).replace(/(<([^>]+)>)/gi, "")}
+                image={blog.gambar ? `/storage/${blog.gambar}` : null}
+                type="article"
+            />
 
             <article className="py-20 bg-white min-h-screen">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

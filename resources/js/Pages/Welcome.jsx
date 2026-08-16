@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Head, usePage, Link, useForm } from '@inertiajs/react';
+import { usePage, Link, useForm } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import SeoHead from '@/Components/SeoHead';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowRight, CheckCircle2, Star, Play,
@@ -10,7 +11,7 @@ import {
     Eye, Target, ChevronDown, MessageCircle, TrendingUp, Zap, X
 } from 'lucide-react';
 
-export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, blog, faq, mitra }) {
+export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, blog, faq, mitra, tentangBeranda }) {
     const { pengaturan } = usePage().props;
     const [openFaq, setOpenFaq] = useState(null);
     const [currentUlasanIndex, setCurrentUlasanIndex] = useState(0);
@@ -90,9 +91,10 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
 
     return (
         <PublicLayout>
-            <Head>
-                <title>{`Beranda - ${pengaturan?.nama_perusahaan || 'WMU'}`}</title>
-            </Head>
+            <SeoHead 
+                title="Beranda" 
+                description="Layanan konstruksi sipil, mekanikal, dan elektrikal terbaik dari WMU Construction."
+            />
 
             {/* Hero Section */}
             <section className="relative bg-wmu-dark text-white overflow-hidden min-h-[90vh] flex items-center">
@@ -150,9 +152,9 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                             </motion.div>
                             <motion.div variants={fadeInUp} className="flex items-center gap-6">
                                 <div className="flex -space-x-4">
-                                    <img className="w-12 h-12 rounded-full border-2 border-wmu-dark" src="https://i.pravatar.cc/100?img=1" alt="Client" />
-                                    <img className="w-12 h-12 rounded-full border-2 border-wmu-dark" src="https://i.pravatar.cc/100?img=2" alt="Client" />
-                                    <img className="w-12 h-12 rounded-full border-2 border-wmu-dark" src="https://i.pravatar.cc/100?img=3" alt="Client" />
+                                    <img className="w-12 h-12 rounded-full border-2 border-wmu-dark" src="https://i.pravatar.cc/100?img=1" alt="Client" loading="lazy" decoding="async" />
+                                    <img className="w-12 h-12 rounded-full border-2 border-wmu-dark" src="https://i.pravatar.cc/100?img=2" alt="Client" loading="lazy" decoding="async" />
+                                    <img className="w-12 h-12 rounded-full border-2 border-wmu-dark" src="https://i.pravatar.cc/100?img=3" alt="Client" loading="lazy" decoding="async" />
                                 </div>
                                 <div>
                                     <p className="font-bold text-white text-lg">150+ <span className="text-sm font-normal text-gray-400">Client</span></p>
@@ -429,10 +431,10 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                             {/* Video Element */}
                             <video
                                 ref={videoRef}
-                                src="/videos/videokonstruksi.mp4"
+                                src={tentangBeranda?.video_file ? `/storage/${tentangBeranda.video_file}` : "/videos/videokonstruksi.mp4"}
                                 className="rounded-2xl shadow-xl w-full aspect-video object-cover bg-gray-100"
                                 controls={isPlaying}
-                                poster="https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070&auto=format&fit=crop"
+                                poster={tentangBeranda?.video_poster ? `/storage/${tentangBeranda.video_poster}` : "https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070&auto=format&fit=crop"}
                                 onPause={() => setIsPlaying(false)}
                                 onPlay={() => setIsPlaying(true)}
                             />
@@ -440,10 +442,10 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                             {/* Badge Floating 10+ Tahun */}
                             <div className="absolute -bottom-10 -left-4 md:-left-10 bg-wmu-dark text-white p-6 md:p-8 rounded-2xl shadow-2xl max-w-xs z-10">
                                 <p className="text-sm text-gray-300 mb-4">
-                                    Kami berkomitmen memberikan hasil terbaik dengan mengutamakan kualitas, keselamatan, dan kepuasan klien.
+                                    {tentangBeranda?.teks_komitmen || 'Kami berkomitmen memberikan hasil terbaik dengan mengutamakan kualitas, keselamatan, dan kepuasan klien.'}
                                 </p>
-                                <div className="font-bold text-5xl mb-1">10+</div>
-                                <div className="text-sm text-wmu-accent font-semibold uppercase tracking-wider">Tahun Pengalaman</div>
+                                <div className="font-bold text-5xl mb-1">{tentangBeranda?.angka_pengalaman || '10+'}</div>
+                                <div className="text-sm text-wmu-accent font-semibold uppercase tracking-wider">{tentangBeranda?.teks_pengalaman || 'Tahun Pengalaman'}</div>
                             </div>
 
                             {/* Tombol Play Custom */}
@@ -462,9 +464,11 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                         {/* Bagian Teks */}
                         <div className="lg:col-span-5 lg:pl-6 mt-16 lg:mt-0 flex flex-col justify-center">
                             <h2 className="text-wmu-accent font-bold tracking-widest text-sm uppercase mb-2">TENTANG KAMI</h2>
-                            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">Solusi Konstruksi Terpercaya Sejak 2014</h3>
-                            <p className="text-gray-600 mb-8 leading-relaxed">
-                                {pengaturan?.deskripsi_perusahaan || `${pengaturan?.nama_perusahaan || 'WMU'} hadir dengan komitmen kuat untuk memberikan layanan konstruksi yang inovatif, efisien, dan berkualitas tinggi. Kami siap menjadi mitra terbaik dalam mewujudkan setiap proyek Anda.`}
+                            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
+                                {tentangBeranda?.judul || 'Solusi Konstruksi Terpercaya Sejak 2014'}
+                            </h3>
+                            <p className="text-gray-600 mb-8 leading-relaxed whitespace-pre-line">
+                                {tentangBeranda?.deskripsi || pengaturan?.deskripsi_perusahaan || `${pengaturan?.nama_perusahaan || 'WMU'} hadir dengan komitmen kuat untuk memberikan layanan konstruksi yang inovatif, efisien, dan berkualitas tinggi. Kami siap menjadi mitra terbaik dalam mewujudkan setiap proyek Anda.`}
                             </p>
 
                             {/* List Keunggulan Tambahan untuk mengisi space kosong */}
@@ -720,7 +724,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                         ].map((client, i) => (
                                             <div key={`client-${i}`} className="flex flex-col items-center justify-center shrink-0 w-28 md:w-36 gap-3">
                                                 <div className="h-12 md:h-16 w-full flex items-center justify-center">
-                                                    <img src={client.url} alt={client.name} className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300" />
+                                                    <img src={client.url} alt={client.name} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300" />
                                                 </div>
                                                 <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{client.name}</span>
                                             </div>
@@ -767,7 +771,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                         ].map((client, i) => (
                                             <div key={`client-dup-${i}`} className="flex flex-col items-center justify-center shrink-0 w-28 md:w-36 gap-3">
                                                 <div className="h-12 md:h-16 w-full flex items-center justify-center">
-                                                    <img src={client.url} alt={client.name} className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300" />
+                                                    <img src={client.url} alt={client.name} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300" />
                                                 </div>
                                                 <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{client.name}</span>
                                             </div>
@@ -823,7 +827,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                 ].map((partner, i) => (
                                     <div key={`partner-${i}`} className="flex flex-col items-center justify-center w-[120px] md:w-40 gap-3 bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-md hover:border-gray-200 hover:-translate-y-1 transition-all duration-300">
                                         <div className="h-10 md:h-14 w-full flex items-center justify-center">
-                                            <img src={partner.url} alt={partner.name} className="max-h-full max-w-full object-contain filter transition-all duration-300" />
+                                            <img src={partner.url} alt={partner.name} loading="lazy" decoding="async" className="max-h-full max-w-full object-contain filter transition-all duration-300" />
                                         </div>
                                         <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{partner.name}</span>
                                     </div>

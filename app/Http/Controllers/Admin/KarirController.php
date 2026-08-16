@@ -10,25 +10,50 @@ use Illuminate\Support\Facades\Storage;
 
 class KarirController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $karir = Karir::orderBy('id_karir', 'desc')->get();
+        $query = Karir::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('posisi', 'like', "%{$search}%")
+                  ->orWhere('persyaratan', 'like', "%{$search}%");
+        }
+
+        if ($request->filled('sort')) {
+            $sort = $request->sort;
+            if ($sort === 'Terbaru') {
+                $query->orderBy('id_karir', 'desc');
+            } elseif ($sort === 'Terlama') {
+                $query->orderBy('id_karir', 'asc');
+            }
+        } else {
+            $query->orderBy('id_karir', 'desc');
+        }
+
+        $karir = $query->paginate(10)->withQueryString();
+
+        $stats = [
+            'total' => Karir::count(),
+            'aktif' => Karir::where('status_aktif', 1)->count(),
+            'nonaktif' => Karir::where('status_aktif', 0)->count(),
+        ];
+
         return Inertia::render('Admin/Karir/Index', [
-            'karir' => $karir
+            'karir' => $karir,
+            'stats' => $stats,
+            'filters' => (object) $request->only(['search', 'sort'])
         ]);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'posisi' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'persyaratan' => 'nullable|string|nullable',
             'status_aktif' => 'required|boolean'
         ]);
-
-        $data = $request;
-        
 
         Karir::create($data);
 
@@ -37,15 +62,12 @@ class KarirController extends Controller
 
     public function update(Request $request, Karir $karir)
     {
-        $request->validate([
+        $data = $request->validate([
             'posisi' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
             'persyaratan' => 'nullable|string|nullable',
             'status_aktif' => 'required|boolean'
         ]);
-
-        $data = $request;
-        
 
         $karir->update($data);
 
@@ -54,7 +76,6 @@ class KarirController extends Controller
 
     public function destroy(Karir $karir)
     {
-        
         $karir->delete();
 
         return redirect()->back()->with('success', 'Karir berhasil dihapus!');

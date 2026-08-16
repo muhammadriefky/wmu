@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Head, usePage, Link } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import SeoHead from '@/Components/SeoHead';
 import { motion } from 'framer-motion';
 import {
     ArrowRight, HardHat, CheckCircle2,
@@ -29,10 +30,10 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
 
     return (
         <PublicLayout>
-            <Head>
-                <title>{`Layanan Kami - ${pengaturan?.nama_perusahaan || 'WMU'}`}</title>
-                <meta name="description" content="Layanan konstruksi dan desain bangunan profesional dari WMU." />
-            </Head>
+            <SeoHead 
+                title="Layanan Kami" 
+                description="Berbagai layanan konstruksi profesional dari WMU Construction untuk mewujudkan proyek impian Anda."
+            />
 
             {/* Hero Section */}
             <section className="relative bg-wmu-dark text-white min-h-[70vh] flex flex-col justify-center overflow-hidden">
@@ -143,7 +144,7 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
                                 >
                                     <div className="h-48 relative overflow-hidden bg-gray-100 shrink-0">
                                         {item.gambar ? (
-                                            <img src={`/storage/${item.gambar}`} alt={item.judul_layanan} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                            <img src={`/storage/${item.gambar}`} alt={item.judul_layanan} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">
                                                 <HardHat size={40} className="text-gray-300" />
@@ -278,7 +279,7 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
                         <div className="flex flex-wrap justify-center gap-4 flex-grow">
                             {filteredKlien && filteredKlien.length > 0 ? filteredKlien.slice(0, 6).map((k) => (
                                 <div key={k.id_klien} className="w-[150px] h-[80px] bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:shadow-md transition-all grayscale hover:grayscale-0 cursor-pointer overflow-hidden p-2">
-                                    <img src={k.logo && k.logo.startsWith('http') ? k.logo : `/storage/${k.logo}`} alt={k.nama_klien} className="max-w-full max-h-full object-contain" />
+                                    <img src={k.logo && k.logo.startsWith('http') ? k.logo : `/storage/${k.logo}`} alt={k.nama_klien} loading="lazy" decoding="async" className="max-w-full max-h-full object-contain" />
                                 </div>
                             )) : (
                                 /* Fallback mock klien */

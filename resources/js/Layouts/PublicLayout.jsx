@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 export default function PublicLayout({ children, hideCTA = false }) {
-    const { pengaturan } = usePage().props;
+    const { pengaturan, has_karir_aktif } = usePage().props;
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -36,6 +36,10 @@ export default function PublicLayout({ children, hideCTA = false }) {
         { name: 'Proyek', href: '/proyek' },
         { name: 'Blog', href: '/blog' },
     ];
+
+    if (has_karir_aktif) {
+        navLinks.push({ name: 'Karir', href: '/karir' });
+    }
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50 text-gray-900">
@@ -183,22 +187,57 @@ export default function PublicLayout({ children, hideCTA = false }) {
                             </p>
                             {/* Legal Info */}
                             <div className="space-y-1.5 text-[11px] text-gray-500 border-t border-gray-700/50 pt-4">
-                                <div className="flex gap-2"><span className="text-gray-600 w-14 shrink-0">NIB</span><span className="text-gray-400">1806250095772</span></div>
-                                <div className="flex gap-2"><span className="text-gray-600 w-14 shrink-0">NPWP</span><span className="text-gray-400">1000.0000.0312.5557</span></div>
+                                {(pengaturan?.nib || pengaturan?.nib_file) && (
+                                    <div className="flex gap-2">
+                                        <span className="text-gray-600 w-14 shrink-0">NIB</span>
+                                        {pengaturan?.nib_file ? (
+                                            <a href={`/storage/${pengaturan.nib_file}`} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-wmu-accent transition-colors underline decoration-wmu-accent/50 underline-offset-2">
+                                                {pengaturan.nib || 'Lihat Dokumen NIB'}
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-400">{pengaturan.nib}</span>
+                                        )}
+                                    </div>
+                                )}
+                                {(pengaturan?.npwp || pengaturan?.npwp_file) && (
+                                    <div className="flex gap-2">
+                                        <span className="text-gray-600 w-14 shrink-0">NPWP</span>
+                                        {pengaturan?.npwp_file ? (
+                                            <a href={`/storage/${pengaturan.npwp_file}`} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-wmu-accent transition-colors underline decoration-wmu-accent/50 underline-offset-2">
+                                                {pengaturan.npwp || 'Lihat Dokumen NPWP'}
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-400">{pengaturan.npwp}</span>
+                                        )}
+                                    </div>
+                                )}
                             </div>
-                            <div className="flex items-center gap-2 mt-5">
-                                <a href="#" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-wmu-accent hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" /></svg>
-                                </a>
-                                <a href="#" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-wmu-accent hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                                </a>
-                                <a href="#" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-wmu-accent hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" /></svg>
-                                </a>
-                                <a href="#" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-wmu-accent hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" /></svg>
-                                </a>
+                            <div className="flex flex-wrap items-center gap-2 mt-5">
+                                {pengaturan?.facebook && (
+                                    <a href={pengaturan.facebook} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-blue-600 hover:text-white transition-colors" title="Facebook">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" /></svg>
+                                    </a>
+                                )}
+                                {pengaturan?.instagram && (
+                                    <a href={pengaturan.instagram} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-pink-600 hover:text-white transition-colors" title="Instagram">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                                    </a>
+                                )}
+                                {pengaturan?.linkedin && (
+                                    <a href={pengaturan.linkedin} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-blue-700 hover:text-white transition-colors" title="LinkedIn">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" /></svg>
+                                    </a>
+                                )}
+                                {pengaturan?.youtube && (
+                                    <a href={pengaturan.youtube} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-red-600 hover:text-white transition-colors" title="YouTube">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" /></svg>
+                                    </a>
+                                )}
+                                {pengaturan?.twitter && (
+                                    <a href={pengaturan.twitter} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-gray-600 hover:text-white transition-colors" title="Twitter / X">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                    </a>
+                                )}
                             </div>
                         </div>
 
@@ -211,6 +250,7 @@ export default function PublicLayout({ children, hideCTA = false }) {
                                 <li><Link href="/layanan" className="hover:text-wmu-accent transition-colors">Layanan</Link></li>
                                 <li><Link href="/proyek" className="hover:text-wmu-accent transition-colors">Proyek</Link></li>
                                 <li><Link href="/blog" className="hover:text-wmu-accent transition-colors">Blog</Link></li>
+                                {has_karir_aktif && <li><Link href="/karir" className="hover:text-wmu-accent transition-colors">Karir</Link></li>}
                                 <li><Link href="#" className="hover:text-wmu-accent transition-colors">FAQ</Link></li>
                             </ul>
                         </div>
@@ -246,7 +286,13 @@ export default function PublicLayout({ children, hideCTA = false }) {
                                 </div>
                                 <div>
                                     <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Akte Pendirian</p>
-                                    <p className="leading-relaxed text-[10px]">AHU-0133197.AH.01.11 Tgl. 17 Juni 2025</p>
+                                    {pengaturan?.akta_file ? (
+                                        <a href={`/storage/${pengaturan.akta_file}`} target="_blank" rel="noreferrer" className="leading-relaxed text-[10px] text-gray-300 hover:text-wmu-accent transition-colors underline decoration-wmu-accent/50 underline-offset-2 block">
+                                            {pengaturan.akta || 'Lihat Dokumen AKTA'}
+                                        </a>
+                                    ) : (
+                                        <p className="leading-relaxed text-[10px]">{pengaturan?.akta || 'AHU-0133197.AH.01.11 Tgl. 17 Juni 2025'}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

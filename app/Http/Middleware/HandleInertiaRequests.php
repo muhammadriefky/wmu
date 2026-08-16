@@ -39,7 +39,12 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'pengaturan' => function () {
-                return \App\Models\Pengaturan::all()->pluck('nilai', 'kunci')->toArray();
+                return \Illuminate\Support\Facades\Cache::rememberForever('pengaturan_global', function () {
+                    return \App\Models\Pengaturan::all()->pluck('nilai', 'kunci')->toArray();
+                });
+            },
+            'has_karir_aktif' => function () {
+                return \App\Models\Karir::where('status_aktif', 1)->exists();
             },
         ];
     }

@@ -1,5 +1,6 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import SeoHead from '@/Components/SeoHead';
 import { motion } from 'framer-motion';
 import { 
     ArrowLeft, CheckCircle2, ArrowRight, Wrench, 
@@ -31,10 +32,11 @@ export default function LayananDetail({ layanan, layananLain }) {
 
     return (
         <PublicLayout>
-            <Head>
-                <title>{`${layanan.judul_layanan} - ${pengaturan?.nama_perusahaan || 'WMU'}`}</title>
-                <meta name="description" content={layanan.deskripsi || layanan.judul_layanan} />
-            </Head>
+            <SeoHead 
+                title={`${layanan.judul_layanan} - ${pengaturan?.nama_perusahaan || 'WMU'}`} 
+                description={layanan.deskripsi || layanan.judul_layanan}
+                image={layanan.gambar ? `/storage/${layanan.gambar}` : null}
+            />
 
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden bg-wmu-dark">

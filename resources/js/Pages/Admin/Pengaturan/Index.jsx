@@ -1,6 +1,6 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Building2, PhoneCall, Target, Save, CheckCircle2 } from 'lucide-react';
+import { Building2, PhoneCall, Target, Save, CheckCircle2, Share2, ShieldCheck, Download, Link as LinkIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Index({ pengaturan }) {
@@ -14,11 +14,24 @@ export default function Index({ pengaturan }) {
         wa_message: pengaturan.wa_message || '',
         visi: pengaturan.visi || '',
         misi: pengaturan.misi || '',
+        instagram: pengaturan.instagram || '',
+        facebook: pengaturan.facebook || '',
+        linkedin: pengaturan.linkedin || '',
+        youtube: pengaturan.youtube || '',
+        twitter: pengaturan.twitter || '',
+        nib: pengaturan.nib || '',
+        npwp: pengaturan.npwp || '',
+        akta: pengaturan.akta || '',
+        nib_file: null,
+        npwp_file: null,
+        akta_file: null,
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('admin.pengaturan.update'));
+        post(route('admin.pengaturan.update'), {
+            forceFormData: true,
+        });
     };
 
     const containerVariants = {
@@ -186,6 +199,173 @@ export default function Index({ pengaturan }) {
                                     onChange={e => setData('misi', e.target.value)}
                                     required
                                 ></textarea>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* Section 4: Social Media */}
+                    <motion.div variants={itemVariants} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+                        <div className="bg-gradient-to-r from-gray-50 to-white px-8 py-5 border-b border-gray-100 flex items-center gap-4">
+                            <div className="p-2.5 bg-indigo-50 text-indigo-500 rounded-xl group-hover:scale-110 group-hover:bg-indigo-100 transition-all duration-300">
+                                <Share2 size={22} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-800">Media Sosial</h3>
+                                <p className="text-sm text-gray-500 font-medium">Tautan profil media sosial perusahaan</p>
+                            </div>
+                        </div>
+                        <div className="p-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">Instagram URL</label>
+                                    <input
+                                        type="url"
+                                        className="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500 transition-all duration-300 sm:text-sm px-4 py-3 shadow-sm hover:border-gray-300"
+                                        value={data.instagram}
+                                        onChange={e => setData('instagram', e.target.value)}
+                                        placeholder="https://instagram.com/..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">Facebook URL</label>
+                                    <input
+                                        type="url"
+                                        className="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-600 focus:ring-blue-600 transition-all duration-300 sm:text-sm px-4 py-3 shadow-sm hover:border-gray-300"
+                                        value={data.facebook}
+                                        onChange={e => setData('facebook', e.target.value)}
+                                        placeholder="https://facebook.com/..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">LinkedIn URL</label>
+                                    <input
+                                        type="url"
+                                        className="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-700 focus:ring-blue-700 transition-all duration-300 sm:text-sm px-4 py-3 shadow-sm hover:border-gray-300"
+                                        value={data.linkedin}
+                                        onChange={e => setData('linkedin', e.target.value)}
+                                        placeholder="https://linkedin.com/company/..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">YouTube URL</label>
+                                    <input
+                                        type="url"
+                                        className="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-red-600 focus:ring-red-600 transition-all duration-300 sm:text-sm px-4 py-3 shadow-sm hover:border-gray-300"
+                                        value={data.youtube}
+                                        onChange={e => setData('youtube', e.target.value)}
+                                        placeholder="https://youtube.com/..."
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">Twitter / X URL</label>
+                                    <input
+                                        type="url"
+                                        className="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-gray-800 focus:ring-gray-800 transition-all duration-300 sm:text-sm px-4 py-3 shadow-sm hover:border-gray-300"
+                                        value={data.twitter}
+                                        onChange={e => setData('twitter', e.target.value)}
+                                        placeholder="https://twitter.com/..."
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+
+                    {/* Section 5: Legalitas Perusahaan */}
+                    <motion.div variants={itemVariants} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+                        <div className="bg-gradient-to-r from-gray-50 to-white px-8 py-5 border-b border-gray-100 flex items-center gap-4">
+                            <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl group-hover:scale-110 group-hover:bg-emerald-100 transition-all duration-300">
+                                <ShieldCheck size={22} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-gray-800">Legalitas & Dokumen</h3>
+                                <p className="text-sm text-gray-500 font-medium">Nomor izin dan dokumen legal perusahaan</p>
+                            </div>
+                        </div>
+                        <div className="p-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                {/* NIB */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Nomor NIB</label>
+                                        <input
+                                            type="text"
+                                            className="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 transition-all duration-300 sm:text-sm px-4 py-3 shadow-sm hover:border-gray-300"
+                                            value={data.nib}
+                                            onChange={e => setData('nib', e.target.value)}
+                                            placeholder="Masukkan nomor NIB..."
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">File Dokumen NIB (PDF/Image)</label>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/*"
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition-colors"
+                                            onChange={e => setData('nib_file', e.target.files[0])}
+                                        />
+                                        {pengaturan.nib_file && (
+                                            <a href={`/storage/${pengaturan.nib_file}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+                                                <LinkIcon size={14} /> Lihat File Tersimpan
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* NPWP */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Nomor NPWP</label>
+                                        <input
+                                            type="text"
+                                            className="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 transition-all duration-300 sm:text-sm px-4 py-3 shadow-sm hover:border-gray-300"
+                                            value={data.npwp}
+                                            onChange={e => setData('npwp', e.target.value)}
+                                            placeholder="Masukkan nomor NPWP..."
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">File Dokumen NPWP (PDF/Image)</label>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/*"
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition-colors"
+                                            onChange={e => setData('npwp_file', e.target.files[0])}
+                                        />
+                                        {pengaturan.npwp_file && (
+                                            <a href={`/storage/${pengaturan.npwp_file}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+                                                <LinkIcon size={14} /> Lihat File Tersimpan
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* AKTA */}
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Nomor/Info AKTA</label>
+                                        <input
+                                            type="text"
+                                            className="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-emerald-500 transition-all duration-300 sm:text-sm px-4 py-3 shadow-sm hover:border-gray-300"
+                                            value={data.akta}
+                                            onChange={e => setData('akta', e.target.value)}
+                                            placeholder="Masukkan info AKTA..."
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">File Dokumen AKTA (PDF/Image)</label>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/*"
+                                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 transition-colors"
+                                            onChange={e => setData('akta_file', e.target.files[0])}
+                                        />
+                                        {pengaturan.akta_file && (
+                                            <a href={`/storage/${pengaturan.akta_file}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 mt-2 text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+                                                <LinkIcon size={14} /> Lihat File Tersimpan
+                                            </a>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </motion.div>

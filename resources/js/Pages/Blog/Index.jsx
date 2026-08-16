@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import SeoHead from '@/Components/SeoHead';
 import { motion } from 'framer-motion';
 import {
     ChevronRight, ChevronDown, LayoutGrid, Settings,
@@ -20,10 +21,10 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
     }, [blog, activeCategory]);
     return (
         <PublicLayout hideCTA={true}>
-            <Head>
-                <title>{`Blog & Insight - ${pengaturan?.nama_perusahaan || 'WMU'}`}</title>
-                <meta name="description" content="Kumpulan artikel, berita, dan tips seputar dunia konstruksi dari pakarnya." />
-            </Head>
+            <SeoHead 
+                title={`Blog & Insight - ${pengaturan?.nama_perusahaan || 'WMU'}`} 
+                description="Kumpulan artikel, berita, dan tips seputar dunia konstruksi dari pakarnya."
+            />
 
             {/* Hero Section */}
             <section className="relative bg-wmu-dark text-white min-h-[500px] flex items-center overflow-hidden">
@@ -127,7 +128,7 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                                         <div key={item.id_blog} className="flex flex-col md:flex-row gap-6 border border-gray-200 p-4 rounded-2xl hover:shadow-lg transition-all duration-300 group bg-white">
                                             {/* Image */}
                                             <div className="w-full md:w-[280px] h-[220px] shrink-0 rounded-xl overflow-hidden relative bg-gray-100">
-                                                <img src={item.gambar ? `/storage/${item.gambar}` : 'https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=600'} alt={item.judul_blog} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                                <img src={item.gambar ? `/storage/${item.gambar}` : 'https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=600'} alt={item.judul_blog} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                                 <div className="absolute bottom-3 left-3 bg-wmu-dark/90 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded tracking-wide uppercase">
                                                     {item.kategori || 'Artikel'}
                                                 </div>
@@ -148,7 +149,7 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                                                 <div className="flex items-center gap-5 mt-auto mb-4">
                                                     <div className="flex items-center gap-2.5">
                                                         <div className="w-7 h-7 rounded-full bg-gray-200 overflow-hidden shrink-0">
-                                                            <img src={`https://ui-avatars.com/api/?name=${item.penulis || 'BuildPro+Team'}&background=032F40&color=fff`} alt="Author" className="w-full h-full object-cover" />
+                                                            <img src={`https://ui-avatars.com/api/?name=${item.penulis || 'BuildPro+Team'}&background=032F40&color=fff`} alt="Author" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                                         </div>
                                                         <span className="text-xs font-semibold text-gray-700">{item.penulis || 'BuildPro Team'}</span>
                                                     </div>
@@ -229,7 +230,7 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                                     {popularBlogs.length > 0 ? popularBlogs.map((article, idx) => (
                                         <Link href={`/blog/${article.slug}`} key={article.id_blog} className="flex gap-4 group cursor-pointer items-center">
                                             <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 bg-gray-100 relative">
-                                                <img src={article.gambar ? `/storage/${article.gambar}` : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=200'} alt={article.judul_blog} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                <img src={article.gambar ? `/storage/${article.gambar}` : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=200'} alt={article.judul_blog} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             </div>
                                             <div className="flex flex-col justify-center flex-grow">
                                                 <span className="text-[10px] font-bold text-gray-400 mb-1">0{idx + 1}</span>

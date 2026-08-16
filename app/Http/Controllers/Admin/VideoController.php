@@ -39,7 +39,7 @@ class VideoController extends Controller
         return Inertia::render('Admin/Video/Index', [
             'videos' => $videos,
             'stats' => $stats,
-            'filters' => $request->only(['search', 'sort'])
+            'filters' => (object) $request->only(['search', 'sort'])
         ]);
     }
 
@@ -47,14 +47,20 @@ class VideoController extends Controller
     {
         $validated = $request->validate([
             'judul_video' => 'required|string|max:255',
+            'sumber' => 'required|in:Youtube,Upload',
             'durasi' => 'nullable|string|max:50',
             'url_video' => 'nullable|string|max:255',
+            'file_video' => 'nullable|mimes:mp4,mov,avi,webm|max:51200',
             'status' => 'required|in:Aktif,Tidak Aktif',
             'gambar' => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('gambar')) {
-            $validated['gambar'] = $request->file('gambar')->store('videos', 'public');
+            $validated['gambar'] = $request->file('gambar')->store('videos/thumbnails', 'public');
+        }
+
+        if ($request->hasFile('file_video')) {
+            $validated['file_video'] = $request->file('file_video')->store('videos/files', 'public');
         }
 
         $validated['rec_usercreated'] = 'admin'; // Hardcode for now or use Auth::user()->name
@@ -70,8 +76,10 @@ class VideoController extends Controller
         
         $validated = $request->validate([
             'judul_video' => 'required|string|max:255',
+            'sumber' => 'required|in:Youtube,Upload',
             'durasi' => 'nullable|string|max:50',
             'url_video' => 'nullable|string|max:255',
+            'file_video' => 'nullable|mimes:mp4,mov,avi,webm|max:51200',
             'status' => 'required|in:Aktif,Tidak Aktif',
             'gambar' => 'nullable|image|max:2048',
         ]);
@@ -80,7 +88,24 @@ class VideoController extends Controller
             if ($video->gambar) {
                 Storage::disk('public')->delete($video->gambar);
             }
-            $validated['gambar'] = $request->file('gambar')->store('videos', 'public');
+            $validated['gambar'] = $request->file('gambar')->store('videos/thumbnails', 'public');
+        }
+
+        if ($request->hasFile('file_video')) {
+            if ($video->file_video) {
+                Storage::disk('public')->delete($video->file_video);
+            }
+            $validated['file_video'] = $request->file('file_video')->store('videos/files', 'public');
+        }
+
+        // Clean up based on sumber
+        if ($validated['sumber'] === 'Youtube') {
+            if ($video->file_video && !$request->hasFile('file_video')) {
+                Storage::disk('public')->delete($video->file_video);
+            }
+            $validated['file_video'] = null;
+        } else {
+            $validated['url_video'] = null;
         }
 
         $validated['rec_userupdate'] = 'admin';
@@ -95,6 +120,9 @@ class VideoController extends Controller
         $video = Video::findOrFail($id);
         if ($video->gambar) {
             Storage::disk('public')->delete($video->gambar);
+        }
+        if ($video->file_video) {
+            Storage::disk('public')->delete($video->file_video);
         }
         $video->delete();
 
