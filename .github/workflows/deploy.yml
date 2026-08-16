@@ -56,22 +56,16 @@ jobs:
           </IfModule>
           EOF
 
-      - name: 📂 Deploy via FTP to Hostinger
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: 🗑️ Bersihkan file yang tidak perlu diupload
+        run: rm -rf .git .github node_modules tests .env.example README.md Database_Schema.md Development_Rules_And_Steps.md PRD_WMU.md SEO_Configuration.md
+
+      - name: 📂 Deploy via SFTP to Hostinger
+        uses: appleboy/scp-action@master
         with:
-          server: ${{ secrets.FTP_SERVER }}
+          host: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # Path di server Hostinger, biasanya /public_html atau /domains/namadomain.com/public_html
-          server-dir: /
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .env.example
-            README.md
-            tests/**
-            Database_Schema.md
-            Development_Rules_And_Steps.md
-            PRD_WMU.md
-            SEO_Configuration.md
+          port: 65002
+          source: "."
+          # Sesuaikan dengan nama folder website Anda di Hostinger
+          target: "domains/winmulyautama.com/public_html"
