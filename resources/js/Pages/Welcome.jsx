@@ -91,8 +91,8 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
 
     return (
         <PublicLayout>
-            <SeoHead 
-                title="Beranda" 
+            <SeoHead
+                title="Beranda"
                 description="Layanan konstruksi sipil, mekanikal, dan elektrikal terbaik dari WMU Construction."
             />
 
@@ -376,7 +376,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                         {/* Kanan: Visi & Misi */}
                         <div className="xl:col-span-5 flex flex-col gap-6 xl:pl-6 xl:border-l border-white/10 mt-10 xl:mt-0">
                             <div className="mb-2 text-center xl:text-left">
-                                <h2 className="text-wmu-accent font-bold tracking-widest text-xs uppercase mb-2">VISI & MISI KAMI</h2>
+                                <h2 className="text-wmu-accent font-bold tracking-widest text-xs uppercase mb-2">VISI & MISI KAMII</h2>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
@@ -803,10 +803,10 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                     return (
                                         <div key={partner.id_mitra || i} className="flex flex-col items-center justify-center w-[120px] md:w-40 gap-3 bg-white border border-gray-100 rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-md hover:border-gray-200 hover:-translate-y-1 transition-all duration-300">
                                             <div className="h-10 md:h-14 w-full flex items-center justify-center">
-                                                <img 
+                                                <img
                                                     src={partner.logo ? (partner.logo.startsWith('http') ? partner.logo : `/storage/${partner.logo}`) : fallbackLogos[i % fallbackLogos.length]}
-                                                    alt={partner.nama_mitra} 
-                                                    className="max-h-full max-w-full object-contain filter transition-all duration-300" 
+                                                    alt={partner.nama_mitra}
+                                                    className="max-h-full max-w-full object-contain filter transition-all duration-300"
                                                     onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
                                                 />
                                             </div>
