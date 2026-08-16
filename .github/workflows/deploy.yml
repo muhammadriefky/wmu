@@ -1,0 +1,77 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main # Ubah ke 'master' jika branch utama Anda bernama master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🚚 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2' # Sesuaikan dengan versi PHP di Hostinger
+          extensions: mbstring, bcmath, pdo_mysql, xml, ctype, iconv, intl, dom, filter, gd, json
+          coverage: none
+
+      - name: 📦 Install Composer Dependencies
+        run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 📦 Install NPM Dependencies & Build Vite
+        run: |
+          npm ci
+          npm run build
+
+      - name: ⚙️ Setup Server Configuration (.env & .htaccess)
+        run: |
+          # 1. Siapkan .env untuk production
+          if [ -n "${{ secrets.ENV_FILE }}" ]; then
+            echo "${{ secrets.ENV_FILE }}" > .env
+          else
+            cp .env.example .env
+            php artisan key:generate
+            sed -i 's/APP_ENV=local/APP_ENV=production/g' .env
+            sed -i 's/APP_DEBUG=true/APP_DEBUG=false/g' .env
+            sed -i 's/DB_DATABASE=laravel/DB_DATABASE=${{ secrets.DB_DATABASE }}/g' .env
+            sed -i 's/DB_USERNAME=root/DB_USERNAME=${{ secrets.DB_USERNAME }}/g' .env
+            sed -i 's/DB_PASSWORD=/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/g' .env
+          fi
+          
+          # 2. Buat file .htaccess di root agar otomatis diarahkan ke folder public (khas Hostinger)
+          cat << 'EOF' > .htaccess
+          <IfModule mod_rewrite.c>
+              RewriteEngine On
+              RewriteRule ^(.*)$ public/$1 [L]
+          </IfModule>
+          EOF
+
+      - name: 📂 Deploy via FTP to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # Path di server Hostinger, biasanya /public_html atau /domains/namadomain.com/public_html
+          server-dir: /
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            .env.example
+            README.md
+            tests/**
+            Database_Schema.md
+            Development_Rules_And_Steps.md
+            PRD_WMU.md
+            SEO_Configuration.md

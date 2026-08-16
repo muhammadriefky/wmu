@@ -53,12 +53,15 @@ export default function PublicLayout({ children, hideCTA = false }) {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-12">
                         {/* Logo */}
-                        <Link href="/" className="block group relative h-full w-32 md:w-40">
+                        <Link href="/" className="flex items-center gap-1 md:gap-0 group h-full z-50">
                             <img
                                 src="/images/logonobg.png"
                                 alt="WMU Logo"
-                                className="absolute top-1/2 -translate-y-1/2 left-0 h-40 md:h-48 w-auto object-contain transition-transform duration-300 group-hover:scale-105 origin-left z-50"
+                                className="h-20 md:h-14 w-auto shrink-0 object-contain transition-transform duration-300 group-hover:scale-105 origin-left"
                             />
+                            <span className="text-white font-bold text-xs md:text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] whitespace-nowrap tracking-wide hidden sm:block">
+                                PT Win Mulya Utama
+                            </span>
                         </Link>
 
                         {/* Desktop Menu */}
@@ -235,7 +238,7 @@ export default function PublicLayout({ children, hideCTA = false }) {
                                 )}
                                 {pengaturan?.twitter && (
                                     <a href={pengaturan.twitter} target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-gray-800/80 flex items-center justify-center text-gray-400 hover:bg-gray-600 hover:text-white transition-colors" title="Twitter / X">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
                                     </a>
                                 )}
                             </div>
