@@ -16,7 +16,7 @@ export default function ProyekDetail({ proyek, galeri }) {
                 title={proyek.prk_judul} 
                 description={proyek.prk_deskripsi?.substring(0, 160).replace(/(<([^>]+)>)/gi, "")}
                 image={proyek.prk_gambar ? `/storage/${proyek.prk_gambar}` : null}
-                url={route('proyek.show', proyek.prk_slug)}
+                url={route('proyek.detail', proyek.prk_slug)}
                 type="article"
             />
 
@@ -24,7 +24,7 @@ export default function ProyekDetail({ proyek, galeri }) {
             <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 overflow-hidden bg-wmu-dark">
                 <div className="absolute inset-0 z-0">
                     <img
-                        src={`/storage/${proyek.prk_gambar}`}
+                        src={proyek.prk_gambar ? `/storage/${proyek.prk_gambar}` : '/images/civil_construction_hero.png'}
                         alt={proyek.prk_judul}
                         className="w-full h-full object-cover opacity-20"
                     />
@@ -43,9 +43,11 @@ export default function ProyekDetail({ proyek, galeri }) {
                                 Kembali ke Daftar Proyek
                             </Link>
                             
-                            <div className="bg-wmu-accent/20 border border-wmu-accent text-wmu-accent text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                {proyek.prk_kategori}
-                            </div>
+                            {proyek.prk_kategori && (
+                                <div className="bg-wmu-accent/20 border border-wmu-accent text-wmu-accent text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                    {proyek.prk_kategori}
+                                </div>
+                            )}
                         </div>
 
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-lg max-w-4xl">
@@ -93,12 +95,12 @@ export default function ProyekDetail({ proyek, galeri }) {
                                 className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 mb-8"
                             >
                                 <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-wmu-accent">
+                                    <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-wmu-accent shrink-0">
                                         <CheckCircle size={16} />
                                     </div>
                                     Deskripsi Proyek
                                 </h3>
-                                <div className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+                                <div className="text-gray-600 leading-relaxed whitespace-pre-wrap break-words">
                                     {proyek.prk_deskripsi || "Detail deskripsi proyek belum ditambahkan."}
                                 </div>
                             </motion.div>
@@ -111,7 +113,7 @@ export default function ProyekDetail({ proyek, galeri }) {
                                     className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100"
                                 >
                                     <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500">
+                                        <div className="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500 shrink-0">
                                             <Target size={16} />
                                         </div>
                                         Tantangan
@@ -128,7 +130,7 @@ export default function ProyekDetail({ proyek, galeri }) {
                                     className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100"
                                 >
                                     <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-500">
+                                        <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-500 shrink-0">
                                             <Trophy size={16} />
                                         </div>
                                         Solusi & Hasil
@@ -183,7 +185,7 @@ export default function ProyekDetail({ proyek, galeri }) {
                     </div>
 
                     {/* Gallery Section */}
-                    {galeri.length > 0 && (
+                    {galeri?.length > 0 && (
                         <div className="mt-16">
                             <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Galeri Proyek</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

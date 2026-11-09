@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm, usePage, router } from '@inertiajs/react';
 import { 
@@ -35,7 +35,7 @@ export default function Index({ mitra, stats }) {
                 nama_mitra: item.nama_mitra || '',
                 kategori: item.kategori || '',
                 logo: null,
-                urutan: item.urutan || '',
+                urutan: item.urutan ?? 0,
                 status_aktif: item.status_aktif == 1,
             });
         } else {
@@ -71,7 +71,13 @@ export default function Index({ mitra, stats }) {
         } else {
             post(route('admin.mitra.store'), {
                 preserveScroll: true,
-                onSuccess: () => closeModal(),
+                onSuccess: (page) => {
+                    closeModal();
+                    // Item baru memiliki urutan terbesar -> tampil di halaman terakhir.
+                    // Pindah ke sana agar admin langsung melihat hasil simpannya.
+                    const total = page.props.mitra?.length ?? 0;
+                    setCurrentPage(Math.max(1, Math.ceil(total / itemsPerPage)));
+                },
             });
         }
     };
@@ -100,6 +106,13 @@ export default function Index({ mitra, stats }) {
 
     // Pagination logic
     const totalPages = Math.ceil(filteredMitra.length / itemsPerPage);
+
+    // Setelah hapus item terakhir di halaman terakhir, jangan tinggal di halaman kosong
+    useEffect(() => {
+        if (currentPage > 1 && currentPage > totalPages) {
+            setCurrentPage(Math.max(1, totalPages));
+        }
+    }, [currentPage, totalPages]);
     const paginatedMitra = filteredMitra.slice(
         (currentPage - 1) * itemsPerPage, 
         currentPage * itemsPerPage
@@ -244,7 +257,7 @@ export default function Index({ mitra, stats }) {
                                                         <Building2 size={20} className="text-gray-300" />
                                                     )}
                                                 </div>
-                                                <div>
+                                                <div className="min-w-[120px]">
                                                     <div className="text-sm font-bold text-gray-900">{item.nama_mitra}</div>
                                                     <div className="text-[11px] text-gray-500 mt-0.5">{item.kategori || '-'}</div>
                                                 </div>
@@ -266,14 +279,14 @@ export default function Index({ mitra, stats }) {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center justify-center gap-2">
-                                                <button 
+                                                <button type="button" aria-label="Edit" title="Edit" 
                                                     onClick={() => openModal(item)} 
                                                     className="w-8 h-8 rounded border border-gray-200 flex items-center justify-center text-gray-500 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-colors"
                                                     title="Edit"
                                                 >
                                                     <Edit2 size={14} />
                                                 </button>
-                                                <button 
+                                                <button type="button" aria-label="Hapus" title="Hapus" 
                                                     onClick={() => deleteItem(item.id_mitra)} 
                                                     className="w-8 h-8 rounded border border-gray-200 flex items-center justify-center text-gray-500 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
                                                     title="Hapus"

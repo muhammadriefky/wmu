@@ -38,7 +38,7 @@ export default function Index({ ulasan, stats, filters }) {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchTerm !== filters?.search || sortFilter !== filters?.sort) {
+            if (searchTerm !== (filters?.search || '') || sortFilter !== (filters?.sort || 'Terbaru')) {
                 router.get(route('admin.ulasan.index'), {
                     search: searchTerm,
                     sort: sortFilter
@@ -115,6 +115,17 @@ export default function Index({ ulasan, stats, filters }) {
                     <Plus size={18} strokeWidth={2.5} /> Tambah Testimoni
                 </button>
             </div>
+
+            {flash?.success && (
+                <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium">
+                    {flash.success}
+                </div>
+            )}
+            {flash?.error && (
+                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+                    {flash.error}
+                </div>
+            )}
 
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -234,15 +245,15 @@ export default function Index({ ulasan, stats, filters }) {
                                             )}
                                         </td>
                                         <td className="py-4 px-6 text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button 
+                                            <div className="flex items-center justify-end gap-2 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100 transition-opacity">
+                                                <button type="button" aria-label="Edit" title="Edit" 
                                                     onClick={() => openModal(item)}
                                                     className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors tooltip-trigger"
                                                     title="Edit"
                                                 >
                                                     <Edit size={16} />
                                                 </button>
-                                                <button 
+                                                <button type="button" aria-label="Hapus" title="Hapus" 
                                                     onClick={() => deleteItem(item.id_ulasan)}
                                                     className="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors tooltip-trigger"
                                                     title="Hapus"
@@ -288,7 +299,7 @@ export default function Index({ ulasan, stats, filters }) {
                             </button>
                         </div>
                         
-                        <form onSubmit={submit} className="p-6">
+                        <form onSubmit={submit} className="p-6 max-h-[calc(90vh-4rem)] overflow-y-auto">
                             <div className="space-y-5">
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 mb-1.5">Nama Pemberi</label>
@@ -315,7 +326,7 @@ export default function Index({ ulasan, stats, filters }) {
                                     {errors.isi_ulasan && <p className="text-red-500 text-xs mt-1.5">{errors.isi_ulasan}</p>}
                                 </div>
                                 
-                                <div className="grid grid-cols-2 gap-5">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     <div>
                                         <label className="block text-sm font-bold text-gray-700 mb-1.5">Rating (1-5)</label>
                                         <div className="relative">

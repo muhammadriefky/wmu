@@ -1,5 +1,6 @@
 import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import { waLink } from '@/utils/contact';
 import SeoHead from '@/Components/SeoHead';
 import { motion } from 'framer-motion';
 import { 
@@ -16,13 +17,10 @@ export default function LayananDetail({ layanan, layananLain }) {
         visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
     };
 
-    const formatWhatsAppMsg = (layananName) => {
-        return encodeURIComponent(`Halo WMU, saya tertarik dan ingin konsultasi mengenai layanan ${layananName}.`);
-    };
-
-    const waNumber = pengaturan?.wa_number || (pengaturan?.telepon?.startsWith('0') 
-        ? '62' + pengaturan?.telepon?.substring(1) 
-        : pengaturan?.telepon);
+    const waHref = waLink(
+        pengaturan,
+        `Halo WMU, saya tertarik dan ingin konsultasi mengenai layanan ${layanan.judul_layanan}.`
+    );
 
     // Default icon helper if none specified in DB
     const getIconForFeature = (index) => {
@@ -33,7 +31,7 @@ export default function LayananDetail({ layanan, layananLain }) {
     return (
         <PublicLayout>
             <SeoHead 
-                title={`${layanan.judul_layanan} - ${pengaturan?.nama_perusahaan || 'WMU'}`} 
+                title={layanan.judul_layanan} 
                 description={layanan.deskripsi || layanan.judul_layanan}
                 image={layanan.gambar ? `/storage/${layanan.gambar}` : null}
             />
@@ -77,10 +75,10 @@ export default function LayananDetail({ layanan, layananLain }) {
                         </p>
                         
                         <a 
-                            href={`https://wa.me/${waNumber}?text=${formatWhatsAppMsg(layanan.judul_layanan)}`}
+                            href={waHref}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-wmu-dark bg-wmu-accent rounded-xl hover:bg-yellow-400 transition-all duration-300 hover:shadow-[0_0_20px_rgba(252,192,20,0.4)]"
+                            className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-wmu-dark bg-wmu-accent rounded-xl hover:bg-white transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,191,98,0.4)]"
                         >
                             Konsultasi Sekarang
                             <MessageSquare size={20} className="ml-2" />
@@ -104,7 +102,7 @@ export default function LayananDetail({ layanan, layananLain }) {
                                 className="mb-12"
                             >
                                 <h2 className="text-3xl font-extrabold text-gray-900 mb-6">Deskripsi Layanan</h2>
-                                <div className="prose prose-lg text-gray-600 leading-relaxed max-w-none">
+                                <div className="text-gray-600 text-lg leading-relaxed max-w-none [&_p]:mb-4 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-8 [&_h2]:mb-4 [&_h3]:text-xl [&_h3]:font-bold [&_h3]:text-gray-900 [&_h3]:mt-6 [&_h3]:mb-3 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_a]:text-wmu-accent [&_a]:underline [&_strong]:text-gray-900">
                                     {layanan.deskripsi_lengkap ? (
                                         <div dangerouslySetInnerHTML={{ __html: layanan.deskripsi_lengkap.replace(/\n/g, '<br/>') }} />
                                     ) : (
@@ -173,7 +171,7 @@ export default function LayananDetail({ layanan, layananLain }) {
 
                         {/* Sidebar */}
                         <div className="w-full lg:w-1/3">
-                            <div className="sticky top-32 space-y-8">
+                            <div className="lg:sticky lg:top-32 space-y-8">
                                 {/* Keunggulan Layanan */}
                                 {layanan.keunggulan_layanan && layanan.keunggulan_layanan.length > 0 && (
                                     <div className="bg-gray-50 rounded-2xl p-8 border border-gray-100">
@@ -200,10 +198,10 @@ export default function LayananDetail({ layanan, layananLain }) {
                                         Diskusikan kebutuhan {layanan.judul_layanan} Anda dengan tim ahli kami untuk solusi terbaik.
                                     </p>
                                     <a 
-                                        href={`https://wa.me/${waNumber}?text=${formatWhatsAppMsg(layanan.judul_layanan)}`}
+                                        href={waHref}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-wmu-dark bg-wmu-accent rounded-xl hover:bg-yellow-400 transition-all duration-300 relative z-10"
+                                        className="w-full inline-flex items-center justify-center px-6 py-3 text-sm font-bold text-wmu-dark bg-wmu-accent rounded-xl hover:bg-white transition-all duration-300 relative z-10"
                                     >
                                         Hubungi Kami <ArrowRight size={16} className="ml-2" />
                                     </a>

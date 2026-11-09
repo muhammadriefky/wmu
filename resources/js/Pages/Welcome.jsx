@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { usePage, Link, useForm } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import SeoHead from '@/Components/SeoHead';
+import DynamicLucideIcon from '@/Components/DynamicLucideIcon';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowRight, CheckCircle2, Star, Play,
@@ -140,7 +141,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                 Membangun Kualitas, Mewujudkan <span className="text-wmu-accent">Masa Depan</span>
                             </motion.h1>
                             <motion.p variants={fadeInUp} className="text-lg text-gray-300 mb-8 max-w-xl leading-relaxed">
-                                {pengaturan?.nama_perusahaan || 'WMU'} adalah perusahaan kontraktor berpengalaman yang siap mewujudkan proyek konstruksi berkualitas tinggi dengan standar terbaik.
+                                {pengaturan?.nama_pt || 'WMU'} adalah perusahaan kontraktor berpengalaman yang siap mewujudkan proyek konstruksi berkualitas tinggi dengan standar terbaik.
                             </motion.p>
                             <motion.div variants={fadeInUp} className="flex flex-wrap gap-4 mb-10">
                                 <a href="#layanan" className="bg-wmu-accent hover:bg-green-600 text-white px-8 py-4 rounded-md font-bold transition-all flex items-center shadow-lg shadow-wmu-accent/30 hover:-translate-y-1">
@@ -252,7 +253,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                             transition={{ delay: 0.1 }}
                             className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4"
                         >
-                            Mengapa Memilih {pengaturan?.nama_perusahaan || 'WMU'}?
+                            Mengapa Memilih {pengaturan?.nama_pt || 'WMU'}?
                         </motion.h3>
                         {/* Decorative Line */}
                         <motion.div
@@ -266,15 +267,25 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
 
                     {/* Simple Carousel */}
                     <div className="relative group/carousel">
+                        {/* Mobile Arrows */}
+                        <div className="flex md:hidden justify-end gap-2 mb-2">
+                            <button onClick={() => scrollKeunggulan('left')} aria-label="Sebelumnya" className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-500 active:bg-wmu-dark active:text-white transition-all">
+                                <ChevronLeft size={20} />
+                            </button>
+                            <button onClick={() => scrollKeunggulan('right')} aria-label="Berikutnya" className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-500 active:bg-wmu-dark active:text-white transition-all">
+                                <ChevronRight size={20} />
+                            </button>
+                        </div>
+
                         {/* Gradient Fades for Carousel edges */}
-                        <div className="absolute inset-y-0 left-0 w-8 md:w-24 bg-gradient-to-r from-gray-50/50 via-gray-50/50 to-transparent z-10 pointer-events-none"></div>
-                        <div className="absolute inset-y-0 right-0 w-8 md:w-24 bg-gradient-to-l from-gray-50/50 via-gray-50/50 to-transparent z-10 pointer-events-none"></div>
+                        <div className="hidden md:block absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-gray-50/50 via-gray-50/50 to-transparent z-10 pointer-events-none"></div>
+                        <div className="hidden md:block absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-gray-50/50 via-gray-50/50 to-transparent z-10 pointer-events-none"></div>
 
                         {/* Navigation Buttons */}
-                        <button onClick={() => scrollKeunggulan('left')} className="absolute left-2 md:-left-6 top-[45%] -translate-y-1/2 z-20 bg-white p-2 md:p-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] text-wmu-accent md:opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 hover:bg-wmu-accent hover:text-white hover:scale-110">
+                        <button onClick={() => scrollKeunggulan('left')} aria-label="Sebelumnya" className="hidden md:block absolute md:-left-6 top-[45%] -translate-y-1/2 z-20 bg-white p-2 md:p-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] text-wmu-accent md:opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 hover:bg-wmu-accent hover:text-white hover:scale-110">
                             <ChevronLeft size={24} />
                         </button>
-                        <button onClick={() => scrollKeunggulan('right')} className="absolute right-2 md:-right-6 top-[45%] -translate-y-1/2 z-20 bg-white p-2 md:p-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] text-wmu-accent md:opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 hover:bg-wmu-accent hover:text-white hover:scale-110">
+                        <button onClick={() => scrollKeunggulan('right')} aria-label="Berikutnya" className="hidden md:block absolute md:-right-6 top-[45%] -translate-y-1/2 z-20 bg-white p-2 md:p-3 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] text-wmu-accent md:opacity-0 group-hover/carousel:opacity-100 transition-all duration-300 hover:bg-wmu-accent hover:text-white hover:scale-110">
                             <ChevronRight size={24} />
                         </button>
 
@@ -302,10 +313,16 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true }}
                                         transition={{ duration: 0.4, delay: i * 0.1 }}
-                                        className="w-[200px] md:w-[220px] shrink-0 snap-center bg-white p-6 rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_25px_rgba(0,191,98,0.15)] transition-all duration-300 flex flex-col items-center text-center group cursor-default"
+                                        className="w-[62%] sm:w-[200px] md:w-[220px] shrink-0 snap-start scroll-ml-4 sm:scroll-ml-0 bg-white p-6 rounded-2xl shadow-[0_2px_15px_rgba(0,0,0,0.04)] border border-gray-100 hover:shadow-[0_8px_25px_rgba(0,191,98,0.15)] transition-all duration-300 flex flex-col items-center text-center group cursor-default"
                                     >
                                         <div className="text-wmu-accent mb-4 group-hover:scale-110 transition-transform duration-300">
-                                            {getIcon(item.judul)}
+                                            {/* Pakai ikon pilihan admin; heuristik judul hanya sebagai fallback */}
+                                            <DynamicLucideIcon
+                                                name={item.ikon}
+                                                size={36}
+                                                strokeWidth={1.5}
+                                                fallback={getIcon(item.judul)}
+                                            />
                                         </div>
                                         <h4 className="font-bold text-sm text-gray-900 mb-2 group-hover:text-wmu-accent transition-colors duration-300">
                                             {item.judul}
@@ -346,9 +363,9 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                 <h3 className="text-3xl md:text-4xl font-bold">Terstruktur, Transparan,<br className="hidden xl:block" /> Hasil Maksimal</h3>
                             </div>
 
-                            <div className="flex justify-between items-start gap-2 relative mt-12 overflow-x-auto pb-4 hide-scrollbar">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-2 gap-y-8 lg:flex lg:justify-between lg:items-start lg:gap-2 relative mt-12 pb-4">
                                 {/* Connecting Dashed Line */}
-                                <div className="hidden md:block absolute top-6 left-12 right-12 h-[1px] border-t border-dashed border-gray-600 z-0"></div>
+                                <div className="hidden lg:block absolute top-7 left-12 right-12 h-[1px] border-t border-dashed border-gray-600 z-0"></div>
 
                                 {[
                                     { title: 'Konsultasi', desc: 'Memahami kebutuhan dan tujuan proyek Anda', icon: Headphones },
@@ -358,7 +375,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                     { title: 'Pengawasan', desc: 'Monitoring kualitas secara berkala', icon: Activity },
                                     { title: 'Serah Terima', desc: 'Proyek selesai tepat waktu & bergaransi', icon: ShieldCheck }
                                 ].map((step, i) => (
-                                    <div key={i} className="relative z-10 flex flex-col items-center text-center w-[120px] shrink-0 group">
+                                    <div key={i} className="relative z-10 flex flex-col items-center text-center w-full lg:w-auto lg:flex-1 lg:min-w-0 group">
                                         <div className="w-14 h-14 bg-wmu-dark rounded-xl border border-gray-600 flex items-center justify-center text-wmu-accent mb-5 relative shadow-lg group-hover:scale-110 group-hover:border-wmu-accent transition-all">
                                             <step.icon size={26} strokeWidth={1.5} />
                                             {/* Number Badge */}
@@ -376,7 +393,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                         {/* Kanan: Visi & Misi */}
                         <div className="xl:col-span-5 flex flex-col gap-6 xl:pl-6 xl:border-l border-white/10 mt-10 xl:mt-0">
                             <div className="mb-2 text-center xl:text-left">
-                                <h2 className="text-wmu-accent font-bold tracking-widest text-xs uppercase mb-2">VISI & MISI KAMII</h2>
+                                <h2 className="text-wmu-accent font-bold tracking-widest text-xs uppercase mb-2">VISI & MISI KAMI</h2>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
@@ -428,47 +445,49 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
 
                         {/* Bagian Video */}
                         <div className="relative lg:col-span-7">
-                            {/* Video Element */}
-                            <video
-                                ref={videoRef}
-                                src={tentangBeranda?.video_file ? `/storage/${tentangBeranda.video_file}` : "/videos/videokonstruksi.mp4"}
-                                className="rounded-2xl shadow-xl w-full aspect-video object-cover bg-gray-100"
-                                controls={isPlaying}
-                                poster={tentangBeranda?.video_poster ? `/storage/${tentangBeranda.video_poster}` : "https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070&auto=format&fit=crop"}
-                                onPause={() => setIsPlaying(false)}
-                                onPlay={() => setIsPlaying(true)}
-                            />
+                            <div className="relative">
+                                {/* Video Element */}
+                                <video
+                                    ref={videoRef}
+                                    src={tentangBeranda?.video_file ? `/storage/${tentangBeranda.video_file}` : "/videos/videokonstruksi.mp4"}
+                                    className="rounded-2xl shadow-xl w-full aspect-video object-cover bg-wmu-dark"
+                                    controls={isPlaying}
+                                    poster={tentangBeranda?.video_poster ? `/storage/${tentangBeranda.video_poster}` : "https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070&auto=format&fit=crop"}
+                                    onPause={() => setIsPlaying(false)}
+                                    onPlay={() => setIsPlaying(true)}
+                                />
+
+                                {/* Tombol Play Custom */}
+                                {!isPlaying && (
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                                        <button
+                                            onClick={handlePlayVideo}
+                                            className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white border border-white/50 hover:scale-110 transition-transform"
+                                        >
+                                            <Play size={28} fill="currentColor" className="ml-1" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
                             {/* Badge Floating 10+ Tahun */}
-                            <div className="absolute -bottom-10 -left-4 md:-left-10 bg-wmu-dark text-white p-6 md:p-8 rounded-2xl shadow-2xl max-w-xs z-10">
+                            <div className="relative mt-4 lg:mt-0 lg:absolute lg:-bottom-10 lg:-left-10 bg-wmu-dark text-white p-6 md:p-8 rounded-2xl shadow-2xl lg:max-w-xs z-10">
                                 <p className="text-sm text-gray-300 mb-4">
                                     {tentangBeranda?.teks_komitmen || 'Kami berkomitmen memberikan hasil terbaik dengan mengutamakan kualitas, keselamatan, dan kepuasan klien.'}
                                 </p>
                                 <div className="font-bold text-5xl mb-1">{tentangBeranda?.angka_pengalaman || '10+'}</div>
                                 <div className="text-sm text-wmu-accent font-semibold uppercase tracking-wider">{tentangBeranda?.teks_pengalaman || 'Tahun Pengalaman'}</div>
                             </div>
-
-                            {/* Tombol Play Custom */}
-                            {!isPlaying && (
-                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                                    <button
-                                        onClick={handlePlayVideo}
-                                        className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white border border-white/50 hover:scale-110 transition-transform"
-                                    >
-                                        <Play size={28} fill="currentColor" className="ml-1" />
-                                    </button>
-                                </div>
-                            )}
                         </div>
 
                         {/* Bagian Teks */}
-                        <div className="lg:col-span-5 lg:pl-6 mt-16 lg:mt-0 flex flex-col justify-center">
+                        <div className="lg:col-span-5 lg:pl-6 flex flex-col justify-center">
                             <h2 className="text-wmu-accent font-bold tracking-widest text-sm uppercase mb-2">TENTANG KAMI</h2>
                             <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight">
                                 {tentangBeranda?.judul || 'Solusi Konstruksi Terpercaya Sejak 2014'}
                             </h3>
                             <p className="text-gray-600 mb-8 leading-relaxed whitespace-pre-line">
-                                {tentangBeranda?.deskripsi || pengaturan?.deskripsi_perusahaan || `${pengaturan?.nama_perusahaan || 'WMU'} hadir dengan komitmen kuat untuk memberikan layanan konstruksi yang inovatif, efisien, dan berkualitas tinggi. Kami siap menjadi mitra terbaik dalam mewujudkan setiap proyek Anda.`}
+                                {tentangBeranda?.deskripsi || pengaturan?.deskripsi_perusahaan || `${pengaturan?.nama_pt || 'WMU'} hadir dengan komitmen kuat untuk memberikan layanan konstruksi yang inovatif, efisien, dan berkualitas tinggi. Kami siap menjadi mitra terbaik dalam mewujudkan setiap proyek Anda.`}
                             </p>
 
                             {/* List Keunggulan Tambahan untuk mengisi space kosong */}
@@ -509,14 +528,14 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Header with Centered Title and Right Arrows */}
                     <div className="relative flex flex-col md:flex-row items-center justify-center mb-12">
-                        <div className="text-center md:absolute md:left-1/2 md:-translate-x-1/2">
+                        <div className="text-center md:px-28">
                             <h2 className="text-wmu-accent font-bold tracking-widest text-xs md:text-sm uppercase mb-3">LAYANAN KAMI</h2>
                             <h3 className="text-3xl md:text-4xl font-bold text-wmu-dark mb-4">Layanan Konstruksi Terintegrasi</h3>
                             <div className="w-12 h-1 bg-wmu-accent mx-auto rounded-full"></div>
                         </div>
 
                         {/* Navigation Arrows (Right aligned on Desktop) */}
-                        <div className="hidden md:flex gap-3 ml-auto z-10 absolute right-0">
+                        <div className="hidden md:flex gap-3 z-10 absolute right-0 bottom-0">
                             <button onClick={() => scrollLayanan('left')} className="w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center text-gray-500 hover:bg-wmu-dark hover:text-white hover:border-wmu-dark transition-all">
                                 <ChevronLeft size={20} />
                             </button>
@@ -553,7 +572,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                                 src={item.gambar ? `/storage/${item.gambar}` : `https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop`}
                                                 alt={item.judul_layanan}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                                onError={(e) => { e.target.onerror = null; e.target.src = `https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop`; }}
+                                                onError={(e) => { if (e.target.dataset.fallback) return; e.target.dataset.fallback = '1'; e.target.src = `https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop`; }}
                                             />
                                         </div>
 
@@ -579,7 +598,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
             {/* Proyek Unggulan */}
             <section className="py-16 bg-wmu-dark text-white overflow-hidden">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6 relative">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 md:mb-12 gap-6 relative">
                         <div>
                             <h2 className="text-wmu-accent font-bold tracking-widest text-xs md:text-sm uppercase mb-2">PROYEK KAMI!</h2>
                             <h3 className="text-3xl md:text-4xl font-bold">Proyek Unggulan</h3>
@@ -590,6 +609,15 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                     </div>
 
                     <div className="relative group/proyek">
+                        {/* Mobile Arrows */}
+                        <div className="flex md:hidden justify-end gap-2 mb-4">
+                            <button onClick={() => scrollProyek('left')} aria-label="Sebelumnya" className="w-10 h-10 rounded-full border-2 border-gray-600 flex items-center justify-center text-gray-300 active:bg-wmu-accent active:border-wmu-accent active:text-wmu-dark transition-all">
+                                <ChevronLeft size={20} />
+                            </button>
+                            <button onClick={() => scrollProyek('right')} aria-label="Berikutnya" className="w-10 h-10 rounded-full border-2 border-gray-600 flex items-center justify-center text-gray-300 active:bg-wmu-accent active:border-wmu-accent active:text-wmu-dark transition-all">
+                                <ChevronRight size={20} />
+                            </button>
+                        </div>
                         <div ref={proyekRef} className="flex overflow-x-auto gap-4 md:gap-6 pb-8 snap-x snap-mandatory scroll-smooth hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-1">
                             {proyek && proyek.map((item, index) => (
                                 <motion.div
@@ -598,7 +626,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                     whileInView={{ opacity: 1, scale: 1 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="w-[220px] md:w-[230px] lg:w-[240px] shrink-0 snap-start group relative rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+                                    className="w-[72%] sm:w-[220px] md:w-[230px] lg:w-[240px] shrink-0 snap-start scroll-ml-4 sm:scroll-ml-0 group relative rounded-2xl overflow-hidden cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
                                 >
                                     <Link href={`/proyek/${item.prk_slug}`} className="absolute inset-0 z-10"></Link>
                                     <div className="aspect-[4/5] md:aspect-square relative">
@@ -613,7 +641,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                             alt={item.prk_judul}
                                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                             onError={(e) => {
-                                                e.target.onerror = null;
+                                                if (e.target.dataset.fallback) return; e.target.dataset.fallback = '1';
                                                 e.target.src = [
                                                     "https://images.unsplash.com/photo-1541888081688-6627a834f826?q=80&w=2070&auto=format&fit=crop",
                                                     "https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2071&auto=format&fit=crop",
@@ -651,10 +679,10 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                         </div>
 
                         {/* Custom Navigation (visible on hover) */}
-                        <button onClick={() => scrollProyek('left')} className="absolute left-2 md:-left-6 top-[45%] -translate-y-1/2 z-20 bg-wmu-dark border border-gray-600 p-2 md:p-3 rounded-full shadow-lg text-white md:opacity-0 group-hover/proyek:opacity-100 transition-all duration-300 hover:bg-wmu-accent hover:border-wmu-accent hover:text-wmu-dark hover:scale-110">
+                        <button onClick={() => scrollProyek('left')} aria-label="Sebelumnya" className="hidden md:block absolute md:-left-6 top-[45%] -translate-y-1/2 z-20 bg-wmu-dark border border-gray-600 p-2 md:p-3 rounded-full shadow-lg text-white md:opacity-0 group-hover/proyek:opacity-100 transition-all duration-300 hover:bg-wmu-accent hover:border-wmu-accent hover:text-wmu-dark hover:scale-110">
                             <ChevronLeft size={24} />
                         </button>
-                        <button onClick={() => scrollProyek('right')} className="absolute right-2 md:-right-6 top-[45%] -translate-y-1/2 z-20 bg-wmu-dark border border-gray-600 p-2 md:p-3 rounded-full shadow-lg text-white md:opacity-0 group-hover/proyek:opacity-100 transition-all duration-300 hover:bg-wmu-accent hover:border-wmu-accent hover:text-wmu-dark hover:scale-110">
+                        <button onClick={() => scrollProyek('right')} aria-label="Berikutnya" className="hidden md:block absolute md:-right-6 top-[45%] -translate-y-1/2 z-20 bg-wmu-dark border border-gray-600 p-2 md:p-3 rounded-full shadow-lg text-white md:opacity-0 group-hover/proyek:opacity-100 transition-all duration-300 hover:bg-wmu-accent hover:border-wmu-accent hover:text-wmu-dark hover:scale-110">
                             <ChevronRight size={24} />
                         </button>
                     </div>
@@ -704,7 +732,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                                             src={k.logo ? (k.logo.startsWith('http') ? k.logo : `/storage/${k.logo}`) : fallbackLogos[i % fallbackLogos.length]}
                                                             alt={k.nama_klien}
                                                             className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300"
-                                                            onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
+                                                            onError={(e) => { if (e.target.dataset.fallback) return; e.target.dataset.fallback = '1'; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
                                                         />
                                                     </div>
                                                     <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{k.nama_klien || 'Client'}</span>
@@ -751,7 +779,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                                             src={k.logo ? (k.logo.startsWith('http') ? k.logo : `/storage/${k.logo}`) : fallbackLogos[i % fallbackLogos.length]}
                                                             alt={k.nama_klien}
                                                             className="max-h-full max-w-full object-contain filter hover:brightness-110 transition-all duration-300"
-                                                            onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
+                                                            onError={(e) => { if (e.target.dataset.fallback) return; e.target.dataset.fallback = '1'; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
                                                         />
                                                     </div>
                                                     <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{k.nama_klien || 'Client'}</span>
@@ -807,7 +835,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                                     src={partner.logo ? (partner.logo.startsWith('http') ? partner.logo : `/storage/${partner.logo}`) : fallbackLogos[i % fallbackLogos.length]}
                                                     alt={partner.nama_mitra}
                                                     className="max-h-full max-w-full object-contain filter transition-all duration-300"
-                                                    onError={(e) => { e.target.onerror = null; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
+                                                    onError={(e) => { if (e.target.dataset.fallback) return; e.target.dataset.fallback = '1'; e.target.src = fallbackLogos[i % fallbackLogos.length]; }}
                                                 />
                                             </div>
                                             <span className="text-[10px] md:text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">{partner.nama_mitra}</span>
@@ -941,7 +969,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
                                     <Link key={b.id_blog || idx} href={`/blog/${b.slug}`} className="flex gap-4 group items-center">
                                         <div className="w-20 h-16 rounded-lg overflow-hidden shrink-0 shadow-sm border border-gray-50">
                                             <img
-                                                src={b.gambar ? `/storage/${b.gambar}` : "https://via.placeholder.com/150"}
+                                                src={b.gambar ? `/storage/${b.gambar}` : "/images/civil_construction_work.png"}
                                                 alt={b.judul_blog}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             />
@@ -1022,7 +1050,7 @@ export default function Welcome({ layanan, keunggulan, klien, ulasan, proyek, bl
             {/* FAQ Section */}
             <section className="py-16 md:py-24 bg-gray-50/50">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-2">
+                    <div className="text-center mb-10">
                         <h2 className="text-wmu-accent font-bold tracking-widest text-sm uppercase mb-2">FAQ</h2>
                         <h3 className="text-3xl md:text-4xl font-bold text-gray-900">Pertanyaan yang Sering Diajukan</h3>
                         <p className="text-gray-500 mt-3 max-w-lg mx-auto text-sm">Temukan jawaban atas pertanyaan umum seputar layanan dan proses kerja kami.</p>

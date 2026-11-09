@@ -1,10 +1,15 @@
 import { usePage } from '@inertiajs/react';
+import { companyName } from '@/utils/contact';
 import PublicLayout from '@/Layouts/PublicLayout';
 import SeoHead from '@/Components/SeoHead';
 import { motion } from 'framer-motion';
 import { Briefcase, CheckCircle2, ChevronRight, FileText, Send } from 'lucide-react';
 
-export default function Karir({ karir }) {
+export default function Karir({ karir = [] }) {
+    const { pengaturan } = usePage().props;
+    const hrdEmail = pengaturan?.email || 'hrd@wmu.com';
+    const mailtoHref = (posisi) => `mailto:${hrdEmail}?subject=${encodeURIComponent(`Lamaran Pekerjaan: ${posisi}`)}`;
+
     return (
         <PublicLayout>
             <SeoHead 
@@ -34,7 +39,7 @@ export default function Karir({ karir }) {
                                 Bergabunglah Bersama <span className="text-wmu-accent">Tim Kami</span>
                             </h1>
                             <p className="text-lg text-gray-300 mb-8 max-w-2xl leading-relaxed">
-                                Kami selalu mencari talenta-talenta terbaik yang memiliki semangat, dedikasi, dan profesionalisme untuk berkembang bersama PT WMU.
+                                Kami selalu mencari talenta-talenta terbaik yang memiliki semangat, dedikasi, dan profesionalisme untuk berkembang bersama {companyName(pengaturan)}.
                             </p>
                         </motion.div>
                     </div>
@@ -50,6 +55,17 @@ export default function Karir({ karir }) {
                     </div>
 
                     <div className="space-y-6">
+                        {karir.length === 0 && (
+                            <div className="py-16 px-6 text-center text-gray-500 bg-white rounded-2xl border border-dashed border-gray-200">
+                                <Briefcase size={40} className="mx-auto mb-4 text-gray-300" />
+                                <p className="font-medium text-gray-700 mb-1">Belum ada lowongan yang dibuka saat ini.</p>
+                                <p className="text-sm">
+                                    Kirimkan CV Anda ke{' '}
+                                    <a href={`mailto:${hrdEmail}`} className="text-wmu-accent font-semibold hover:underline break-all">{hrdEmail}</a>
+                                    {' '}untuk kesempatan berikutnya.
+                                </p>
+                            </div>
+                        )}
                         {karir.map((item, index) => (
                             <motion.div
                                 key={item.id_karir}
@@ -59,13 +75,13 @@ export default function Karir({ karir }) {
                                 className="bg-white rounded-2xl border border-gray-100 p-6 md:p-8 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
                             >
                                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-                                    <div className="flex-1">
+                                    <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-3 mb-4">
                                             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center shrink-0">
                                                 <Briefcase size={24} />
                                             </div>
                                             <div>
-                                                <h4 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-wmu-accent transition-colors">
+                                                <h4 className="text-xl md:text-2xl font-bold text-gray-900 group-hover:text-wmu-accent transition-colors break-words">
                                                     {item.posisi}
                                                 </h4>
                                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold border border-green-100 mt-2">
@@ -88,7 +104,7 @@ export default function Karir({ karir }) {
                                         <div className="bg-gray-50 rounded-xl p-5 border border-gray-100">
                                             <p className="text-xs text-gray-500 mb-3 font-medium text-center">Tertarik dengan posisi ini?</p>
                                             <a 
-                                                href={`mailto:hrd@wmu.com?subject=Lamaran Pekerjaan: ${item.posisi}`}
+                                                href={mailtoHref(item.posisi)}
                                                 className="w-full bg-wmu-dark text-white text-sm font-bold py-3 px-4 rounded-xl hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 group-hover:bg-wmu-accent"
                                             >
                                                 Kirim CV <Send size={16} />

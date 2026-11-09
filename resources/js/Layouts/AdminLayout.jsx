@@ -42,10 +42,10 @@ export default function AdminLayout({ header, children }) {
             />
 
             {/* Sidebar */}
-            <aside className={`fixed xl:static inset-y-0 left-0 w-[260px] bg-[#0B1120] text-white flex flex-col z-30 transform transition-transform duration-400 ease-in-out border-r border-gray-800 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'}`}>
+            <aside className={`fixed xl:sticky xl:top-0 xl:h-screen xl:self-start inset-y-0 left-0 w-[260px] shrink-0 bg-[#0B1120] text-white flex flex-col z-30 transform transition-transform duration-400 ease-in-out border-r border-gray-800 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'}`}>
                 {/* Logo Area */}
                 <div className="h-20 flex items-center justify-between px-6 shrink-0">
-                    <Link href="/admin/dashboard" className="flex items-center gap-2">
+                    <Link href={route('dashboard')} className="flex items-center gap-2">
                         <div className="flex items-end gap-1">
                             <div className="w-1 h-5 bg-[#EAB308] rounded-full"></div>
                             <div className="w-1 h-7 bg-[#EAB308] rounded-full"></div>
@@ -65,10 +65,10 @@ export default function AdminLayout({ header, children }) {
                             <button className="w-full flex items-center justify-between p-3 rounded-xl bg-transparent hover:bg-white/5 border border-transparent hover:border-white/10 transition-all group">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#EAB308] to-orange-400 flex items-center justify-center text-white font-bold shadow-lg shrink-0">
-                                        {user?.name ? user.name.charAt(0) : 'A'}
+                                        {user?.nama ? user.nama.charAt(0) : 'A'}
                                     </div>
                                     <div className="text-left overflow-hidden">
-                                        <p className="text-sm font-bold text-gray-100 truncate group-hover:text-white transition-colors">{user?.name || 'Administrator'}</p>
+                                        <p className="text-sm font-bold text-gray-100 truncate group-hover:text-white transition-colors">{user?.nama || 'Administrator'}</p>
                                         <p className="text-[11px] text-gray-400 truncate">Super Admin</p>
                                     </div>
                                 </div>
@@ -100,7 +100,7 @@ export default function AdminLayout({ header, children }) {
                 </div>
                 
                 {/* Navigation */}
-                <div className="flex-1 overflow-y-auto pb-6 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto pb-6 custom-scrollbar" data-lenis-prevent>
                     <nav className="space-y-0.5">
                         <NavItem href={route('dashboard')} routeName="dashboard" icon={LayoutDashboard}>
                             Dashboard
@@ -109,7 +109,7 @@ export default function AdminLayout({ header, children }) {
                         <div className="pt-6 pb-2 px-6 text-[10px] font-bold text-gray-500 uppercase tracking-widest">
                             Content Management
                         </div>
-                        <NavItem href={route('admin.tentang-beranda')} routeName="admin.tentang-beranda" icon={MonitorPlay}>
+                        <NavItem href={route('admin.tentang-beranda')} routeName="admin.tentang-beranda" icon={Home}>
                             Tentang Beranda
                         </NavItem>
                         <NavItem href={route('admin.tentang-kami')} routeName="admin.tentang-kami" icon={MonitorPlay}>
@@ -183,13 +183,14 @@ export default function AdminLayout({ header, children }) {
                     </div>
                     
                     <div className="flex items-center gap-4">
-                        <Link 
-                            href="/" 
+                        <a
+                            href="/"
                             target="_blank"
+                            rel="noopener noreferrer"
                             className="hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full border border-gray-200 text-gray-600 text-xs font-semibold hover:border-gray-300 hover:bg-gray-50 transition-colors"
                         >
                             Lihat Website <ExternalLink size={14} />
-                        </Link>
+                        </a>
                         <button className="flex items-center justify-center w-9 h-9 rounded-full text-gray-500 hover:bg-gray-100 transition-colors relative">
                             <Bell size={18} />
                             <span className="absolute top-2 right-2.5 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
@@ -198,7 +199,7 @@ export default function AdminLayout({ header, children }) {
                 </header>
                 
                 {/* Main Scrollable Content */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
+                <main className="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8" data-lenis-prevent>
                     <div className="max-w-[1600px] mx-auto">
                         {children}
                     </div>
@@ -206,7 +207,7 @@ export default function AdminLayout({ header, children }) {
             </div>
             
             {/* Custom Scrollbar Styles */}
-            <style jsx global>{`
+            <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 4px;
                 }

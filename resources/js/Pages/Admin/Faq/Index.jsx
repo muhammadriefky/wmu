@@ -24,7 +24,7 @@ export default function Index({ faq, stats }) {
             setData({
                 pertanyaan: item.pertanyaan || '',
                 jawaban: item.jawaban || '',
-                urutan: item.urutan || '',
+                urutan: item.urutan ?? 0,
                 status_aktif: item.status_aktif ? true : false,
             });
         } else {
@@ -68,7 +68,7 @@ export default function Index({ faq, stats }) {
         router.put(route('admin.faq.update', item.id_faq), {
             pertanyaan: item.pertanyaan || '',
             jawaban: item.jawaban || '',
-            urutan: item.urutan || '',
+            urutan: item.urutan ?? 0,
             status_aktif: !item.status_aktif,
         }, { preserveScroll: true });
     };
@@ -99,9 +99,9 @@ export default function Index({ faq, stats }) {
             )}
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-blue-50 text-blue-500 rounded-full">
+                    <div className="p-3 bg-blue-50 text-blue-500 rounded-full shrink-0">
                         <HelpCircle size={24} />
                     </div>
                     <div>
@@ -111,7 +111,7 @@ export default function Index({ faq, stats }) {
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-green-50 text-green-500 rounded-full">
+                    <div className="p-3 bg-green-50 text-green-500 rounded-full shrink-0">
                         <CheckCircle size={24} />
                     </div>
                     <div>
@@ -121,7 +121,7 @@ export default function Index({ faq, stats }) {
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-orange-50 text-orange-500 rounded-full">
+                    <div className="p-3 bg-orange-50 text-orange-500 rounded-full shrink-0">
                         <Eye size={24} />
                     </div>
                     <div>
@@ -131,7 +131,7 @@ export default function Index({ faq, stats }) {
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-purple-50 text-purple-500 rounded-full">
+                    <div className="p-3 bg-purple-50 text-purple-500 rounded-full shrink-0">
                         <FileText size={24} />
                     </div>
                     <div>
@@ -147,7 +147,7 @@ export default function Index({ faq, stats }) {
                 
                 {/* Filter Bar */}
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center gap-4">
-                    <div className="relative w-64">
+                    <div className="relative flex-1 sm:flex-none sm:w-64">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search size={14} className="text-gray-400" />
                         </div>
@@ -158,7 +158,7 @@ export default function Index({ faq, stats }) {
                         />
                     </div>
                     <div>
-                        <button className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-white hover:bg-gray-50">
+                        <button className="flex items-center gap-2 whitespace-nowrap px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-white hover:bg-gray-50">
                             Semua Status <Filter size={14} />
                         </button>
                     </div>
@@ -202,10 +202,10 @@ export default function Index({ faq, stats }) {
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <button onClick={() => openModal(item)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
+                                                <button type="button" aria-label="Edit" title="Edit" onClick={() => openModal(item)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-md transition-colors">
                                                     <Edit size={16} />
                                                 </button>
-                                                <button onClick={() => deleteItem(item.id_faq)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors">
+                                                <button type="button" aria-label="Hapus" title="Hapus" onClick={() => deleteItem(item.id_faq)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-md transition-colors">
                                                     <X size={16} />
                                                 </button>
                                             </div>
@@ -307,7 +307,7 @@ export default function Index({ faq, stats }) {
                 </div>
             )}
             
-            <style jsx global>{`
+            <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 6px;
                 }

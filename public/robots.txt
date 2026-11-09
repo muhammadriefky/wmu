@@ -1,8 +1,0 @@
-User-agent: *
-Disallow: /admin/
-Disallow: /login
-Disallow: /build/
-
-Allow: /
-
-Sitemap: http://wmu.test/sitemap.xml

@@ -41,13 +41,9 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
-            MitraSeeder::class,
             FaqSeeder::class,
             KontraktorSeeder::class,
             KlienSeeder::class,
-            UlasanSeeder::class,
-            ProyekSeeder::class,
-            GaleriSeeder::class,
             BlogSeeder::class,
             VideoSeeder::class,
         ]);

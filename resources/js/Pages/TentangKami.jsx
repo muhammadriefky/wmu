@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import SeoHead from '@/Components/SeoHead';
@@ -10,24 +10,27 @@ import {
     Plus, Minus, X
 } from 'lucide-react';
 
-// Helper: convert YouTube URL to embed URL
+// Helper: ubah berbagai format URL YouTube (watch, youtu.be, embed, shorts, live)
+// menjadi URL embed. URL yang tidak dikenali -> null (modal menampilkan fallback).
 function getYoutubeEmbedUrl(url) {
     if (!url) return null;
-    // Already embed
-    if (url.includes('youtube.com/embed/')) return url;
-    // youtu.be short link
-    const shortMatch = url.match(/youtu\.be\/([\w-]+)/);
-    if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}?autoplay=1`;
-    // youtube.com/watch?v=
-    const watchMatch = url.match(/[?&]v=([\w-]+)/);
-    if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?autoplay=1`;
-    return url;
+    const match = url.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:embed\/|shorts\/|live\/|watch\?(?:.*&)?v=))([\w-]{11})/);
+    return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1` : null;
 }
 
 export default function TentangKami({ keunggulan = [], mitra = [], videos = [], tentang = null }) {
     const { pengaturan } = usePage().props;
     const [orgZoom, setOrgZoom] = useState(100);
     const [activeVideo, setActiveVideo] = useState(null);
+    const orgScrollRef = useRef(null);
+
+    // Bagan organisasi lebih lebar dari layar kecil: mulai dari posisi tengah (puncak bagan)
+    useEffect(() => {
+        const el = orgScrollRef.current;
+        if (el && el.scrollWidth > el.clientWidth) {
+            el.scrollLeft = (el.scrollWidth - el.clientWidth) / 2;
+        }
+    }, []);
 
     const safeParse = (data) => {
         if (!data) return [];
@@ -37,8 +40,16 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [], 
         return Array.isArray(data) ? data : [];
     };
 
-    const sejarah = safeParse(tentang?.sejarah_perusahaan);
-    const nilai = safeParse(tentang?.nilai_perusahaan);
+    // Data lama/seed memakai kunci tahun/judul/deskripsi; admin menyimpan year/title/desc.
+    const sejarah = safeParse(tentang?.sejarah_perusahaan).map(item => ({
+        year: item?.year ?? item?.tahun,
+        title: item?.title ?? item?.judul,
+        desc: item?.desc ?? item?.deskripsi,
+    }));
+    const nilai = safeParse(tentang?.nilai_perusahaan).map(item => ({
+        title: item?.title ?? item?.judul,
+        desc: item?.desc ?? item?.deskripsi,
+    }));
 
     const fadeInUp = {
         hidden: { opacity: 0, y: 40 },
@@ -62,7 +73,7 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [], 
                         className="w-full h-full object-cover"
                     />
                     {/* Dark semi-transparent overlay for readability */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-wmu-dark/95 via-wmu-dark/75 to-wmu-dark/40"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-wmu-dark/95 via-wmu-dark/80 to-wmu-dark/60 lg:via-wmu-dark/75 lg:to-wmu-dark/40"></div>
                     {/* Bottom fade for seamless section transition */}
                     <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-wmu-dark to-transparent"></div>
                 </div>
@@ -93,28 +104,28 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [], 
 
                             {/* Stats inline */}
                             <motion.div variants={fadeInUp} className="grid grid-cols-2 lg:grid-cols-4 gap-y-8 lg:gap-0 pt-8 max-w-4xl">
-                                <div className="flex items-center gap-4 lg:border-r border-gray-600/50 pr-6">
+                                <div className="flex items-center gap-3 sm:gap-4 lg:border-r border-gray-600/50 pr-4 lg:pr-6">
                                     <Award size={36} className="text-wmu-accent shrink-0" strokeWidth={1.5} />
                                     <div>
                                         <div className="font-extrabold text-2xl text-white leading-none mb-1.5">10+</div>
                                         <div className="text-[11px] text-gray-400 uppercase tracking-widest font-medium">Tahun Pengalaman</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 lg:border-r border-gray-600/50 lg:px-6">
+                                <div className="flex items-center gap-3 sm:gap-4 lg:border-r border-gray-600/50 lg:px-6">
                                     <ShieldCheck size={36} className="text-wmu-accent shrink-0" strokeWidth={1.5} />
                                     <div>
                                         <div className="font-extrabold text-2xl text-white leading-none mb-1.5">150+</div>
                                         <div className="text-[11px] text-gray-400 uppercase tracking-widest font-medium">Proyek Selesai</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 lg:border-r border-gray-600/50 lg:px-6">
+                                <div className="flex items-center gap-3 sm:gap-4 lg:border-r border-gray-600/50 lg:px-6">
                                     <Users size={36} className="text-wmu-accent shrink-0" strokeWidth={1.5} />
                                     <div>
                                         <div className="font-extrabold text-2xl text-white leading-none mb-1.5">50+</div>
                                         <div className="text-[11px] text-gray-400 uppercase tracking-widest font-medium">Klien Terpercaya</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 lg:px-6">
+                                <div className="flex items-center gap-3 sm:gap-4 lg:px-6">
                                     <CheckCircle2 size={36} className="text-wmu-accent shrink-0" strokeWidth={1.5} />
                                     <div>
                                         <div className="font-extrabold text-2xl text-white leading-none mb-1.5">98%</div>
@@ -207,7 +218,7 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [], 
                                         </div>
                                     </div>
                                 )) : [
-                                    { year: '2014', title: 'Awal Berdiri', desc: `${pengaturan?.nama_perusahaan || 'WMU'} didirikan dengan visi menjadi perusahaan kontraktor profesional dan terpercaya.` },
+                                    { year: '2014', title: 'Awal Berdiri', desc: `${pengaturan?.nama_pt || 'WMU'} didirikan dengan visi menjadi perusahaan kontraktor profesional dan terpercaya.` },
                                     { year: '2016', title: 'Ekspansi Layanan', desc: 'Menambah layanan konstruksi terintegrasi meliputi design & build serta interior construction.' },
                                     { year: '2018', title: 'Peningkatan Kapasitas', desc: 'Meningkatkan sumber daya manusia, alat berat, dan sistem manajemen proyek.' },
                                     { year: '2020', title: 'Sertifikasi & Standar', desc: 'Memperoleh sertifikasi ISO dan SMK3 sebagai bukti komitmen terhadap kualitas dan keselamatan.' },
@@ -328,15 +339,17 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [], 
                             <p className="text-gray-600 leading-relaxed text-sm mb-8">
                                 Kami memiliki struktur organisasi yang jelas dengan pembagian peran dan tanggung jawab yang tepat untuk menghasilkan kinerja terbaik dalam setiap proyek.
                             </p>
-                            <a href="#" className="inline-flex items-center justify-center bg-wmu-dark text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-800 transition-colors shadow-lg shadow-wmu-dark/20">
-                                Lihat Detail <ArrowRight size={16} className="ml-2" />
-                            </a>
+                            {tentang?.struktur_organisasi_image && (
+                                <a href={`/storage/${tentang.struktur_organisasi_image}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center bg-wmu-dark text-white px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-800 transition-colors shadow-lg shadow-wmu-dark/20">
+                                    Lihat Detail <ArrowRight size={16} className="ml-2" />
+                                </a>
+                            )}
                         </div>
 
                         <div className="lg:w-3/4 w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden relative">
                             {/* Toolbar */}
-                            <div className="flex justify-end items-center gap-4 text-xs font-medium text-gray-500 mb-8 border-b border-gray-50 pb-4">
-                                <span className="mr-auto text-gray-400">Struktur Organisasi ({orgZoom}%)</span>
+                            <div className="flex flex-wrap justify-end items-center gap-x-4 gap-y-2 text-xs font-medium text-gray-500 mb-8 border-b border-gray-50 pb-4">
+                                <span className="w-full sm:w-auto sm:mr-auto text-gray-400">Struktur Organisasi ({orgZoom}%)</span>
                                 <button onClick={() => setOrgZoom(z => Math.max(z - 10, 50))} className="hover:text-wmu-accent transition-colors flex items-center gap-1 bg-gray-50 px-2 py-1 rounded">
                                     <Minus size={14} /> Zoom Out
                                 </button>
@@ -350,7 +363,7 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [], 
                             </div>
 
                             {/* Org Chart Container */}
-                            <div className="overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-gray-200 flex justify-center">
+                            <div ref={orgScrollRef} className="overflow-x-auto pb-8 scrollbar-thin scrollbar-thumb-gray-200">
                             {tentang?.struktur_organisasi_image ? (
                                 <div className="flex justify-center w-full">
                                     <img 
@@ -362,7 +375,7 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [], 
                                 </div>
                             ) : (
                                 <div 
-                                    className="min-w-[800px] flex flex-col items-center select-none pt-4 transition-transform duration-300 origin-top"
+                                    className="w-[800px] mx-auto flex flex-col items-center select-none pt-4 transition-transform duration-300 origin-top"
                                     style={{ transform: `scale(${orgZoom / 100})` }}
                                 >
                                     {/* Komisaris & Direktur Utama */}
@@ -468,7 +481,7 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [], 
                                             <Users size={12} className="text-wmu-accent" /> SUPERVISOR
                                         </div>
                                         <div className="bg-white border border-gray-200 text-gray-700 font-bold py-2 px-3 rounded shadow-sm flex items-center gap-1.5 z-10 text-[10px] w-24 justify-center">
-                                            <Users size={12} className="text-wmu-accent" /> SURVIVOR
+                                            <Users size={12} className="text-wmu-accent" /> SURVEYOR
                                         </div>
                                     </div>
 
@@ -540,7 +553,7 @@ export default function TentangKami({ keunggulan = [], mitra = [], videos = [], 
                                                 )}
 
                                                 {/* YouTube badge */}
-                                                {video.url_video && video.url_video.includes('youtube') && (
+                                                {getYoutubeEmbedUrl(video.url_video) && (
                                                     <div className="absolute top-2 left-2 bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1">
                                                         ▶ YouTube
                                                     </div>

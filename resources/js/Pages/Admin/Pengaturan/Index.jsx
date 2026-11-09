@@ -51,6 +51,11 @@ export default function Index({ pengaturan }) {
         <AdminLayout header="Pengaturan Global">
             <Head title="Pengaturan Global" />
 
+            <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Pengaturan Website</h2>
+                <p className="text-sm text-gray-500 mt-1">Kelola profil perusahaan, kontak, media sosial, dan dokumen legal.</p>
+            </div>
+
             {flash?.success && (
                 <motion.div 
                     initial={{ opacity: 0, y: -20 }}
@@ -376,12 +381,12 @@ export default function Index({ pengaturan }) {
                     initial={{ y: 100 }}
                     animate={{ y: 0 }}
                     transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
-                    className="fixed bottom-0 left-0 md:left-[280px] right-0 z-40 bg-white/80 backdrop-blur-xl border-t border-gray-200/60 p-4 sm:px-8 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] flex justify-end"
+                    className="fixed bottom-0 left-0 xl:left-[260px] right-0 z-10 bg-white/80 backdrop-blur-xl border-t border-gray-200/60 p-4 sm:px-8 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] flex justify-end"
                 >
                     <button
                         type="submit"
                         disabled={processing}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-wmu-dark py-3 px-8 text-sm font-bold text-white shadow-lg hover:bg-gray-800 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 disabled:opacity-75 disabled:hover:translate-y-0"
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-transparent bg-wmu-dark py-3 px-8 text-sm font-bold text-white shadow-lg hover:bg-gray-800 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 disabled:opacity-75 disabled:hover:translate-y-0"
                     >
                         <Save size={18} className={processing ? 'animate-pulse' : ''} />
                         {processing ? 'Menyimpan...' : 'Simpan Semua Perubahan'}

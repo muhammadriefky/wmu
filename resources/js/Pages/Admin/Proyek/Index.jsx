@@ -21,6 +21,7 @@ export default function Index({ proyek, stats }) {
         prk_gambar: null,
         prk_kategori: '',
         prk_status: 'Draft',
+        prk_is_tampil: false,
         prk_is_unggulan: false,
         prk_deskripsi: '',
         prk_tantangan: '',
@@ -71,7 +72,8 @@ export default function Index({ proyek, stats }) {
         e.preventDefault();
         
         if (isEditing) {
-            let updateData = { ...data, _method: 'put' };
+            // sync_galeri: hanya form edit lengkap yang boleh mengubah galeri
+            let updateData = { ...data, _method: 'put', sync_galeri: true };
             if (typeof updateData.prk_gambar === 'string') {
                 delete updateData.prk_gambar;
             }
@@ -155,29 +157,29 @@ export default function Index({ proyek, stats }) {
             )}
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-purple-50 text-purple-500 rounded-xl">
+                    <div className="p-3 bg-purple-50 text-purple-500 rounded-xl shrink-0">
                         <Folder size={24} />
                     </div>
                     <div>
                         <p className="text-xs font-semibold text-gray-500">Total Proyek</p>
-                        <h3 className="text-xl font-bold text-gray-800 leading-tight">{stats?.total_proyek || 0}</h3>
+                        <h3 className="text-xl font-bold text-gray-800 leading-tight">{stats?.total || 0}</h3>
                         <p className="text-[10px] text-gray-400">Semua proyek</p>
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-green-50 text-green-500 rounded-xl">
+                    <div className="p-3 bg-green-50 text-green-500 rounded-xl shrink-0">
                         <CheckCircle size={24} />
                     </div>
                     <div>
                         <p className="text-xs font-semibold text-gray-500">Proyek Aktif</p>
-                        <h3 className="text-xl font-bold text-gray-800 leading-tight">{stats?.proyek_aktif || 0}</h3>
+                        <h3 className="text-xl font-bold text-gray-800 leading-tight">{stats?.aktif || 0}</h3>
                         <p className="text-[10px] text-gray-400">Status published</p>
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-orange-50 text-orange-500 rounded-xl">
+                    <div className="p-3 bg-orange-50 text-orange-500 rounded-xl shrink-0">
                         <Star size={24} />
                     </div>
                     <div>
@@ -187,22 +189,22 @@ export default function Index({ proyek, stats }) {
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-blue-50 text-blue-500 rounded-xl">
+                    <div className="p-3 bg-blue-50 text-blue-500 rounded-xl shrink-0">
                         <Eye size={24} />
                     </div>
                     <div>
                         <p className="text-xs font-semibold text-gray-500">Total Dilihat</p>
-                        <h3 className="text-xl font-bold text-gray-800 leading-tight">{stats?.total_dilihat?.toLocaleString('id-ID') || 0}</h3>
+                        <h3 className="text-xl font-bold text-gray-800 leading-tight">{stats?.total_views?.toLocaleString('id-ID') || 0}</h3>
                         <p className="text-[10px] text-gray-400">Semua proyek</p>
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-red-50 text-red-500 rounded-xl">
+                    <div className="p-3 bg-red-50 text-red-500 rounded-xl shrink-0">
                         <Calendar size={24} />
                     </div>
                     <div>
                         <p className="text-xs font-semibold text-gray-500">Proyek Terbaru</p>
-                        <h3 className="text-xl font-bold text-gray-800 leading-tight">{stats?.proyek_terbaru || 0}</h3>
+                        <h3 className="text-xl font-bold text-gray-800 leading-tight">{stats?.baru_bulan_ini || 0}</h3>
                         <p className="text-[10px] text-gray-400">Dalam 30 hari</p>
                     </div>
                 </div>
@@ -213,8 +215,8 @@ export default function Index({ proyek, stats }) {
                 
                 {/* Filter Bar */}
                 <div className="p-4 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="flex w-full md:w-auto gap-2">
-                        <button className="flex items-center justify-between w-40 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-gray-50 hover:bg-white transition-colors">
+                    <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
+                        <button className="flex items-center justify-between w-full sm:w-40 shrink-0 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-gray-50 hover:bg-white transition-colors">
                             Semua Kategori <ChevronDown size={14} />
                         </button>
                         <div className="relative flex-1 md:w-64">
@@ -310,14 +312,14 @@ export default function Index({ proyek, stats }) {
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <button onClick={() => openModal(item)} className="p-1.5 text-gray-400 hover:text-wmu-accent hover:bg-green-50 rounded-md border border-transparent hover:border-green-100 transition-colors">
+                                                    <button type="button" aria-label="Edit" title="Edit" onClick={() => openModal(item)} className="p-1.5 text-gray-400 hover:text-wmu-accent hover:bg-green-50 rounded-md border border-transparent hover:border-green-100 transition-colors">
                                                         <Edit size={16} />
                                                     </button>
                                                     <div className="relative group">
                                                         <button className="p-1.5 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-50 transition-colors">
                                                             <MoreVertical size={16} />
                                                         </button>
-                                                        <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-md shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                                                        <div className="absolute right-full top-1/2 -translate-y-1/2 w-32 bg-white rounded-md shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all z-10">
                                                             <button 
                                                                 onClick={() => deleteItem(item.prk_id)}
                                                                 className="w-full text-left px-4 py-2 text-xs text-red-600 hover:bg-red-50 rounded-md"
@@ -343,28 +345,25 @@ export default function Index({ proyek, stats }) {
                 </div>
                 
                 {/* Pagination */}
-                <div className="p-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-                    <p>Menampilkan {proyek?.length > 0 ? 1 : 0} - {proyek?.length || 0} dari {stats?.total_proyek || 0} proyek</p>
+                <div className="p-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+                    <p>Menampilkan {proyek?.length > 0 ? 1 : 0} - {proyek?.length || 0} dari {stats?.total || 0} proyek</p>
                     <div className="flex gap-1">
-                        <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-400 hover:bg-gray-50">&lt;</button>
+                        <button disabled className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-300 cursor-not-allowed">&lt;</button>
                         <button className="w-8 h-8 flex items-center justify-center rounded bg-wmu-dark text-white font-bold">1</button>
-                        <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50">2</button>
-                        <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50">3</button>
-                        <span className="w-8 h-8 flex items-center justify-center text-gray-400">...</span>
-                        <button className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-400 hover:bg-gray-50">&gt;</button>
+                        <button disabled className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-300 cursor-not-allowed">&gt;</button>
                     </div>
                 </div>
             </div>
 
             {/* Tips Section */}
-            <div className="bg-yellow-50/50 border border-yellow-100 rounded-xl p-5 flex items-center justify-between gap-4">
+            <div className="bg-yellow-50/50 border border-yellow-100 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="p-2 bg-yellow-100 text-yellow-600 rounded-full">
+                    <div className="p-2 bg-yellow-100 text-yellow-600 rounded-full shrink-0">
                         <Star size={20} />
                     </div>
                     <div>
                         <h4 className="text-sm font-bold text-gray-800">Tips</h4>
-                        <p className="text-xs text-gray-500 mt-0.5">Atur proyek unggulan agar prk_is_tampil di halaman utama website untuk menarik perhatian pengunjung.</p>
+                        <p className="text-xs text-gray-500 mt-0.5">Atur proyek unggulan agar ditampilkan di halaman utama website untuk menarik perhatian pengunjung.</p>
                     </div>
                 </div>
                 <button className="px-4 py-2 border border-yellow-300 text-yellow-700 bg-white rounded-lg text-xs font-bold hover:bg-yellow-50 transition-colors whitespace-nowrap">
@@ -473,11 +472,11 @@ export default function Index({ proyek, stats }) {
                                                 <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
                                                 <div className="flex text-sm text-gray-600 justify-center">
                                                     <span className="relative rounded-md font-medium text-wmu-accent hover:text-green-500 focus-within:outline-none">
-                                                        Upload a file
+                                                        Unggah gambar
                                                     </span>
-                                                    <p className="pl-1">or click here</p>
+                                                    <p className="pl-1">atau klik di sini</p>
                                                 </div>
-                                                <p className="text-xs text-gray-500">PNG, JPG, GIF up to 2MB</p>
+                                                <p className="text-xs text-gray-500">PNG, JPG, GIF maks. 2MB</p>
                                                 <input id="file-upload" type="file" className="sr-only" accept="image/*" onChange={e => setData('prk_gambar', e.target.files[0])} />
                                             </label>
                                         )}
@@ -559,7 +558,7 @@ export default function Index({ proyek, stats }) {
                                                     <button type="button" onClick={() => {
                                                         const newExisting = data.existing_galeri.filter((_, idx) => idx !== i);
                                                         setData('existing_galeri', newExisting);
-                                                    }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    }} className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                                         <X size={12} />
                                                     </button>
                                                 </div>
@@ -621,7 +620,7 @@ export default function Index({ proyek, stats }) {
                 </div>
             )}
             
-            <style jsx global>{`
+            <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 6px;
                 }

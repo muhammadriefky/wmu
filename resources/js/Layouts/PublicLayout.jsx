@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
+import { waLink, phoneNumber } from '@/utils/contact';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Menu, X, Phone, Mail, MapPin, ChevronRight,
@@ -10,6 +11,10 @@ export default function PublicLayout({ children, hideCTA = false }) {
     const { pengaturan, has_karir_aktif } = usePage().props;
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    // Halaman tanpa hero gelap di bagian atas: navbar transparan membuat link
+    // putih tidak terbaca, jadi navbar langsung dibuat solid.
+    const lightTopPage = route().current('semua-proyek') || route().current('blog.show');
 
     // Track scroll for navbar glass effect
     useEffect(() => {
@@ -25,9 +30,8 @@ export default function PublicLayout({ children, hideCTA = false }) {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const waNumber = pengaturan?.no_telepon || '';
-    // Format WA Number for link (remove leading 0 and replace with 62)
-    const formattedWa = waNumber.startsWith('0') ? '62' + waNumber.substring(1) : waNumber;
+    const waNumber = phoneNumber(pengaturan);
+    const waHref = waLink(pengaturan);
 
     const navLinks = [
         { name: 'Beranda', href: '/' },
@@ -48,7 +52,7 @@ export default function PublicLayout({ children, hideCTA = false }) {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 transition={{ duration: 0.5 }}
-                className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled ? 'bg-wmu-dark/95 backdrop-blur-md shadow-lg py-2' : 'bg-gradient-to-b from-black/60 to-transparent py-4'}`}
+                className={`fixed top-0 z-50 w-full transition-all duration-300 ${scrolled || mobileMenuOpen || lightTopPage ? 'bg-wmu-dark/95 backdrop-blur-md shadow-lg py-2' : 'bg-gradient-to-b from-black/60 to-transparent py-4'}`}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-12">
@@ -77,7 +81,7 @@ export default function PublicLayout({ children, hideCTA = false }) {
                                 </Link>
                             ))}
                             <a
-                                href={`https://wa.me/${formattedWa}`}
+                                href={waHref}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="bg-wmu-accent hover:bg-yellow-600 text-white px-6 py-2.5 rounded-full font-semibold transition-all duration-300 shadow-lg shadow-wmu-accent/30 hover:shadow-wmu-accent/50 transform hover:-translate-y-1"
@@ -88,7 +92,7 @@ export default function PublicLayout({ children, hideCTA = false }) {
 
                         {/* Mobile Menu Button */}
                         <div className="md:hidden flex items-center">
-                            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white p-2">
+                            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menu" aria-expanded={mobileMenuOpen} className="text-white p-2">
                                 {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
                             </button>
                         </div>
@@ -116,7 +120,7 @@ export default function PublicLayout({ children, hideCTA = false }) {
                                     </Link>
                                 ))}
                                 <a
-                                    href={`https://wa.me/${formattedWa}`}
+                                    href={waHref}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="block text-center mt-4 bg-wmu-accent text-white px-3 py-3 rounded-md font-bold"
@@ -152,14 +156,14 @@ export default function PublicLayout({ children, hideCTA = false }) {
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 flex flex-col lg:flex-row items-center justify-between gap-8 pt-24 md:pt-32 pb-16 md:pb-20">
                             <div className="text-center lg:text-left lg:w-3/5">
                                 <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-2 tracking-tight">Punya Proyek Fasade?</h2>
-                                <h2 className="text-3xl md:text-5xl font-extrabold text-wmu-accent mb-6 tracking-tight">Mari Wujudkan Bersama {pengaturan?.nama_perusahaan || 'WMU'}</h2>
+                                <h2 className="text-3xl md:text-5xl font-extrabold text-wmu-accent mb-6 tracking-tight">Mari Wujudkan Bersama {pengaturan?.nama_pt || 'WMU'}</h2>
                                 <p className="text-gray-300 text-sm md:text-base max-w-xl mx-auto lg:mx-0 leading-relaxed">
                                     Konsultasikan kebutuhan proyek Anda sekarang juga dan dapatkan solusi konstruksi fasade terbaik dari kami.
                                 </p>
                             </div>
                             <div className="flex flex-col sm:flex-row gap-4 shrink-0 mt-8 lg:mt-0">
                                 <a
-                                    href={`https://wa.me/${formattedWa}`}
+                                    href={waHref}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="bg-wmu-accent hover:bg-yellow-600 text-white px-8 py-3.5 rounded-lg font-bold transition-all shadow-lg flex items-center justify-center shrink-0"
@@ -170,7 +174,7 @@ export default function PublicLayout({ children, hideCTA = false }) {
                                     href={`tel:${waNumber}`}
                                     className="border border-wmu-accent hover:bg-wmu-accent hover:text-white text-white px-8 py-3.5 rounded-lg font-bold transition-all flex items-center justify-center shrink-0 group"
                                 >
-                                    <Phone size={18} className="mr-2 text-wmu-accent group-hover:text-white transition-colors" /> {pengaturan?.no_telepon || '(021) 1234 5678'}
+                                    <Phone size={18} className="mr-2 text-wmu-accent group-hover:text-white transition-colors" /> {waNumber || '(021) 1234 5678'}
                                 </a>
                             </div>
                         </div>
@@ -179,17 +183,17 @@ export default function PublicLayout({ children, hideCTA = false }) {
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
                     {/* Footer Grid Layout */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 mb-12">
+                    <div className="grid grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10 mb-12">
                         {/* Col 1: Logo & About (3/12) */}
-                        <div className="lg:col-span-3">
+                        <div className="col-span-2 sm:col-span-1 lg:col-span-3">
                             <div className="mb-6">
                                 <img src="/images/logonobg.png" alt="WMU Logo" className="h-10 w-auto object-contain" />
                             </div>
                             <p className="text-gray-400 text-xs leading-relaxed mb-4">
-                                {pengaturan?.nama_perusahaan || 'PT. Win Mulya Utama'} adalah perusahaan kontraktor profesional yang siap mewujudkan proyek konstruksi berkualitas tinggi dengan standar terbaik.
+                                {pengaturan?.nama_pt || 'PT. Win Mulya Utama'} adalah perusahaan kontraktor profesional yang siap mewujudkan proyek konstruksi berkualitas tinggi dengan standar terbaik.
                             </p>
                             {/* Legal Info */}
-                            <div className="space-y-1.5 text-[11px] text-gray-500 border-t border-gray-700/50 pt-4">
+                            <div className="space-y-1.5 text-[11px] text-gray-500 border-t border-gray-700/50 pt-4 empty:hidden">
                                 {(pengaturan?.nib || pengaturan?.nib_file) && (
                                     <div className="flex gap-2">
                                         <span className="text-gray-600 w-14 shrink-0">NIB</span>
@@ -272,7 +276,7 @@ export default function PublicLayout({ children, hideCTA = false }) {
                         </div>
 
                         {/* Col 4: Info Perusahaan (2/12) */}
-                        <div className="lg:col-span-2">
+                        <div className="col-span-2 sm:col-span-1 lg:col-span-2">
                             <h3 className="text-white font-bold text-sm mb-6">Info Perusahaan</h3>
                             <div className="space-y-4 text-xs text-gray-400">
                                 <div>
@@ -301,12 +305,12 @@ export default function PublicLayout({ children, hideCTA = false }) {
                         </div>
 
                         {/* Col 5: Kontak & Newsletter (3/12) */}
-                        <div className="lg:col-span-3">
+                        <div className="col-span-2 sm:col-span-1 lg:col-span-3">
                             <h3 className="text-white font-bold text-sm mb-6">Kontak</h3>
                             <div className="space-y-3 text-xs text-gray-400 mb-6">
                                 <div className="flex items-center gap-3">
                                     <Phone size={14} className="shrink-0 text-wmu-accent" />
-                                    <span>{pengaturan?.no_telepon || '0852-6031-8481'}</span>
+                                    <span>{waNumber || '0852-6031-8481'}</span>
                                 </div>
                                 <div className="flex items-start gap-3">
                                     <Mail size={14} className="shrink-0 text-wmu-accent mt-0.5" />
@@ -337,7 +341,7 @@ export default function PublicLayout({ children, hideCTA = false }) {
                     </div>
 
                     <div className="border-t border-gray-800 pt-6 flex flex-col md:flex-row justify-between items-center text-[11px] text-gray-500">
-                        <p>&copy; {new Date().getFullYear()} {pengaturan?.nama_perusahaan || 'WMU'}. All Rights Reserved.</p>
+                        <p>&copy; {new Date().getFullYear()} {pengaturan?.nama_pt || 'WMU'}. All Rights Reserved.</p>
                         <div className="flex items-center gap-6 mt-4 md:mt-0">
                             <Link href="#" className="hover:text-gray-300 transition-colors">Privacy Policy</Link>
                             <Link href="#" className="hover:text-gray-300 transition-colors">Terms & Condition</Link>
@@ -348,14 +352,14 @@ export default function PublicLayout({ children, hideCTA = false }) {
 
             {/* Floating WhatsApp Button */}
             <a
-                href={`https://wa.me/${formattedWa}`}
+                href={waHref}
                 target="_blank"
                 rel="noreferrer"
-                className="fixed bottom-8 right-8 bg-[#25D366] text-white p-3.5 rounded-full shadow-2xl hover:bg-[#1EBE57] transition-all transform hover:scale-110 z-50 flex items-center justify-center group"
+                className="fixed bottom-4 right-4 md:bottom-8 md:right-8 bg-[#25D366] text-white p-3 md:p-3.5 rounded-full shadow-2xl hover:bg-[#1EBE57] transition-all transform hover:scale-110 z-50 flex items-center justify-center group"
                 aria-label="Chat via WhatsApp"
             >
-                <MessageCircle size={28} />
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm">
+                <MessageCircle className="w-6 h-6 md:w-7 md:h-7" />
+                <span className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white shadow-sm">
                     1
                 </span>
                 <span className="absolute right-full mr-4 bg-white text-gray-800 px-3 py-1.5 rounded-lg text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity shadow-lg pointer-events-none whitespace-nowrap">

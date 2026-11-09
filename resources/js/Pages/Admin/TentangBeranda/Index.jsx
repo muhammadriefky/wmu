@@ -1,9 +1,10 @@
 import React from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Save, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
 
 export default function Index({ tentang }) {
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors } = useForm({
         judul: tentang?.judul || '',
         deskripsi: tentang?.deskripsi || '',
@@ -31,7 +32,18 @@ export default function Index({ tentang }) {
                 <p className="text-sm text-gray-500 mt-1">Kelola konten teks dan video pada bagian Tentang Kami di halaman Beranda</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-8">
+            {flash?.success && (
+                <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium">
+                    {flash.success}
+                </div>
+            )}
+            {flash?.error && (
+                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+                    {flash.error}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-5 sm:p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {/* Teks Konten Utama */}
                     <div className="space-y-6">
@@ -67,7 +79,7 @@ export default function Index({ tentang }) {
                     <div className="space-y-6">
                         <h3 className="text-lg font-bold text-gray-800 border-b pb-2">Badge Pengalaman (Kotak Hitam)</h3>
                         
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-1.5">Angka Pengalaman <span className="text-red-500">*</span></label>
                                 <input

@@ -16,8 +16,10 @@ class KarirController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('posisi', 'like', "%{$search}%")
+            $query->where(function ($q) use ($search) {
+                $q->where('posisi', 'like', "%{$search}%")
                   ->orWhere('persyaratan', 'like', "%{$search}%");
+            });
         }
 
         if ($request->filled('sort')) {
@@ -50,8 +52,8 @@ class KarirController extends Controller
     {
         $data = $request->validate([
             'posisi' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
-            'persyaratan' => 'nullable|string|nullable',
+            'slug' => 'required|string|max:255|unique:ms_karir,slug',
+            'persyaratan' => 'nullable|string',
             'status_aktif' => 'required|boolean'
         ]);
 
@@ -64,8 +66,8 @@ class KarirController extends Controller
     {
         $data = $request->validate([
             'posisi' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
-            'persyaratan' => 'nullable|string|nullable',
+            'slug' => 'required|string|max:255|unique:ms_karir,slug,' . $karir->id_karir . ',id_karir',
+            'persyaratan' => 'nullable|string',
             'status_aktif' => 'required|boolean'
         ]);
 

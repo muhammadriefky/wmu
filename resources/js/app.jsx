@@ -7,10 +7,17 @@ import { createRoot } from 'react-dom/client';
 
 import Lenis from 'lenis';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const envAppName = import.meta.env.VITE_APP_NAME;
+const appName = envAppName && envAppName !== 'Laravel' ? envAppName : 'WMU';
 
 createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
+    // Halaman publik memakai <SeoHead> yang sudah menambahkan nama perusahaan
+    // ("Judul - PT ..."), jadi jangan ditambah suffix lagi. Halaman admin/auth
+    // yang hanya memberi judul pendek mendapat suffix nama aplikasi.
+    title: (title) => {
+        if (!title) return appName;
+        return title.includes(' - ') ? title : `${title} - ${appName}`;
+    },
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.jsx`,
@@ -20,8 +27,8 @@ createInertiaApp({
         const lenis = new Lenis({
             duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            smooth: true,
-            smoothTouch: false,
+            // Biarkan elemen scroll bersarang (sidebar admin, modal) tetap bisa di-scroll
+            allowNestedScroll: true,
         });
 
         function raf(time) {

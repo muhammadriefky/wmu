@@ -41,7 +41,7 @@ export default function Login({ status, canResetPassword }) {
                 <div className="absolute inset-0 bg-gradient-to-r from-wmu-dark via-wmu-dark/60 to-transparent"></div>
             </div>
 
-            <div className="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10 min-h-[600px]">
+            <div className="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row items-center justify-between gap-12 relative z-10 min-h-[600px] pb-16 sm:pb-16 lg:pb-8">
 
                 {/* Left Side - Typography & Branding */}
                 <motion.div
@@ -50,11 +50,11 @@ export default function Login({ status, canResetPassword }) {
                     transition={{ duration: 0.8 }}
                     className="w-full lg:w-1/2 text-white text-center lg:text-left"
                 >
-                    <Link href="/" className="inline-block mb-6 group -ml-8 lg:-ml-28 xl:-ml-36">
+                    <Link href="/" className="inline-block mb-6 group lg:-ml-28 xl:-ml-36">
                         <img
                             src="/images/logonobg.png"
                             alt="WMU Logo"
-                            className="h-48 sm:h-56 md:h-64 lg:h-72 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-2xl origin-left"
+                            className="h-32 sm:h-48 md:h-56 lg:h-72 object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-2xl origin-left"
                         />
                     </Link>
 
@@ -64,7 +64,7 @@ export default function Login({ status, canResetPassword }) {
                             Manajemen Proyek
                         </span>
                     </h1>
-                    <p className="text-gray-300 text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed border-l-4 border-wmu-accent pl-4">
+                    <p className="text-gray-300 text-lg max-w-xl mx-auto lg:mx-0 leading-relaxed lg:border-l-4 border-wmu-accent lg:pl-4">
                         Akses khusus portal administrasi PT Winmulyautama. Mengelola data klien, layanan, portofolio proyek, dan memantau kemajuan pembangunan secara terpadu.
                     </p>
                 </motion.div>

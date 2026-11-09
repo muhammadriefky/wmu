@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
-import { usePage, Link } from '@inertiajs/react';
+import { usePage, Link, router } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import { waLink, phoneNumber, companyName } from '@/utils/contact';
 import SeoHead from '@/Components/SeoHead';
 import { motion } from 'framer-motion';
 import {
@@ -9,20 +9,25 @@ import {
     Clock, ArrowRight, ChevronLeft, Phone, Tag
 } from 'lucide-react';
 
-export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
+export default function Index({ blog, kategoriList = [], popularBlogs = [], filters = {} }) {
     const { pengaturan } = usePage().props;
 
-    const [activeCategory, setActiveCategory] = useState('Semua');
+    // Filter kategori dijalankan di server agar berlaku di semua halaman pagination
+    const activeCategory = filters?.kategori || 'Semua';
+    const setActiveCategory = (kat) => {
+        router.get(
+            route('blog'),
+            kat === 'Semua' ? {} : { kategori: kat },
+            { preserveScroll: true, preserveState: true }
+        );
+    };
 
-    const filteredBlogs = useMemo(() => {
-        if (!blog?.data) return [];
-        if (activeCategory === 'Semua') return blog.data;
-        return blog.data.filter(item => item.kategori === activeCategory);
-    }, [blog, activeCategory]);
+    const filteredBlogs = blog?.data ?? [];
+    const defaultAuthor = companyName(pengaturan);
     return (
         <PublicLayout hideCTA={true}>
             <SeoHead 
-                title={`Blog & Insight - ${pengaturan?.nama_perusahaan || 'WMU'}`} 
+                title="Blog & Insight" 
                 description="Kumpulan artikel, berita, dan tips seputar dunia konstruksi dari pakarnya."
             />
 
@@ -51,7 +56,7 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                         {/* Breadcrumb */}
                         <div className="flex items-center text-xs text-gray-400 mb-6 tracking-wide">
                             <Link href="/" className="hover:text-wmu-accent transition-colors">Home</Link>
-                            <ChevronRight size={14} className="mx-1 text-[#DFA639]" />
+                            <ChevronRight size={14} className="mx-1 text-wmu-accent" />
                             <span className="text-gray-200">Blog</span>
                         </div>
 
@@ -117,8 +122,8 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                         <div className="lg:w-2/3">
                             <div className="flex justify-between items-center mb-8">
                                 <h3 className="text-2xl font-bold text-gray-900">Artikel Terbaru</h3>
-                                <div className="flex items-center gap-2 text-sm text-gray-500 border border-gray-200 rounded-lg px-4 py-2 cursor-pointer hover:bg-gray-50 transition-colors font-medium">
-                                    Urutkan: Terbaru <ChevronDown size={16} />
+                                <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 border border-gray-200 rounded-lg px-4 py-2 font-medium">
+                                    Urutan: Terbaru
                                 </div>
                             </div>
 
@@ -135,7 +140,7 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                                             </div>
 
                                             {/* Content */}
-                                            <div className="flex flex-col flex-grow py-2 pr-2">
+                                            <div className="flex flex-col flex-grow min-w-0 py-2 pr-2">
                                                 <div className="text-xs text-gray-400 mb-2 font-medium">
                                                     {new Date(item.tanggal_terbit).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
                                                 </div>
@@ -146,12 +151,12 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                                                     {item.meta_deskripsi || 'Baca selengkapnya untuk mengetahui informasi lebih lanjut mengenai artikel ini. Kami menyediakan insight dan pengetahuan terbaik seputar industri.'}
                                                 </p>
 
-                                                <div className="flex items-center gap-5 mt-auto mb-4">
+                                                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-auto mb-4">
                                                     <div className="flex items-center gap-2.5">
                                                         <div className="w-7 h-7 rounded-full bg-gray-200 overflow-hidden shrink-0">
-                                                            <img src={`https://ui-avatars.com/api/?name=${item.penulis || 'BuildPro+Team'}&background=032F40&color=fff`} alt="Author" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                                                            <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(item.penulis || defaultAuthor)}&background=032F40&color=fff`} alt="Author" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                                         </div>
-                                                        <span className="text-xs font-semibold text-gray-700">{item.penulis || 'BuildPro Team'}</span>
+                                                        <span className="text-xs font-semibold text-gray-700">{item.penulis || defaultAuthor}</span>
                                                     </div>
                                                     <div className="flex items-center gap-1.5 text-gray-400 text-xs font-medium">
                                                         <Clock size={14} /> 5 menit baca
@@ -159,7 +164,7 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                                                 </div>
 
                                                 <div className="pt-4 border-t border-gray-100">
-                                                    <Link href={`/blog/${item.slug}`} className="text-[#DFA639] font-bold text-sm flex items-center group-hover:text-yellow-600 transition-colors">
+                                                    <Link href={`/blog/${item.slug}`} className="text-wmu-accent font-bold text-sm flex items-center group-hover:text-wmu-dark transition-colors">
                                                         Baca Selengkapnya <ArrowRight size={16} className="ml-1.5 group-hover:translate-x-1 transition-transform" />
                                                     </Link>
                                                 </div>
@@ -173,34 +178,34 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                                 )}
                             </div>
 
-                            {/* Pagination */}
-                            <div className="mt-12 flex items-center justify-center gap-2">
-                                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-wmu-dark hover:bg-gray-100 transition-colors">
-                                    <ChevronLeft size={16} />
-                                </button>
-                                <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-wmu-dark text-white font-bold text-xs transition-colors">
-                                    1
-                                </button>
-                                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-wmu-dark hover:bg-gray-100 font-bold text-xs transition-colors">
-                                    2
-                                </button>
-                                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-wmu-dark hover:bg-gray-100 font-bold text-xs transition-colors">
-                                    3
-                                </button>
-                                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-wmu-dark hover:bg-gray-100 font-bold text-xs transition-colors">
-                                    4
-                                </button>
-                                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-wmu-dark hover:bg-gray-100 font-bold text-xs transition-colors">
-                                    5
-                                </button>
-                                <span className="px-1 text-gray-400">...</span>
-                                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:text-wmu-dark hover:bg-gray-100 font-bold text-xs transition-colors">
-                                    12
-                                </button>
-                                <button className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-wmu-dark hover:bg-gray-100 transition-colors">
-                                    <ChevronRight size={16} />
-                                </button>
-                            </div>
+                            {/* Pagination (data dari paginator Laravel) */}
+                            {blog?.last_page > 1 && (
+                                <nav className="mt-12 flex flex-wrap items-center justify-center gap-2" aria-label="Pagination">
+                                    {blog.links.map((link, idx) => {
+                                        const isPrev = idx === 0;
+                                        const isNext = idx === blog.links.length - 1;
+                                        const label = isPrev ? <ChevronLeft size={16} /> : isNext ? <ChevronRight size={16} /> : link.label;
+                                        const base = 'min-w-8 h-8 px-2 flex items-center justify-center rounded-lg font-bold text-xs transition-colors';
+
+                                        if (!link.url) {
+                                            return (
+                                                <span key={idx} className={`${base} text-gray-300`}>{label}</span>
+                                            );
+                                        }
+
+                                        return (
+                                            <Link
+                                                key={idx}
+                                                href={link.url}
+                                                preserveScroll
+                                                className={`${base} ${link.active ? 'bg-wmu-dark text-white' : 'text-gray-500 hover:text-wmu-dark hover:bg-gray-100'}`}
+                                            >
+                                                {label}
+                                            </Link>
+                                        );
+                                    })}
+                                </nav>
+                            )}
                         </div>
 
                         {/* Right Column - Sidebar */}
@@ -213,8 +218,8 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                                     Dapatkan update artikel terbaru seputar konstruksi fasade langsung di email Anda.
                                 </p>
                                 <form className="flex flex-col gap-3 relative z-10" onSubmit={(e) => e.preventDefault()}>
-                                    <input type="email" placeholder="Email Anda" className="w-full bg-wmu-dark border border-gray-600 rounded-lg px-4 py-3.5 text-sm text-white focus:outline-none focus:border-[#DFA639] transition-colors placeholder:text-gray-500" />
-                                    <button type="submit" className="w-full bg-wmu-accent hover:bg-yellow-500 text-white rounded-lg px-4 py-3.5 font-bold text-sm transition-colors flex justify-center items-center gap-2">
+                                    <input type="email" placeholder="Email Anda" className="w-full bg-wmu-dark border border-gray-600 rounded-lg px-4 py-3.5 text-sm text-white focus:outline-none focus:border-wmu-accent transition-colors placeholder:text-gray-500" />
+                                    <button type="submit" className="w-full bg-wmu-accent hover:bg-wmu-accent/90 text-white rounded-lg px-4 py-3.5 font-bold text-sm transition-colors flex justify-center items-center gap-2">
                                         Berlangganan <ArrowRight size={16} />
                                     </button>
                                 </form>
@@ -253,16 +258,17 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                                 <h4 className="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-100">Kategori</h4>
                                 <div className="flex flex-col gap-4">
                                     {(Array.isArray(kategoriList) ? kategoriList : Object.values(kategoriList || {})).map((kat, idx) => (
-                                        <div 
+                                        <button 
+                                            type="button"
                                             key={idx} 
                                             onClick={() => setActiveCategory(kat)}
-                                            className="flex items-center justify-between group cursor-pointer"
+                                            className="flex items-center justify-between group cursor-pointer text-left"
                                         >
                                             <div className="flex items-center gap-3">
-                                                <Tag size={16} className="text-[#DFA639]" />
-                                                <span className="text-sm font-medium text-gray-600 group-hover:text-wmu-dark transition-colors">{kat}</span>
+                                                <Tag size={16} className="text-wmu-accent" />
+                                                <span className={`text-sm transition-colors group-hover:text-wmu-dark ${activeCategory === kat ? 'font-bold text-wmu-dark' : 'font-medium text-gray-600'}`}>{kat}</span>
                                             </div>
-                                        </div>
+                                        </button>
                                     ))}
                                 </div>
                             </div>
@@ -273,7 +279,7 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                 {/* Bottom CTA Block for Blog Page */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-30 mt-16 -mb-8">
                     <div className="bg-wmu-dark rounded-2xl shadow-xl p-8 md:p-12 border border-gray-800 flex flex-col lg:flex-row items-center justify-between gap-8">
-                        <div className="flex items-center gap-6 lg:w-2/3">
+                        <div className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-6 lg:w-2/3">
                             <div className="w-20 h-20 rounded-full border border-dashed border-wmu-accent/50 flex items-center justify-center shrink-0">
                                 <div className="w-16 h-16 rounded-full border border-wmu-accent flex items-center justify-center text-wmu-accent">
                                     <Briefcase size={28} />
@@ -282,25 +288,25 @@ export default function Index({ blog, kategoriList = [], popularBlogs = [] }) {
                             <div>
                                 <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">Butuh Insight untuk Proyek Anda?</h3>
                                 <p className="text-gray-300 text-sm md:text-base leading-relaxed">
-                                    Konsultasikan kebutuhan proyek fasade Anda bersama tim ahli kami.<br className="hidden md:block" />
+                                    Konsultasikan kebutuhan proyek fasade Anda bersama tim ahli kami.{' '}<br className="hidden md:block" />
                                     Dapatkan solusi terbaik, tepat, dan efisien.
                                 </p>
                             </div>
                         </div>
                         <div className="flex flex-col gap-4 shrink-0 lg:w-1/3 w-full sm:w-auto">
                             <a
-                                href={`https://wa.me/${pengaturan?.no_telepon?.replace(/\D/g, '') || '6281234567890'}`}
+                                href={waLink(pengaturan)}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="bg-wmu-accent hover:bg-[#c9922b] text-white px-8 py-3.5 rounded-lg font-bold text-sm transition-all shadow-lg flex items-center justify-center text-center w-full"
+                                className="bg-wmu-accent hover:bg-wmu-accent/90 text-white px-8 py-3.5 rounded-lg font-bold text-sm transition-all shadow-lg flex items-center justify-center text-center w-full"
                             >
                                 Konsultasi Gratis <ArrowRight size={18} className="ml-2" />
                             </a>
                             <a
-                                href={`tel:${pengaturan?.no_telepon || '02112345678'}`}
+                                href={`tel:${phoneNumber(pengaturan)}`}
                                 className="text-gray-300 hover:text-white font-bold text-sm transition-colors flex items-center justify-center w-full"
                             >
-                                <Phone size={16} className="mr-2 text-wmu-accent" /> {pengaturan?.no_telepon || '(021) 1234 5678'}
+                                <Phone size={16} className="mr-2 text-wmu-accent" /> {phoneNumber(pengaturan) || '(021) 1234 5678'}
                             </a>
                         </div>
                     </div>

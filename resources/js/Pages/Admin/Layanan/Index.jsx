@@ -41,7 +41,7 @@ export default function Index({ layanan, proyek, stats, filters }) {
     // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchTerm !== filters?.search || kategoriFilter !== filters?.kategori || sortFilter !== filters?.sort) {
+            if (searchTerm !== (filters?.search || '') || kategoriFilter !== (filters?.kategori || 'Semua Kategori') || sortFilter !== (filters?.sort || 'Terbaru')) {
                 router.get(route('admin.layanan.index'), {
                     search: searchTerm,
                     kategori: kategoriFilter,
@@ -282,10 +282,10 @@ export default function Index({ layanan, proyek, stats, filters }) {
                 
                 {/* Toolbar */}
                 <div className="p-5 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-white">
-                    <div className="flex w-full md:w-auto gap-3">
+                    <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
                         <div className="relative">
                             <select 
-                                className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 focus:ring-wmu-accent focus:border-wmu-accent transition-colors"
+                                className="w-full sm:w-auto appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-xl text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 focus:ring-wmu-accent focus:border-wmu-accent transition-colors"
                                 value={kategoriFilter}
                                 onChange={e => setKategoriFilter(e.target.value)}
                             >
@@ -406,14 +406,14 @@ export default function Index({ layanan, proyek, stats, filters }) {
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="flex justify-center gap-2">
-                                                <button onClick={() => openModal(item)} className="p-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition-colors shadow-sm" title="Edit">
+                                                <button type="button" aria-label="Edit" title="Edit" onClick={() => openModal(item)} className="p-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition-colors shadow-sm" title="Edit">
                                                     <Edit size={16} />
                                                 </button>
                                                 <div className="relative group/menu">
                                                     <button className="p-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
                                                         <MoreVertical size={16} />
                                                     </button>
-                                                    <div className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10 py-1">
+                                                    <div className="absolute right-full top-1/2 -translate-y-1/2 w-32 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible group-focus-within/menu:opacity-100 group-focus-within/menu:visible transition-all z-10 py-1">
                                                         <button onClick={() => deleteItem(item.id_layanan)} className="w-full text-left px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2">
                                                             <Trash2 size={14} /> Hapus
                                                         </button>
@@ -453,7 +453,7 @@ export default function Index({ layanan, proyek, stats, filters }) {
             </div>
 
             {/* Tips Card */}
-            <div className="bg-[#FFFBF2] border border-[#FDEBCA] rounded-2xl p-6 flex items-start sm:items-center gap-5 shadow-sm">
+            <div className="bg-[#FFFBF2] border border-[#FDEBCA] rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 shadow-sm">
                 <div className="p-3 bg-[#FDF2DF] text-orange-500 rounded-xl shrink-0">
                     <Lightbulb size={24} />
                 </div>
@@ -464,7 +464,7 @@ export default function Index({ layanan, proyek, stats, filters }) {
                         Pastikan deskripsi singkat menarik dan gambar berkualitas tinggi.
                     </p>
                 </div>
-                <div className="shrink-0 mt-3 sm:mt-0">
+                <div className="shrink-0">
                     <button className="px-5 py-2.5 border border-[#FDEBCA] bg-white rounded-xl text-xs font-bold text-orange-600 shadow-sm hover:bg-orange-50 transition-colors">
                         Kelola Halaman Layanan
                     </button>

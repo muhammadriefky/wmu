@@ -32,7 +32,7 @@ export default function Index({ klien, stats }) {
                 nama_klien: item.nama_klien || '',
                 email: item.email || '',
                 telepon: item.telepon || '',
-                urutan: item.urutan || '',
+                urutan: item.urutan ?? 0,
                 kategori: item.kategori || '',
                 logo: null,
                 status_aktif: item.status_aktif ? true : false,
@@ -124,9 +124,9 @@ export default function Index({ klien, stats }) {
             )}
 
             {/* Stat Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-purple-50 text-purple-500 rounded-full">
+                    <div className="p-3 bg-purple-50 text-purple-500 rounded-full shrink-0">
                         <Users size={24} />
                     </div>
                     <div>
@@ -136,7 +136,7 @@ export default function Index({ klien, stats }) {
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-green-50 text-green-500 rounded-full">
+                    <div className="p-3 bg-green-50 text-green-500 rounded-full shrink-0">
                         <CheckCircle size={24} />
                     </div>
                     <div>
@@ -146,7 +146,7 @@ export default function Index({ klien, stats }) {
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-blue-50 text-blue-500 rounded-full">
+                    <div className="p-3 bg-blue-50 text-blue-500 rounded-full shrink-0">
                         <FolderOpen size={24} />
                     </div>
                     <div>
@@ -156,7 +156,7 @@ export default function Index({ klien, stats }) {
                     </div>
                 </div>
                 <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm flex items-center gap-4">
-                    <div className="p-3 bg-orange-50 text-orange-500 rounded-full">
+                    <div className="p-3 bg-orange-50 text-orange-500 rounded-full shrink-0">
                         <Star size={24} />
                     </div>
                     <div>
@@ -171,8 +171,8 @@ export default function Index({ klien, stats }) {
             <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden mb-6">
                 
                 {/* Filter Bar */}
-                <div className="p-4 border-b border-gray-100 flex justify-between items-center gap-4">
-                    <div className="relative w-64">
+                <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4">
+                    <div className="relative w-full sm:w-64">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search size={14} className="text-gray-400" />
                         </div>
@@ -184,7 +184,7 @@ export default function Index({ klien, stats }) {
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="relative">
-                            <select className="appearance-none pl-3 pr-8 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                            <select className="appearance-none bg-none pl-3 pr-8 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
                                 <option>Semua Status</option>
                                 <option>Aktif</option>
                                 <option>Nonaktif</option>
@@ -223,7 +223,7 @@ export default function Index({ klien, stats }) {
                                                 {item.logo ? (
                                                     <img src={item.logo.startsWith('http') ? item.logo : `/storage/${item.logo}`} alt={item.nama_klien} className="max-h-full max-w-full object-contain" />
                                                 ) : (
-                                                    <span className="text-gray-400 text-xs">No Logo</span>
+                                                    <Users size={16} className="text-gray-300" />
                                                 )}
                                             </div>
                                         </td>
@@ -253,7 +253,7 @@ export default function Index({ klien, stats }) {
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 text-center text-sm text-gray-500">
+                                        <td className="px-6 py-4 text-center text-sm text-gray-500 whitespace-nowrap">
                                             {item.proyek_count} Proyek
                                         </td>
                                         <td className="px-6 py-4 text-right text-sm font-medium relative">
@@ -266,7 +266,7 @@ export default function Index({ klien, stats }) {
                                             
                                             {/* Dropdown Menu */}
                                             {activeMenu === item.id_klien && (
-                                                <div className="absolute right-6 top-14 w-32 bg-white rounded-md shadow-lg border border-gray-100 z-10 py-1">
+                                                <div className="absolute right-16 top-1/2 -translate-y-1/2 w-32 bg-white rounded-md shadow-lg border border-gray-100 z-10 py-1">
                                                     <button 
                                                         onClick={() => { openModal(item); setActiveMenu(null); }}
                                                         className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 flex items-center gap-2"
@@ -377,12 +377,12 @@ export default function Index({ klien, stats }) {
                                         {errors.urutan && <p className="text-red-500 text-xs mt-1">{errors.urutan}</p>}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                                        <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Kategori</label>
                                         <input 
                                             type="text" 
                                             value={data.kategori} 
                                             onChange={e => setData('kategori', e.target.value)}
-                                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                            className="block w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 transition-all text-sm"
                                             placeholder="Contoh: Industrial, Hospitality"
                                         />
                                         {errors.kategori && <p className="text-red-500 text-xs mt-1">{errors.kategori}</p>}
@@ -440,7 +440,7 @@ export default function Index({ klien, stats }) {
                 </div>
             )}
             
-            <style jsx global>{`
+            <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 6px;
                 }

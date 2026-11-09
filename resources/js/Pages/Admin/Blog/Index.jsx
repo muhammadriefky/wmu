@@ -44,7 +44,7 @@ export default function Index({ blog, stats, filters }) {
     // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchTerm !== filters?.search || sortFilter !== filters?.sort) {
+            if (searchTerm !== (filters?.search || '') || sortFilter !== (filters?.sort || 'Terbaru')) {
                 router.get(route('admin.blog.index'), {
                     search: searchTerm,
                     sort: sortFilter
@@ -267,14 +267,14 @@ export default function Index({ blog, stats, filters }) {
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="flex justify-center gap-2">
-                                                <button onClick={() => openModal(item)} className="p-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition-colors shadow-sm" title="Edit">
+                                                <button type="button" aria-label="Edit" title="Edit" onClick={() => openModal(item)} className="p-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition-colors shadow-sm" title="Edit">
                                                     <Edit size={16} />
                                                 </button>
                                                 <div className="relative group/menu">
                                                     <button className="p-2 bg-white border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
                                                         <MoreVertical size={16} />
                                                     </button>
-                                                    <div className="absolute right-0 top-full mt-2 w-32 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10 py-1">
+                                                    <div className="absolute right-full top-1/2 -translate-y-1/2 w-32 bg-white border border-gray-100 rounded-xl shadow-lg opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible group-focus-within/menu:opacity-100 group-focus-within/menu:visible transition-all z-10 py-1">
                                                         <button onClick={() => deleteItem(item.id_blog)} className="w-full text-left px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2">
                                                             <Trash2 size={14} /> Hapus
                                                         </button>
@@ -437,7 +437,7 @@ export default function Index({ blog, stats, filters }) {
                 </div>
             )}
             
-            <style jsx global>{`
+            <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 6px;
                 }

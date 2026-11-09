@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Save, Plus, Trash2, Image as ImageIcon, Building2, ChevronUp, ChevronDown } from 'lucide-react';
 
 export default function TentangKami({ tentang }) {
+    const { flash } = usePage().props;
     // Parse JSON arrays safely
     const parseArray = (data) => {
         if (!data) return [];
@@ -100,6 +101,17 @@ export default function TentangKami({ tentang }) {
                     <Save size={18} /> Simpan Perubahan
                 </button>
             </div>
+
+            {flash?.success && (
+                <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium">
+                    {flash.success}
+                </div>
+            )}
+            {flash?.error && (
+                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+                    {flash.error}
+                </div>
+            )}
 
             <form id="tentangkami-form" onSubmit={submit} className="space-y-8 pb-12">
                 

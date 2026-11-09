@@ -5,11 +5,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Video;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
 
 class VideoController extends Controller
 {
+    /** youtube.com/watch?v=, youtu.be/, /embed/, /shorts/, /live/ */
+    private const YOUTUBE_REGEX = '~^https?://(www\.|m\.)?(youtube\.com/(watch\?(.*&)?v=|embed/|shorts/|live/)|youtu\.be/)[\w-]{11}~i';
+
     public function index(Request $request)
     {
         $query = Video::query();
@@ -49,8 +53,9 @@ class VideoController extends Controller
             'judul_video' => 'required|string|max:255',
             'sumber' => 'required|in:Youtube,Upload',
             'durasi' => 'nullable|string|max:50',
-            'url_video' => 'nullable|string|max:255',
-            'file_video' => 'nullable|mimes:mp4,mov,avi,webm|max:51200',
+            // Video YouTube wajib punya URL YouTube yang valid; video Upload wajib punya file.
+            'url_video' => ['nullable', 'required_if:sumber,Youtube', 'url', 'max:255', 'regex:' . self::YOUTUBE_REGEX],
+            'file_video' => 'nullable|required_if:sumber,Upload|mimes:mp4,mov,avi,webm|max:51200',
             'status' => 'required|in:Aktif,Tidak Aktif',
             'gambar' => 'nullable|image|max:2048',
         ]);
@@ -63,11 +68,9 @@ class VideoController extends Controller
             $validated['file_video'] = $request->file('file_video')->store('videos/files', 'public');
         }
 
-        $validated['rec_usercreated'] = 'admin'; // Hardcode for now or use Auth::user()->name
-
         Video::create($validated);
 
-        return redirect()->back()->with('message', 'Video berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Video berhasil ditambahkan!');
     }
 
     public function update(Request $request, $id)
@@ -78,8 +81,14 @@ class VideoController extends Controller
             'judul_video' => 'required|string|max:255',
             'sumber' => 'required|in:Youtube,Upload',
             'durasi' => 'nullable|string|max:50',
-            'url_video' => 'nullable|string|max:255',
-            'file_video' => 'nullable|mimes:mp4,mov,avi,webm|max:51200',
+            'url_video' => ['nullable', 'required_if:sumber,Youtube', 'url', 'max:255', 'regex:' . self::YOUTUBE_REGEX],
+            // Saat edit, file boleh kosong jika video sudah punya file sebelumnya.
+            'file_video' => [
+                'nullable',
+                Rule::requiredIf(fn () => $request->input('sumber') === 'Upload' && ! $video->file_video),
+                'mimes:mp4,mov,avi,webm',
+                'max:51200',
+            ],
             'status' => 'required|in:Aktif,Tidak Aktif',
             'gambar' => 'nullable|image|max:2048',
         ]);
@@ -108,11 +117,9 @@ class VideoController extends Controller
             $validated['url_video'] = null;
         }
 
-        $validated['rec_userupdate'] = 'admin';
-
         $video->update($validated);
 
-        return redirect()->back()->with('message', 'Video berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Video berhasil diperbarui!');
     }
 
     public function destroy($id)
@@ -126,6 +133,6 @@ class VideoController extends Controller
         }
         $video->delete();
 
-        return redirect()->back()->with('message', 'Video berhasil dihapus!');
+        return redirect()->back()->with('success', 'Video berhasil dihapus!');
     }
 }

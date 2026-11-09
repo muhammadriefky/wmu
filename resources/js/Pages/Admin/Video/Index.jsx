@@ -47,7 +47,7 @@ export default function Index({ videos, stats, filters }) {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (searchTerm !== filters?.search || sortFilter !== filters?.sort) {
+            if (searchTerm !== (filters?.search || '') || sortFilter !== (filters?.sort || 'Terbaru')) {
                 router.get(route('admin.video.index'), {
                     search: searchTerm,
                     sort: sortFilter
@@ -131,6 +131,17 @@ export default function Index({ videos, stats, filters }) {
                     <Plus size={18} strokeWidth={2.5} /> Tambah Video Baru
                 </button>
             </div>
+
+            {flash?.success && (
+                <div className="mb-6 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm font-medium">
+                    {flash.success}
+                </div>
+            )}
+            {flash?.error && (
+                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-medium">
+                    {flash.error}
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] flex items-center gap-5">
@@ -233,11 +244,11 @@ export default function Index({ videos, stats, filters }) {
                                             </span>
                                         </td>
                                         <td className="py-4 px-6">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => openModal(video)} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm">
+                                            <div className="flex items-center justify-end gap-2 lg:opacity-0 lg:group-hover:opacity-100 lg:group-focus-within:opacity-100 transition-opacity">
+                                                <button type="button" aria-label="Edit" title="Edit" onClick={() => openModal(video)} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm">
                                                     <Edit size={14} />
                                                 </button>
-                                                <button onClick={() => handleDelete(video.id_video)} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm">
+                                                <button type="button" aria-label="Hapus" title="Hapus" onClick={() => handleDelete(video.id_video)} className="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-600 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm">
                                                     <Trash2 size={14} />
                                                 </button>
                                             </div>

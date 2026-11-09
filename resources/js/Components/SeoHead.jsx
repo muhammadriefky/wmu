@@ -9,14 +9,25 @@ export default function SeoHead({
     keywords = ''
 }) {
     const { pengaturan } = usePage().props;
-    const siteName = pengaturan?.nama_perusahaan || 'WMU Construction';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const siteName = pengaturan?.nama_pt || 'WMU Construction';
     const defaultDesc = pengaturan?.deskripsi_web || 'Layanan konstruksi terpercaya dan profesional di Indonesia.';
-    const defaultImage = pengaturan?.logo ? `${window.location.origin}/storage/${pengaturan.logo}` : `${window.location.origin}/images/default-og.jpg`;
-    
+
+    // Terima URL absolut ("https://..."), path absolut ("/storage/x.jpg")
+    // maupun path relatif storage ("blog/x.jpg") tanpa menggandakan prefix.
+    const toAbsolute = (value, storagePrefix = false) => {
+        if (!value) return '';
+        if (/^https?:\/\//i.test(value)) return value;
+        if (value.startsWith('/')) return `${origin}${value}`;
+        return storagePrefix ? `${origin}/storage/${value}` : `${origin}/${value}`;
+    };
+
+    const defaultImage = pengaturan?.logo ? toAbsolute(pengaturan.logo, true) : `${origin}/images/logonobg.png`;
+
     const finalTitle = title ? `${title} - ${siteName}` : siteName;
     const finalDesc = description || defaultDesc;
-    const finalImage = image ? (image.startsWith('http') ? image : `${window.location.origin}/storage/${image}`) : defaultImage;
-    const finalUrl = url ? `${window.location.origin}${url}` : window.location.href;
+    const finalImage = image ? toAbsolute(image, true) : defaultImage;
+    const finalUrl = url ? toAbsolute(url) : (typeof window !== 'undefined' ? window.location.href : '');
     const finalKeywords = keywords || 'kontraktor, konstruksi, wmu, jasa konstruksi, sipil, arsitektur, bangunan';
 
     return (

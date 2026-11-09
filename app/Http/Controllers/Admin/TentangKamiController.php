@@ -12,10 +12,7 @@ class TentangKamiController extends Controller
 {
     public function index()
     {
-        $tentang = TentangKami::first();
-        if (!$tentang) {
-            $tentang = TentangKami::create();
-        }
+        $tentang = TentangKami::firstOrCreate([]);
 
         return Inertia::render('Admin/TentangKami/Index', [
             'tentang' => $tentang
@@ -24,8 +21,9 @@ class TentangKamiController extends Controller
 
     public function update(Request $request)
     {
-        $tentang = TentangKami::first();
-        
+        // firstOrCreate: update bisa dipanggil sebelum halaman index pernah dibuka
+        $tentang = TentangKami::firstOrCreate([]);
+
         $validated = $request->validate([
             'judul_hero' => 'nullable|string|max:255',
             'deskripsi_hero' => 'nullable|string',
@@ -43,6 +41,6 @@ class TentangKamiController extends Controller
 
         $tentang->update($validated);
 
-        return redirect()->back()->with('message', 'Konten Halaman Tentang Kami berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Konten Halaman Tentang Kami berhasil diperbarui!');
     }
 }

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
+import { waLink } from '@/utils/contact';
 import SeoHead from '@/Components/SeoHead';
+import { storageUrl } from '@/utils/storage';
 import { motion } from 'framer-motion';
 import {
     ArrowRight, HardHat, CheckCircle2,
@@ -46,7 +48,7 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
                             className="w-full h-full object-cover"
                         />
                         {/* Dark gradient for mobile */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-wmu-dark via-wmu-dark/90 to-transparent lg:hidden"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-wmu-dark via-wmu-dark/90 to-wmu-dark/60 lg:hidden"></div>
                     </div>
                 </div>
 
@@ -83,28 +85,28 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
 
                             {/* Stats Row */}
                             <motion.div variants={fadeInUp} className="grid grid-cols-2 lg:grid-cols-4 gap-y-8 lg:gap-0 pt-8 max-w-4xl">
-                                <div className="flex items-center gap-4 lg:border-r border-gray-600/50 pr-6">
+                                <div className="flex items-center gap-3 sm:gap-4 lg:border-r border-gray-600/50 pr-4 lg:pr-6">
                                     <Clock size={36} className="text-wmu-accent shrink-0" strokeWidth={1.5} />
                                     <div>
                                         <div className="font-extrabold text-2xl text-wmu-accent leading-none mb-1.5">10+</div>
                                         <div className="text-[11px] text-gray-400 uppercase tracking-widest font-medium">Tahun Pengalaman</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 lg:border-r border-gray-600/50 lg:px-6">
+                                <div className="flex items-center gap-3 sm:gap-4 lg:border-r border-gray-600/50 lg:px-6">
                                     <Briefcase size={36} className="text-wmu-accent shrink-0" strokeWidth={1.5} />
                                     <div>
                                         <div className="font-extrabold text-2xl text-wmu-accent leading-none mb-1.5">150+</div>
                                         <div className="text-[11px] text-gray-400 uppercase tracking-widest font-medium">Proyek Selesai</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 lg:border-r border-gray-600/50 lg:px-6">
+                                <div className="flex items-center gap-3 sm:gap-4 lg:border-r border-gray-600/50 lg:px-6">
                                     <Users size={36} className="text-wmu-accent shrink-0" strokeWidth={1.5} />
                                     <div>
                                         <div className="font-extrabold text-2xl text-wmu-accent leading-none mb-1.5">50+</div>
                                         <div className="text-[11px] text-gray-400 uppercase tracking-widest font-medium">Klien Terpercaya</div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 lg:px-6">
+                                <div className="flex items-center gap-3 sm:gap-4 lg:px-6">
                                     <CheckCircle2 size={36} className="text-wmu-accent shrink-0" strokeWidth={1.5} />
                                     <div>
                                         <div className="font-extrabold text-2xl text-wmu-accent leading-none mb-1.5">98%</div>
@@ -272,26 +274,26 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
 
                     {/* Logos Carousel Mock */}
                     <div className="flex items-center justify-center gap-4">
-                        <button className="w-10 h-10 shrink-0 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-wmu-dark transition-colors shadow-sm">
+                        <button type="button" aria-hidden="true" tabIndex={-1} className="hidden md:flex w-10 h-10 shrink-0 rounded-full border border-gray-200 items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-wmu-dark transition-colors shadow-sm">
                             <ChevronLeft size={18} />
                         </button>
 
-                        <div className="flex flex-wrap justify-center gap-4 flex-grow">
+                        <div className="flex flex-wrap justify-center gap-3 sm:gap-4 flex-grow">
                             {filteredKlien && filteredKlien.length > 0 ? filteredKlien.slice(0, 6).map((k) => (
-                                <div key={k.id_klien} className="w-[150px] h-[80px] bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:shadow-md transition-all grayscale hover:grayscale-0 cursor-pointer overflow-hidden p-2">
-                                    <img src={k.logo && k.logo.startsWith('http') ? k.logo : `/storage/${k.logo}`} alt={k.nama_klien} loading="lazy" decoding="async" className="max-w-full max-h-full object-contain" />
+                                <div key={k.id_klien} className="w-[calc(50%-0.375rem)] sm:w-[150px] h-[80px] bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:shadow-md transition-all grayscale hover:grayscale-0 cursor-pointer overflow-hidden p-2">
+                                    <img src={storageUrl(k.logo)} alt={k.nama_klien} loading="lazy" decoding="async" className="max-w-full max-h-full object-contain" />
                                 </div>
                             )) : (
                                 /* Fallback mock klien */
                                 [1, 2, 3, 4, 5, 6].map((i) => (
-                                    <div key={i} className="w-[150px] h-[80px] bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:shadow-md transition-all grayscale hover:grayscale-0 cursor-pointer">
+                                    <div key={i} className="w-[calc(50%-0.375rem)] sm:w-[150px] h-[80px] bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-[0_2px_10px_rgba(0,0,0,0.02)] hover:border-gray-300 hover:shadow-md transition-all grayscale hover:grayscale-0 cursor-pointer">
                                         <Building2 size={32} className="text-gray-300" />
                                     </div>
                                 ))
                             )}
                         </div>
 
-                        <button className="w-10 h-10 shrink-0 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-wmu-dark transition-colors shadow-sm">
+                        <button type="button" aria-hidden="true" tabIndex={-1} className="hidden md:flex w-10 h-10 shrink-0 rounded-full border border-gray-200 items-center justify-center text-gray-400 hover:bg-gray-50 hover:text-wmu-dark transition-colors shadow-sm">
                             <ChevronRight size={18} />
                         </button>
                     </div>
@@ -351,7 +353,7 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
                             </div>
 
                             <a
-                                href={`https://wa.me/${pengaturan?.no_telepon?.startsWith('0') ? '62' + pengaturan?.no_telepon?.substring(1) : pengaturan?.no_telepon}?text=Halo%20WMU,%20saya%20ingin%20konsultasi.`}
+                                href={waLink(pengaturan, 'Halo WMU, saya ingin konsultasi.')}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="inline-flex items-center justify-center bg-wmu-accent text-white px-8 py-3.5 rounded font-bold text-sm hover:bg-wmu-dark transition-colors shadow-md"
@@ -411,7 +413,7 @@ export default function Layanan({ layanan, klien, layananTambahan }) {
 
                                 <div className="relative pt-6">
                                     {/* Connecting line (dashed) */}
-                                    <div className="absolute top-[38px] left-[5%] right-[5%] h-[2px] border-t-2 border-dashed border-gray-200 z-0"></div>
+                                    <div className="hidden md:block absolute top-[38px] left-[5%] right-[5%] h-[2px] border-t-2 border-dashed border-gray-200 z-0"></div>
 
                                     <div className="grid grid-cols-2 md:grid-cols-6 gap-6 relative z-10">
                                         <div className="flex flex-col items-center text-center">

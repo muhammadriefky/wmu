@@ -33,7 +33,7 @@ class KlienController extends Controller
             'status_aktif' => filter_var($request->status_aktif, FILTER_VALIDATE_BOOLEAN),
         ]);
 
-        $request->validate([
+        $data = $request->validate([
             'nama_klien' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'telepon' => 'nullable|string|max:50',
@@ -43,7 +43,7 @@ class KlienController extends Controller
             'status_aktif' => 'nullable|boolean'
         ]);
 
-        $data = $request->except('logo');
+        unset($data['logo']);
 
         if ($request->hasFile('logo')) {
             $data['logo'] = $request->file('logo')->store('klien', 'public');
@@ -60,7 +60,7 @@ class KlienController extends Controller
             'status_aktif' => filter_var($request->status_aktif, FILTER_VALIDATE_BOOLEAN),
         ]);
 
-        $request->validate([
+        $data = $request->validate([
             'nama_klien' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'telepon' => 'nullable|string|max:50',
@@ -70,7 +70,7 @@ class KlienController extends Controller
             'status_aktif' => 'nullable|boolean'
         ]);
 
-        $data = $request->except('logo');
+        unset($data['logo']);
 
         if ($request->hasFile('logo')) {
             if ($klien->logo) {

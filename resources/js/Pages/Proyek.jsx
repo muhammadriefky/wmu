@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import SeoHead from '@/Components/SeoHead';
+import { storageUrl } from '@/utils/storage';
+import { companyName } from '@/utils/contact';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Building2, Users, Map, ThumbsUp, Play, ChevronLeft, ChevronRight,
@@ -58,12 +60,26 @@ export default function Proyek() {
         }
     }, [klien]);
 
-    const project = displayFeatured.length > 0 ? displayFeatured[currentFeaturedIndex] : null;
+    // Reset gambar aktif setiap kali slide proyek unggulan berganti
+    useEffect(() => {
+        setActiveImageIndex(0);
+    }, [currentFeaturedIndex]);
+
+    const project = displayFeatured.length > 0 ? (displayFeatured[currentFeaturedIndex] ?? displayFeatured[0]) : null;
 
     const projectSliderRef = useRef(null);
     const testiSliderRef = useRef(null);
 
-    const galeri = project && project.prk_galeri ? JSON.parse(project.prk_galeri) : [];
+    const galeri = (() => {
+        if (!project?.prk_galeri) return [];
+        if (Array.isArray(project.prk_galeri)) return project.prk_galeri;
+        try {
+            const parsed = JSON.parse(project.prk_galeri);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
+    })();
     const thumbnails = project ? [project.prk_gambar, ...galeri].filter(Boolean).map(t => `/storage/${t}`) : [];
 
     const nextImage = () => {
@@ -112,7 +128,7 @@ export default function Proyek() {
                             transition={{ duration: 0.6 }}
                             className="text-sm font-bold tracking-wider text-gray-400 mb-4 uppercase flex items-center gap-2"
                         >
-                            Home <ChevronRight size={14} className="text-[#DFA639]" /> <span className="text-white">Proyek</span>
+                            <Link href="/" className="hover:text-wmu-accent transition-colors">Home</Link> <ChevronRight size={14} className="text-wmu-accent" /> <span className="text-white">Proyek</span>
                         </motion.div>
 
                         <motion.h1
@@ -138,43 +154,43 @@ export default function Proyek() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6, delay: 0.3 }}
-                            className="flex flex-wrap md:flex-nowrap gap-y-8 gap-x-2 w-full max-w-4xl"
+                            className="grid grid-cols-2 md:flex md:flex-nowrap gap-y-8 gap-x-2 w-full max-w-4xl"
                         >
                             {/* Stat 1 */}
-                            <div className="flex items-start gap-3 w-1/2 md:w-1/4 relative pr-4">
+                            <div className="flex items-start gap-3 md:w-1/4 relative md:pr-4">
                                 <Building2 className="text-wmu-accent shrink-0 mt-1" size={28} strokeWidth={1.5} />
                                 <div>
-                                    <div className="text-xl md:text-2xl font-bold leading-none mb-1">150+</div>
+                                    <div className="text-lg md:text-xl font-bold leading-none mb-1 whitespace-nowrap">150+</div>
                                     <div className="text-xs text-gray-400">Proyek Selesai</div>
                                 </div>
                                 <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-[1px] h-10 bg-white/10"></div>
                             </div>
 
                             {/* Stat 2 */}
-                            <div className="flex items-start gap-3 w-1/2 md:w-1/4 relative md:pl-6 pr-4">
+                            <div className="flex items-start gap-3 md:w-1/4 relative md:pl-6 md:pr-4">
                                 <Users className="text-wmu-accent shrink-0 mt-1" size={28} strokeWidth={1.5} />
                                 <div>
-                                    <div className="text-xl md:text-2xl font-bold leading-none mb-1">50+</div>
+                                    <div className="text-lg md:text-xl font-bold leading-none mb-1 whitespace-nowrap">50+</div>
                                     <div className="text-xs text-gray-400">Klien</div>
                                 </div>
                                 <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-[1px] h-10 bg-white/10"></div>
                             </div>
 
                             {/* Stat 3 */}
-                            <div className="flex items-start gap-3 w-1/2 md:w-1/4 relative md:pl-6 pr-4">
+                            <div className="flex items-start gap-3 md:w-1/4 relative md:pl-6 md:pr-4">
                                 <Building className="text-wmu-accent shrink-0 mt-1" size={28} strokeWidth={1.5} />
                                 <div>
-                                    <div className="text-xl md:text-2xl font-bold leading-none mb-1">1.000.000+ m²</div>
+                                    <div className="text-lg md:text-xl font-bold leading-none mb-1 whitespace-nowrap">1.000.000+ m²</div>
                                     <div className="text-xs text-gray-400">Area Fasad Terpasang</div>
                                 </div>
                                 <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-[1px] h-10 bg-white/10"></div>
                             </div>
 
                             {/* Stat 4 */}
-                            <div className="flex items-start gap-3 w-1/2 md:w-1/4 relative md:pl-6">
+                            <div className="flex items-start gap-3 md:w-1/4 relative md:pl-6">
                                 <CheckCircle2 className="text-wmu-accent shrink-0 mt-1" size={28} strokeWidth={1.5} />
                                 <div>
-                                    <div className="text-xl md:text-2xl font-bold leading-none mb-1">98%</div>
+                                    <div className="text-lg md:text-xl font-bold leading-none mb-1 whitespace-nowrap">98%</div>
                                     <div className="text-xs text-gray-400">Kepuasan Klien</div>
                                 </div>
                             </div>
@@ -214,7 +230,7 @@ export default function Proyek() {
                                             {project.prk_kategori}
                                         </div>
                                         <p className="text-gray-600 text-sm leading-relaxed mb-8">
-                                            {project.prk_deskripsi || "Proyek unggulan dari PT Winmulyautama yang mewakili standar kualitas dan profesionalisme tinggi."}
+                                            {project.prk_deskripsi || `Proyek unggulan dari ${companyName(pengaturan)} yang mewakili standar kualitas dan profesionalisme tinggi.`}
                                         </p>
 
                                         <div className="space-y-5 mb-8">
@@ -256,7 +272,7 @@ export default function Proyek() {
                                         <AnimatePresence mode="wait">
                                             <motion.img
                                                 key={activeImageIndex}
-                                                src={thumbnails[activeImageIndex] || (project.prk_gambar ? `/storage/${project.prk_gambar}` : 'https://placehold.co/800x600?text=No+Image')}
+                                                src={thumbnails[activeImageIndex] || '/images/civil_construction_work.png'}
                                                 alt={project.prk_judul}
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
@@ -272,26 +288,30 @@ export default function Proyek() {
                                                 </Link>
                                             </div>
                                         </div>
+                                        {thumbnails.length > 1 && (<>
                                         <button onClick={(e) => { e.stopPropagation(); prevImage(); }} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-wmu-dark/80 hover:bg-wmu-dark text-white rounded-full flex items-center justify-center backdrop-blur-sm transition-colors z-10">
                                             <ChevronLeft size={20} />
                                         </button>
                                         <button onClick={(e) => { e.stopPropagation(); nextImage(); }} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-wmu-dark/80 hover:bg-wmu-dark text-white rounded-full flex items-center justify-center backdrop-blur-sm transition-colors z-10">
                                             <ChevronRight size={20} />
                                         </button>
+                                        </>)}
                                     </div>
 
                                     {/* Thumbnails */}
-                                    <div className="flex gap-2 lg:gap-3 justify-between">
+                                    {thumbnails.length > 1 && (
+                                    <div className="flex gap-2 lg:gap-3">
                                         {thumbnails.map((thumb, idx) => (
                                             <button
                                                 key={idx}
                                                 onClick={() => setActiveImageIndex(idx)}
-                                                className={`relative w-1/5 aspect-video rounded-lg overflow-hidden border-2 transition-all duration-300 ${activeImageIndex === idx ? 'border-[#DFA639] scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                                                className={`relative w-1/5 aspect-video rounded-lg overflow-hidden border-2 transition-all duration-300 ${activeImageIndex === idx ? 'border-wmu-accent scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
                                             >
                                                 <img src={thumb} alt={`Thumbnail ${idx + 1}`} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                                             </button>
                                         ))}
                                     </div>
+                                    )}
                                 </div>
 
                                 {/* Right Column: Key Points */}
@@ -429,9 +449,9 @@ export default function Proyek() {
                             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                         >
                             {proyek.map((item) => (
-                                <div key={item.prk_id} className="min-w-[280px] md:min-w-[300px] bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0 snap-start border border-gray-100 group">
+                                <div key={item.prk_id} className="w-[280px] md:w-[300px] bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0 snap-start border border-gray-100 group">
                                     <div className="relative h-48 overflow-hidden">
-                                        <img src={`/storage/${item.prk_gambar}`} alt={item.prk_judul} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                        <img src={storageUrl(item.prk_gambar, '/images/civil_construction_work.png')} alt={item.prk_judul} loading="lazy" decoding="async" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                         <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-wmu-dark/90 to-transparent flex items-end p-4">
                                             <span className="text-white text-xs font-semibold px-2 py-1 bg-wmu-dark/80 backdrop-blur-sm rounded">
                                                 {item.prk_kategori}
@@ -442,9 +462,9 @@ export default function Proyek() {
                                         <h3 className="font-bold text-lg text-wmu-dark mb-4 line-clamp-1 group-hover:text-wmu-accent transition-colors">{item.prk_judul}</h3>
 
                                         <div className="flex justify-between items-center text-xs text-gray-500 mb-6">
-                                            <div className="flex items-center gap-1.5">
-                                                <MapPin size={14} className="text-wmu-accent" />
-                                                <span className="line-clamp-1 max-w-[120px]">{item.prk_klien}</span>
+                                            <div className="flex items-center gap-1.5 min-w-0 mr-3">
+                                                <MapPin size={14} className="text-wmu-accent shrink-0" />
+                                                <span className="truncate">{item.prk_klien}</span>
                                             </div>
                                             <div className="flex items-center gap-1.5 whitespace-nowrap">
                                                 {item.prk_tahun}
@@ -504,10 +524,10 @@ export default function Proyek() {
                                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                                 >
                                     {klien.map((item, idx) => (
-                                        <div key={item.id_klien || idx} className="min-w-[280px] md:min-w-[320px] bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 p-6 md:p-8 flex-shrink-0 snap-center flex flex-col justify-between">
+                                        <div key={item.id_klien || idx} className="w-[280px] md:w-[320px] bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 p-6 md:p-8 flex-shrink-0 snap-center flex flex-col justify-between">
                                             <div>
                                                 <div className="flex justify-between items-start mb-6">
-                                                    <img src={`/storage/${item.logo}`} alt={item.nama_klien} loading="lazy" decoding="async" className="h-12 md:h-16 object-contain max-w-[120px] md:max-w-[150px]" />
+                                                    <img src={storageUrl(item.logo)} alt={item.nama_klien} loading="lazy" decoding="async" className="h-12 md:h-16 object-contain max-w-[120px] md:max-w-[150px]" />
                                                     <div className="flex gap-0.5 mt-2">
                                                         {[...Array(5)].map((_, i) => (
                                                             <Star key={i} size={14} className="text-[#DFA639] fill-current" />

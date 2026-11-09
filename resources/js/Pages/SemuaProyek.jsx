@@ -2,6 +2,8 @@ import { useState, useMemo } from 'react';
 import { usePage, Link } from '@inertiajs/react';
 import PublicLayout from '@/Layouts/PublicLayout';
 import SeoHead from '@/Components/SeoHead';
+import { companyName } from '@/utils/contact';
+import { storageUrl } from '@/utils/storage';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     MapPin, Calendar, ArrowRight, Search, Filter, FolderOpen, ArrowLeft
@@ -29,7 +31,7 @@ export default function SemuaProyek() {
         <PublicLayout pengaturan={pengaturan}>
             <SeoHead 
                 title="Semua Proyek" 
-                description="Lihat daftar lengkap portofolio proyek konstruksi dari PT Winmulyautama."
+                description={`Lihat daftar lengkap portofolio proyek konstruksi dari ${companyName(pengaturan)}.`}
             />
 
             {/* Header Section */}
@@ -43,7 +45,7 @@ export default function SemuaProyek() {
                     </div>
                     <h1 className="text-4xl md:text-5xl font-extrabold text-wmu-dark mb-4">Semua Proyek Kami</h1>
                     <p className="text-lg text-gray-600 max-w-2xl">
-                        Jelajahi seluruh rekam jejak pekerjaan dan portofolio proyek PT Wiratama Mitra Unggul dari berbagai kategori dan skala.
+                        Jelajahi seluruh rekam jejak pekerjaan dan portofolio proyek {companyName(pengaturan)} dari berbagai kategori dan skala.
                     </p>
                 </div>
             </section>
@@ -134,19 +136,13 @@ export default function SemuaProyek() {
                                         className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-gray-100 flex flex-col h-full"
                                     >
                                         <div className="relative h-56 overflow-hidden bg-gray-200">
-                                            {item.prk_gambar ? (
-                                                <img 
-                                                    src={`/storage/${item.prk_gambar}`} 
-                                                    alt={item.prk_judul} 
-                                                    loading="lazy" 
-                                                    decoding="async" 
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                                    No Image
-                                                </div>
-                                            )}
+                                            <img 
+                                                src={storageUrl(item.prk_gambar, '/images/civil_construction_work.png')} 
+                                                alt={item.prk_judul} 
+                                                loading="lazy" 
+                                                decoding="async" 
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                                            />
                                             
                                             {item.prk_kategori && (
                                                 <div className="absolute bottom-4 left-4">
@@ -163,11 +159,11 @@ export default function SemuaProyek() {
                                             </h3>
                                             
                                             <div className="flex items-center justify-between mt-auto pt-6 border-t border-gray-100">
-                                                <div className="flex items-center text-gray-500 text-sm">
-                                                    <MapPin size={16} className="mr-1.5 text-wmu-accent" />
-                                                    <span className="truncate max-w-[120px]">{item.prk_klien || 'Client'}</span>
+                                                <div className="flex items-center text-gray-500 text-sm min-w-0 mr-4">
+                                                    <MapPin size={16} className="mr-1.5 text-wmu-accent shrink-0" />
+                                                    <span className="truncate">{item.prk_klien || 'Client'}</span>
                                                 </div>
-                                                <div className="flex items-center text-gray-500 text-sm font-semibold">
+                                                <div className="flex items-center text-gray-500 text-sm font-semibold shrink-0">
                                                     {item.prk_tahun}
                                                 </div>
                                             </div>

@@ -16,8 +16,10 @@ class UlasanController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('nama_pemberi', 'like', "%{$search}%")
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_pemberi', 'like', "%{$search}%")
                   ->orWhere('isi_ulasan', 'like', "%{$search}%");
+            });
         }
 
         if ($request->filled('sort')) {
@@ -53,14 +55,12 @@ class UlasanController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'nama_pemberi' => 'required|string|max:255',
-            'isi_ulasan' => 'nullable|string|nullable',
-            'rating_bintang' => 'required|integer',
+            'isi_ulasan' => 'nullable|string',
+            'rating_bintang' => 'required|integer|min:1|max:5',
             'status_disetujui' => 'required|boolean'
         ]);
-
-        $data = $request->validated();
         
         Ulasan::create($data);
 
@@ -69,14 +69,12 @@ class UlasanController extends Controller
 
     public function update(Request $request, Ulasan $ulasan)
     {
-        $request->validate([
+        $data = $request->validate([
             'nama_pemberi' => 'required|string|max:255',
-            'isi_ulasan' => 'nullable|string|nullable',
-            'rating_bintang' => 'required|integer',
+            'isi_ulasan' => 'nullable|string',
+            'rating_bintang' => 'required|integer|min:1|max:5',
             'status_disetujui' => 'required|boolean'
         ]);
-
-        $data = $request->validated();
         
         $ulasan->update($data);
 

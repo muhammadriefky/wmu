@@ -47,18 +47,18 @@ class BlogController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'judul_blog' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:tr_blog,slug',
             'meta_deskripsi' => 'nullable|string|max:160',
             'isi_konten' => 'nullable|string',
             'tanggal_terbit' => 'required|date',
             'gambar' => 'nullable|image|max:2048',
             'kategori' => 'nullable|string|max:100',
-            'status' => 'required|string|max:20',
+            'status' => 'required|in:Published,Draft',
         ]);
 
-        $data = $request->except('gambar');
+        unset($data['gambar']);
         
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('blog', 'public');
@@ -71,18 +71,18 @@ class BlogController extends Controller
 
     public function update(Request $request, Blog $blog)
     {
-        $request->validate([
+        $data = $request->validate([
             'judul_blog' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:tr_blog,slug,' . $blog->id_blog . ',id_blog',
             'meta_deskripsi' => 'nullable|string|max:160',
             'isi_konten' => 'nullable|string',
             'tanggal_terbit' => 'required|date',
             'gambar' => 'nullable|image|max:2048',
             'kategori' => 'nullable|string|max:100',
-            'status' => 'required|string|max:20',
+            'status' => 'required|in:Published,Draft',
         ]);
 
-        $data = $request->except('gambar');
+        unset($data['gambar']);
         
         if ($request->hasFile('gambar')) {
             if ($blog->gambar) {

@@ -57,9 +57,9 @@ class LayananController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'judul_layanan' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:ms_layanan,slug',
             'deskripsi' => 'nullable|string',
             'gambar' => 'nullable|image|max:2048',
             'keunggulan_layanan' => 'nullable|array',
@@ -75,8 +75,7 @@ class LayananController extends Controller
             'gambar_detail' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->except(['gambar', 'gambar_detail']);
-        $data['is_unggulan'] = $request->boolean('is_unggulan');
+        $data = $this->normalize($data, $request);
         
         if ($request->hasFile('gambar')) {
             $data['gambar'] = $request->file('gambar')->store('layanan', 'public');
@@ -93,9 +92,9 @@ class LayananController extends Controller
 
     public function update(Request $request, Layanan $layanan)
     {
-        $request->validate([
+        $data = $request->validate([
             'judul_layanan' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:ms_layanan,slug,' . $layanan->id_layanan . ',id_layanan',
             'deskripsi' => 'nullable|string',
             'gambar' => 'nullable|image|max:2048',
             'keunggulan_layanan' => 'nullable|array',
@@ -111,8 +110,7 @@ class LayananController extends Controller
             'gambar_detail' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->except(['gambar', 'gambar_detail']);
-        $data['is_unggulan'] = $request->boolean('is_unggulan');
+        $data = $this->normalize($data, $request);
         
         if ($request->hasFile('gambar')) {
             if ($layanan->gambar) {
@@ -131,6 +129,23 @@ class LayananController extends Controller
         $layanan->update($data);
 
         return redirect()->back()->with('success', 'Layanan berhasil diperbarui!');
+    }
+
+    /**
+     * Buang field file dari data validasi dan pastikan field JSON selalu array.
+     * Saat dikirim sebagai FormData, array kosong tidak ikut terkirim sehingga
+     * tanpa ini item yang dihapus admin tidak pernah benar-benar terhapus.
+     */
+    private function normalize(array $data, Request $request): array
+    {
+        unset($data['gambar'], $data['gambar_detail']);
+        $data['is_unggulan'] = $request->boolean('is_unggulan');
+
+        foreach (['keunggulan_layanan', 'proyek_terkait', 'fitur_layanan', 'proses_kerja'] as $field) {
+            $data[$field] = array_values($data[$field] ?? []);
+        }
+
+        return $data;
     }
 
     public function destroy(Layanan $layanan)

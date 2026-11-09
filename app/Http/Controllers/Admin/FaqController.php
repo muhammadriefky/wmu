@@ -31,14 +31,13 @@ class FaqController extends Controller
             'status_aktif' => filter_var($request->status_aktif, FILTER_VALIDATE_BOOLEAN),
         ]);
 
-        $request->validate([
+        $data = $request->validate([
             'pertanyaan' => 'required|string|max:500',
             'jawaban' => 'nullable|string',
             'urutan' => 'required|integer',
             'status_aktif' => 'nullable|boolean'
         ]);
 
-        $data = $request->all();
         
         Faq::create($data);
 
@@ -51,14 +50,13 @@ class FaqController extends Controller
             'status_aktif' => filter_var($request->status_aktif, FILTER_VALIDATE_BOOLEAN),
         ]);
 
-        $request->validate([
+        $data = $request->validate([
             'pertanyaan' => 'required|string|max:500',
             'jawaban' => 'nullable|string',
             'urutan' => 'required|integer',
             'status_aktif' => 'nullable|boolean'
         ]);
 
-        $data = $request->all();
         
         $faq->update($data);
 

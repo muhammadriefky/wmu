@@ -30,15 +30,15 @@ class MitraController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'nama_mitra' => 'required|string|max:255',
             'urutan' => 'required|integer',
             'kategori' => 'nullable|string|max:255',
             'status_aktif' => 'boolean',
-            'logo' => 'nullable|image|max:2048|nullable'
+            'logo' => 'nullable|image|max:2048'
         ]);
 
-        $data = $request->except('logo');
+        unset($data['logo']);
         
         if ($request->hasFile('logo')) {
             $data['logo'] = $request->file('logo')->store('mitra', 'public');
@@ -51,15 +51,15 @@ class MitraController extends Controller
 
     public function update(Request $request, Mitra $mitra)
     {
-        $request->validate([
+        $data = $request->validate([
             'nama_mitra' => 'required|string|max:255',
             'urutan' => 'required|integer',
             'kategori' => 'nullable|string|max:255',
             'status_aktif' => 'boolean',
-            'logo' => 'nullable|image|max:2048|nullable'
+            'logo' => 'nullable|image|max:2048'
         ]);
 
-        $data = $request->except('logo');
+        unset($data['logo']);
         
         if ($request->hasFile('logo')) {
             if ($mitra->logo) {

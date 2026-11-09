@@ -12,10 +12,7 @@ class TentangBerandaController extends Controller
 {
     public function index()
     {
-        $tentang = TentangBeranda::first();
-        if (!$tentang) {
-            $tentang = TentangBeranda::create();
-        }
+        $tentang = TentangBeranda::firstOrCreate([]);
 
         return Inertia::render('Admin/TentangBeranda/Index', [
             'tentang' => $tentang
@@ -24,8 +21,9 @@ class TentangBerandaController extends Controller
 
     public function update(Request $request)
     {
-        $tentang = TentangBeranda::first();
-        
+        // firstOrCreate: update bisa dipanggil sebelum halaman index pernah dibuka
+        $tentang = TentangBeranda::firstOrCreate([]);
+
         $validated = $request->validate([
             'judul' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
@@ -52,6 +50,6 @@ class TentangBerandaController extends Controller
 
         $tentang->update($validated);
 
-        return redirect()->back()->with('message', 'Konten Tentang Beranda berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Konten Tentang Beranda berhasil diperbarui!');
     }
 }

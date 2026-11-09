@@ -34,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
             \App\Models\Ulasan::class,
             \App\Models\Proyek::class,
             \App\Models\Blog::class,
+            \App\Models\Video::class,
         ];
         foreach ($models as $model) {
             $model::observe(\App\Observers\AuditTrailObserver::class);

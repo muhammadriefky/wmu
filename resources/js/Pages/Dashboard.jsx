@@ -78,9 +78,9 @@ export default function Dashboard() {
                 <span className={`text-[10px] font-bold ${categoryColor} mb-1 block`}>{category}</span>
                 <h4 className="text-xs font-bold text-gray-800 truncate mb-0.5">{title}</h4>
                 <p className="text-[10px] text-gray-500 truncate mb-1">{subtitle}</p>
-                <div className="flex items-center gap-3 text-[9px] text-gray-400 font-medium">
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full border border-gray-300"></span> {date}</span>
-                    <span className="flex items-center gap-1"><UserIcon size={9} /> {author}</span>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[9px] text-gray-400 font-medium">
+                    <span className="flex items-center gap-1 whitespace-nowrap"><span className="w-2 h-2 rounded-full border border-gray-300 shrink-0"></span> {date}</span>
+                    <span className="flex items-center gap-1 whitespace-nowrap"><UserIcon size={9} /> {author}</span>
                 </div>
             </div>
             <button className="p-1 text-gray-300 hover:text-gray-600 rounded-lg shrink-0">
@@ -119,7 +119,7 @@ export default function Dashboard() {
 
             <div className="mb-8">
                 <h1 className="text-[22px] font-extrabold text-gray-900 mb-1 tracking-tight">Dashboard</h1>
-                <p className="text-xs text-gray-500">Selamat datang kembali, {user?.name || 'Admin'}! Kelola konten dan informasi website dengan mudah.</p>
+                <p className="text-xs text-gray-500">Selamat datang kembali, {user?.nama || 'Admin'}! Kelola konten dan informasi website dengan mudah.</p>
             </div>
 
             {/* Stat Cards */}
@@ -141,7 +141,8 @@ export default function Dashboard() {
                         </div>
                     </div>
                     
-                    <div className="px-5">
+                    <div className="overflow-x-auto">
+                    <div className="px-5 min-w-[640px]">
                         <div className="flex text-[10px] font-bold text-gray-400 py-3 border-b border-gray-100 uppercase tracking-wider">
                             <div className="w-1/3">Halaman</div>
                             <div className="w-1/6">Status</div>
@@ -150,14 +151,15 @@ export default function Dashboard() {
                         </div>
                         
                         <div className="flex-1">
-                            <PageRow name="Beranda (Home)" description="Kelola konten halaman beranda" status="Published" date="2 Jun 2024, 10:30 WIB" author={user?.name || "Riefky Admin"} icon={Building2} />
-                            <PageRow name="Tentang Kami" description="Kelola konten halaman tentang kami" status="Published" date="1 Jun 2024, 14:20 WIB" author={user?.name || "Riefky Admin"} icon={FileText} />
-                            <PageRow name="Layanan Kami" description="Kelola konten halaman layanan" status="Published" date="2 Jun 2024, 09:15 WIB" author={user?.name || "Riefky Admin"} icon={Briefcase} />
-                            <PageRow name="Proyek" description="Kelola konten halaman proyek" status="Published" date="31 Mei 2024, 16:45 WIB" author={user?.name || "Riefky Admin"} icon={Building2} />
-                            <PageRow name="Blog" description="Kelola konten halaman blog" status="Published" date="30 Mei 2024, 11:20 WIB" author={user?.name || "Riefky Admin"} icon={FileText} />
-                            <PageRow name="Kontak" description="Kelola informasi kontak & lokasi" status="Published" date="25 Mei 2024, 13:10 WIB" author={user?.name || "Riefky Admin"} icon={FileText} />
-                            <PageRow name="FAQ" description="Kelola pertanyaan yang sering diajukan" status="Draft" date="20 Mei 2024, 09:30 WIB" author={user?.name || "Riefky Admin"} icon={HelpCircle} />
+                            <PageRow name="Beranda (Home)" description="Kelola konten halaman beranda" status="Published" date="2 Jun 2024, 10:30 WIB" author={user?.nama || "Administrator"} icon={Building2} />
+                            <PageRow name="Tentang Kami" description="Kelola konten halaman tentang kami" status="Published" date="1 Jun 2024, 14:20 WIB" author={user?.nama || "Administrator"} icon={FileText} />
+                            <PageRow name="Layanan Kami" description="Kelola konten halaman layanan" status="Published" date="2 Jun 2024, 09:15 WIB" author={user?.nama || "Administrator"} icon={Briefcase} />
+                            <PageRow name="Proyek" description="Kelola konten halaman proyek" status="Published" date="31 Mei 2024, 16:45 WIB" author={user?.nama || "Administrator"} icon={Building2} />
+                            <PageRow name="Blog" description="Kelola konten halaman blog" status="Published" date="30 Mei 2024, 11:20 WIB" author={user?.nama || "Administrator"} icon={FileText} />
+                            <PageRow name="Kontak" description="Kelola informasi kontak & lokasi" status="Published" date="25 Mei 2024, 13:10 WIB" author={user?.nama || "Administrator"} icon={FileText} />
+                            <PageRow name="FAQ" description="Kelola pertanyaan yang sering diajukan" status="Draft" date="20 Mei 2024, 09:30 WIB" author={user?.nama || "Administrator"} icon={HelpCircle} />
                         </div>
+                    </div>
                     </div>
                     
                     <div className="p-4 border-t border-gray-100 mt-auto">
@@ -179,25 +181,25 @@ export default function Dashboard() {
                         <ContentItem 
                             category="Proyek" categoryColor="text-green-500" 
                             title="Grand City Office Tower" subtitle="Proyek Commercial Building" 
-                            date="2 Jun 2024, 10:30 WIB" author={user?.name || "Riefky Admin"} 
+                            date="2 Jun 2024, 10:30 WIB" author={user?.nama || "Administrator"} 
                             image="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=2070" 
                         />
                         <ContentItem 
                             category="Artikel" categoryColor="text-blue-500" 
                             title="Mengenal Unitized Curtain Wall" subtitle="Teknologi & Material" 
-                            date="2 Jun 2024, 09:15 WIB" author={user?.name || "Riefky Admin"} 
+                            date="2 Jun 2024, 09:15 WIB" author={user?.nama || "Administrator"} 
                             image="https://images.unsplash.com/photo-1574360741695-156550f2fb4c?auto=format&fit=crop&q=80&w=1956" 
                         />
                         <ContentItem 
                             category="Testimoni" categoryColor="text-orange-500" 
-                            title="PT. Wijaya Karya (Persero) Tbk" subtitle="Sangat puas dengan hasil kerja BuildPro" 
-                            date="1 Jun 2024, 16:20 WIB" author={user?.name || "Riefky Admin"} 
+                            title="PT. Wijaya Karya (Persero) Tbk" subtitle="Sangat puas dengan hasil kerja WMU" 
+                            date="1 Jun 2024, 16:20 WIB" author={user?.nama || "Administrator"} 
                             image="https://images.unsplash.com/photo-1560179707-f14e90ef3623?auto=format&fit=crop&q=80&w=2073" 
                         />
                         <ContentItem 
                             category="Layanan" categoryColor="text-blue-400" 
                             title="Facade Installation" subtitle="Pemasangan facade berkualitas tinggi" 
-                            date="1 Jun 2024, 14:10 WIB" author={user?.name || "Riefky Admin"} 
+                            date="1 Jun 2024, 14:10 WIB" author={user?.nama || "Administrator"} 
                             image="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=2831" 
                         />
                     </div>
@@ -236,8 +238,8 @@ export default function Dashboard() {
                 </div>
             </div>
             
-            <div className="mt-10 flex justify-between items-center text-[10px] text-gray-400 pb-4">
-                <p>© 2024 WMU Construction. All rights reserved.</p>
+            <div className="mt-10 flex flex-col sm:flex-row justify-between items-center gap-2 text-[10px] text-gray-400 pb-4">
+                <p>© {new Date().getFullYear()} WMU Construction. All rights reserved.</p>
                 <div className="flex gap-4">
                     <span>Version 1.0.0</span>
                     <span>Made with ❤️ for WMU</span>

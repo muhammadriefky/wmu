@@ -1,7 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { Head, useForm, usePage, router } from '@inertiajs/react';
-import * as LucideIcons from 'lucide-react';
+import { AlertCircle, CheckCircle2, Edit2, Filter, ListOrdered, PenTool, Plus, Search, Star, Trash2 } from 'lucide-react';
+import DynamicLucideIcon, { SUPPORTED_ICONS, SUPPORTED_ICON_NAMES } from '@/Components/DynamicLucideIcon';
+
+// Alias agar pemakaian <LucideIcons.X /> yang sudah ada tetap berjalan
+const LucideIcons = { AlertCircle, CheckCircle2, Edit2, Filter, ListOrdered, PenTool, Plus, Search, Star, Trash2 };
 
 export default function Index({ keunggulan, stats }) {
     const { flash } = usePage().props;
@@ -32,7 +36,7 @@ export default function Index({ keunggulan, stats }) {
                 judul: item.judul || '',
                 deskripsi: item.deskripsi || '',
                 ikon: item.ikon || '',
-                urutan: item.urutan || '',
+                urutan: item.urutan ?? 0,
                 status_aktif: item.status_aktif == 1,
             });
         } else {
@@ -68,7 +72,13 @@ export default function Index({ keunggulan, stats }) {
         } else {
             post(route('admin.keunggulan.store'), {
                 preserveScroll: true,
-                onSuccess: () => closeModal(),
+                onSuccess: (page) => {
+                    closeModal();
+                    // Item baru memiliki urutan terbesar -> tampil di halaman terakhir.
+                    // Pindah ke sana agar admin langsung melihat hasil simpannya.
+                    const total = page.props.keunggulan?.length ?? 0;
+                    setCurrentPage(Math.max(1, Math.ceil(total / itemsPerPage)));
+                },
             });
         }
     };
@@ -97,18 +107,23 @@ export default function Index({ keunggulan, stats }) {
 
     // Pagination logic
     const totalPages = Math.ceil(filteredKeunggulan.length / itemsPerPage);
+
+    // Setelah hapus item terakhir di halaman terakhir, jangan tinggal di halaman kosong
+    useEffect(() => {
+        if (currentPage > 1 && currentPage > totalPages) {
+            setCurrentPage(Math.max(1, totalPages));
+        }
+    }, [currentPage, totalPages]);
     const paginatedKeunggulan = filteredKeunggulan.slice(
         (currentPage - 1) * itemsPerPage, 
         currentPage * itemsPerPage
     );
 
-    // Dynamic Icon Renderer
-    const renderIcon = (iconName, className) => {
-        if (!iconName) return <LucideIcons.Star className={className} />;
-        const IconComponent = LucideIcons[iconName];
-        if (!IconComponent) return <LucideIcons.Star className={className} />;
-        return <IconComponent className={className} />;
-    };
+    // Render ikon dengan set yang sama seperti website publik,
+    // sehingga preview admin = tampilan di website.
+    const renderIcon = (iconName, className = "w-6 h-6") => (
+        <DynamicLucideIcon name={iconName} className={className} fallback={<Star className={className} />} />
+    );
 
     const colors = [
         'text-purple-500 bg-purple-50 border-purple-100',
@@ -147,8 +162,8 @@ export default function Index({ keunggulan, stats }) {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {/* Total Keunggulan */}
-                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-start justify-center text-center flex-col md:flex-row md:text-left gap-4">
-                    <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center mx-auto md:mx-0 shrink-0">
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
                         <LucideIcons.Star size={24} className="text-purple-500" />
                     </div>
                     <div>
@@ -159,8 +174,8 @@ export default function Index({ keunggulan, stats }) {
                 </div>
 
                 {/* Aktif */}
-                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-start justify-center text-center flex-col md:flex-row md:text-left gap-4">
-                    <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto md:mx-0 shrink-0">
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center shrink-0">
                         <LucideIcons.CheckCircle2 size={24} className="text-green-500" />
                     </div>
                     <div>
@@ -171,8 +186,8 @@ export default function Index({ keunggulan, stats }) {
                 </div>
 
                 {/* Terakhir Diperbarui */}
-                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-start justify-center text-center flex-col md:flex-row md:text-left gap-4">
-                    <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center mx-auto md:mx-0 shrink-0">
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
                         <LucideIcons.PenTool size={20} className="text-orange-500" />
                     </div>
                     <div>
@@ -183,8 +198,8 @@ export default function Index({ keunggulan, stats }) {
                 </div>
 
                 {/* Urutan Tertinggi */}
-                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-start justify-center text-center flex-col md:flex-row md:text-left gap-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mx-auto md:mx-0 shrink-0">
+                <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
                         <LucideIcons.ListOrdered size={24} className="text-blue-500" />
                     </div>
                     <div>
@@ -283,14 +298,14 @@ export default function Index({ keunggulan, stats }) {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center justify-center gap-2">
-                                                    <button 
+                                                    <button type="button" aria-label="Edit" title="Edit" 
                                                         onClick={() => openModal(item)} 
                                                         className="w-8 h-8 rounded border border-gray-200 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-colors"
                                                         title="Edit"
                                                     >
                                                         <LucideIcons.Edit2 size={14} />
                                                     </button>
-                                                    <button 
+                                                    <button type="button" aria-label="Hapus" title="Hapus" 
                                                         onClick={() => deleteItem(item.id_keunggulan)} 
                                                         className="w-8 h-8 rounded border border-gray-200 flex items-center justify-center text-gray-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
                                                         title="Hapus"
@@ -399,15 +414,44 @@ export default function Index({ keunggulan, stats }) {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Nama Ikon <span className="text-gray-400 font-normal">(Opsional)</span></label>
-                                    <input
-                                        type="text"
-                                        placeholder="Contoh: Award, Users, Clock, ShieldCheck"
-                                        className="block w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 sm:text-sm transition-all"
-                                        value={data.ikon}
-                                        onChange={e => setData('ikon', e.target.value)}
-                                    />
-                                    <p className="text-xs text-gray-500 mt-1.5">Gunakan nama ikon dari <a href="https://lucide.dev/icons" target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">Lucide Icons</a></p>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="block text-sm font-semibold text-gray-700">Ikon <span className="text-gray-400 font-normal">(Opsional)</span></label>
+                                        {data.ikon && (
+                                            <button type="button" onClick={() => setData('ikon', '')} className="text-xs font-semibold text-gray-500 hover:text-red-600">
+                                                Hapus pilihan
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div
+                                        role="radiogroup"
+                                        aria-label="Pilih ikon"
+                                        className="grid grid-cols-6 sm:grid-cols-8 gap-1.5 max-h-40 overflow-y-auto p-2 rounded-xl border border-gray-200 bg-gray-50"
+                                        data-lenis-prevent
+                                    >
+                                        {SUPPORTED_ICON_NAMES.map((name) => {
+                                            const Icon = SUPPORTED_ICONS[name];
+                                            const active = data.ikon === name;
+                                            return (
+                                                <button
+                                                    key={name}
+                                                    type="button"
+                                                    role="radio"
+                                                    aria-checked={active}
+                                                    aria-label={name}
+                                                    title={name}
+                                                    onClick={() => setData('ikon', name)}
+                                                    className={`aspect-square flex items-center justify-center rounded-lg border transition-colors ${active ? 'bg-wmu-dark text-white border-wmu-dark' : 'bg-white text-gray-600 border-gray-200 hover:border-wmu-accent hover:text-wmu-accent'}`}
+                                                >
+                                                    <Icon size={18} />
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1.5">
+                                        {data.ikon
+                                            ? <>Terpilih: <span className="font-semibold text-gray-700">{data.ikon}</span>{!SUPPORTED_ICONS[data.ikon] && ' (tidak didukung, website akan memakai ikon default)'}</>
+                                            : 'Tanpa pilihan, website memilih ikon otomatis berdasarkan judul.'}
+                                    </p>
                                     {errors.ikon && <p className="text-red-500 text-xs mt-1.5">{errors.ikon}</p>}
                                 </div>
                                 
