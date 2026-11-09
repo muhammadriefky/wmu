@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+
+        // Kunci pengaman: di production, perintah yang menghapus struktur/data
+        // database (migrate:fresh, migrate:refresh, migrate:reset, db:wipe)
+        // akan ditolak. `php artisan migrate` biasa tetap boleh.
+        DB::prohibitDestructiveCommands($this->app->isProduction());
 
         $models = [
             \App\Models\User::class,

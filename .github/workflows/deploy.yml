@@ -69,3 +69,44 @@ jobs:
           source: "."
           # Sesuaikan dengan nama folder website Anda di Hostinger
           target: "domains/winmulyautama.com/public_html"
+
+      # Masuk ke server via SSH lalu jalankan artisan memakai .env production.
+      # AMAN: hanya `migrate` biasa (menambah migrasi baru), TIDAK PERNAH
+      # migrate:fresh / refresh / reset / db:wipe. Database di-backup dulu.
+      - name: 🗄️ Backup DB, Clear Cache & Migrate di Server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: 65002
+          script: |
+            set -eo pipefail
+            cd ~/domains/winmulyautama.com/public_html
+
+            # Ambil kredensial DB dari .env production
+            env_val() { grep -E "^$1=" .env | tail -n1 | cut -d= -f2- | tr -d '\r' | sed -e 's/^"//' -e 's/"$//' -e "s/^'//" -e "s/'$//"; }
+            DB_HOST="$(env_val DB_HOST)"; DB_PORT="$(env_val DB_PORT)"
+            DB_NAME="$(env_val DB_DATABASE)"; DB_USER="$(env_val DB_USERNAME)"; DB_PASS="$(env_val DB_PASSWORD)"
+
+            # 1. Backup database (di luar public_html, simpan 10 terakhir).
+            #    Kalau backup gagal, deploy berhenti dan migrate TIDAK dijalankan.
+            mkdir -p ~/db_backups
+            BACKUP=~/db_backups/${DB_NAME}_$(date +%Y%m%d_%H%M%S).sql.gz
+            MYSQL_PWD="$DB_PASS" mysqldump -h "${DB_HOST:-127.0.0.1}" -P "${DB_PORT:-3306}" -u "$DB_USER" \
+              --single-transaction --no-tablespaces --routines "$DB_NAME" | gzip > "$BACKUP"
+            echo "Backup tersimpan: $BACKUP"
+            ls -1t ~/db_backups/*.sql.gz | tail -n +11 | xargs -r rm --
+
+            # 2. Bersihkan cache lama (config, route, view, packages)
+            php artisan optimize:clear
+
+            # 3. Symlink storage untuk file upload (kalau belum ada)
+            [ -e public/storage ] || php artisan storage:link
+
+            # 4. Jalankan HANYA migrasi baru yang belum pernah dijalankan
+            if php artisan migrate:status > /dev/null 2>&1; then
+              php artisan migrate --force
+            else
+              echo "PERINGATAN: tabel 'migrations' tidak ditemukan di DB production, migrate dilewati agar tidak bentrok dengan tabel yang sudah ada."
+            fi
